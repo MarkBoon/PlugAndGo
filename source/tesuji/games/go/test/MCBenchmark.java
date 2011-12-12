@@ -23,8 +23,8 @@
  * <font color="#00000"><font size=+1>
  * 
  */
-
 package tesuji.games.go.test;
+//Test
 
 import tesuji.games.go.monte_carlo.MCPlayout;
 
