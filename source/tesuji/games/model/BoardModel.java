@@ -23,28 +23,35 @@
  * <font color="#00000"><font size=+1>
  * 
  */
+package tesuji.games.model;
 
-package tesuji.games.go.test;
-
-import tesuji.games.go.monte_carlo.MCLibertyAdministration;
-import tesuji.games.go.monte_carlo.MCPlayout;
-import tesuji.games.go.monte_carlo.AbstractMonteCarloAdministration;
-
-/** Simply runs a bunch of playouts to test speed. */
-public class MCLibertyBenchmark
-{
-	public static final int BOARD_SIZE = 9;
-	public static final int KOMI = 5;
-	
-	public static final int NUMBER_OF_PLAYOUTS = 500000;
-	public static final int NUMBER_OF_THREADS = 1;
-
-	public static void main(String[] args)
-	{
-		AbstractMonteCarloAdministration administration = new MCLibertyAdministration();
-		administration.setBoardSize(BOARD_SIZE);
-		administration.setKomi(KOMI);
-		MCPlayout playout = new MCPlayout(administration);
-		MCBenchmark.doPlayout(playout,NUMBER_OF_PLAYOUTS,NUMBER_OF_THREADS);
-	}
+/**
+ * This interface describes a 2-dimensional board that is square.
+ * The coordinates start at 1, so the valid range is [1..boardSize][1..boardSize]
+ * That leaves an undefined edge around the board, which contain MIN_VALUE
+ * 
+ * There are also methods to get and set the values with a one-dimensional coordinate.
+ */
+public interface BoardModel
+    extends BoardArray
+{    
+    /**
+     * @param listener to changes to the board-model
+     */
+    public void addBoardModelListener(BoardModelListener listener);
+    
+    /**
+     * @param listener to changes to the board-model
+     */
+    public void removeBoardModelListener(BoardModelListener listener);
+    
+    /**
+     * Set whether many changes in a row are to be expected.
+     * This is used so that 'updating' either of the graphics
+     * or internal data-structures can be postponed until
+     * all the changes have been made.
+     * 
+     * @param flag
+     */
+    public void setMultipleChanges(boolean flag);
 }

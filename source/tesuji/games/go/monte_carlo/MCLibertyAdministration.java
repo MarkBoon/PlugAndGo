@@ -197,7 +197,7 @@ public class MCLibertyAdministration
 	}
 	
 	@Override
-	public MonteCarloAdministration<GoMove> createClone()
+	public MonteCarloAdministration createClone()
 	{
 		MCLibertyAdministration clone = new MCLibertyAdministration(getBoardSize());
 		clone.copyDataFrom(this);

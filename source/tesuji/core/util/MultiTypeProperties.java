@@ -24,27 +24,44 @@
  * 
  */
 
-package tesuji.games.go.test;
+package tesuji.core.util;
 
-import tesuji.games.go.monte_carlo.MCLibertyAdministration;
-import tesuji.games.go.monte_carlo.MCPlayout;
-import tesuji.games.go.monte_carlo.AbstractMonteCarloAdministration;
+import java.util.Properties;
 
-/** Simply runs a bunch of playouts to test speed. */
-public class MCLibertyBenchmark
+/**
+ * Simple convenience class that can store and retrieve properties of types other than String as well.
+ */
+public class MultiTypeProperties
+	extends Properties
 {
-	public static final int BOARD_SIZE = 9;
-	public static final int KOMI = 5;
-	
-	public static final int NUMBER_OF_PLAYOUTS = 500000;
-	public static final int NUMBER_OF_THREADS = 1;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5703602162799219412L;
 
-	public static void main(String[] args)
+	public int getIntProperty(String key)
 	{
-		AbstractMonteCarloAdministration administration = new MCLibertyAdministration();
-		administration.setBoardSize(BOARD_SIZE);
-		administration.setKomi(KOMI);
-		MCPlayout playout = new MCPlayout(administration);
-		MCBenchmark.doPlayout(playout,NUMBER_OF_PLAYOUTS,NUMBER_OF_THREADS);
+		String property = getProperty(key);
+		if (property==null)
+			return Integer.MIN_VALUE;
+		return Integer.parseInt(property);
+	}
+
+	public double getDoubleProperty(String key)
+	{
+		String property = getProperty(key);
+		if (property==null)
+			return Double.NEGATIVE_INFINITY;
+		return Double.parseDouble(getProperty(key));
+	}
+	
+	public void setIntProperty(String key, int value)
+	{
+		setProperty(key, ""+value);
+	}
+	
+	public void setDoubleProperty(String key, double value)
+	{
+		setProperty(key, ""+value);
 	}
 }

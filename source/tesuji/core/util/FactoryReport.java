@@ -23,28 +23,36 @@
  * <font color="#00000"><font size=+1>
  * 
  */
+package tesuji.core.util;
 
-package tesuji.games.go.test;
-
-import tesuji.games.go.monte_carlo.MCLibertyAdministration;
-import tesuji.games.go.monte_carlo.MCPlayout;
-import tesuji.games.go.monte_carlo.AbstractMonteCarloAdministration;
-
-/** Simply runs a bunch of playouts to test speed. */
-public class MCLibertyBenchmark
+/**
+ * This class maintains a list of registered Factory objects and puts out
+ * a report about the object allocations of each factory upon request.
+ *
+ */
+public class FactoryReport
 {
-	public static final int BOARD_SIZE = 9;
-	public static final int KOMI = 5;
+	public static ArrayList<Factory> _factoryList = new ArrayList<Factory>();
 	
-	public static final int NUMBER_OF_PLAYOUTS = 500000;
-	public static final int NUMBER_OF_THREADS = 1;
-
-	public static void main(String[] args)
+	public static void addFactory(Factory factory)
 	{
-		AbstractMonteCarloAdministration administration = new MCLibertyAdministration();
-		administration.setBoardSize(BOARD_SIZE);
-		administration.setKomi(KOMI);
-		MCPlayout playout = new MCPlayout(administration);
-		MCBenchmark.doPlayout(playout,NUMBER_OF_PLAYOUTS,NUMBER_OF_THREADS);
+		_factoryList.add(factory);
+	}
+	
+	public static void removeFactory(Factory factory)
+	{
+		_factoryList.remove(factory);
+	}
+	
+	public static String getFactoryReport()
+	{
+		StringBuffer out = new StringBuffer();
+		for (Factory factory : _factoryList)
+		{
+			out.append(factory.getFactoryName()+"\n");
+			out.append("====================\n");
+			out.append(factory.getFactoryReport()+"\n\n");
+		}
+		return out.toString();
 	}
 }

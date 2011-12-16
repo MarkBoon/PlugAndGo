@@ -23,28 +23,40 @@
  * <font color="#00000"><font size=+1>
  * 
  */
+package tesuji.games.go.common;
 
-package tesuji.games.go.test;
-
-import tesuji.games.go.monte_carlo.MCLibertyAdministration;
-import tesuji.games.go.monte_carlo.MCPlayout;
-import tesuji.games.go.monte_carlo.AbstractMonteCarloAdministration;
-
-/** Simply runs a bunch of playouts to test speed. */
-public class MCLibertyBenchmark
+/**
+ * This class just contains some definitions of constant values used in Go
+ * programming. The maximum numbers are valid for board-sizes up to 19x19.
+ */
+public class GoConstant
 {
-	public static final int BOARD_SIZE = 9;
-	public static final int KOMI = 5;
+	/** Coordinate representing a pass move */
+	public static final int PASS = 0;
 	
-	public static final int NUMBER_OF_PLAYOUTS = 500000;
-	public static final int NUMBER_OF_THREADS = 1;
+	/** Coordinate representing resignation */
+	public static final int RESIGN = -1;
+	
+	/** Maximum number of moves we allow.
+	 * The theoretical maximum is a huge number, but this is enough
+	 * for just about all practical purposes.	 * */
+	public static final int MAXMOVE = 1000;
+	
+	/** Maximum number of liberties of a chain on a 19x19 board */
+	public static final int MAXLIBERTY = 229;
+	
+	/** Maximum number of neigbouring chains of a chain on a 19x19 board */
+	public static final int MAXCHAINS = 100;
+	
+	/** Maximum number of points on a 19x19 board */
+	public static final int MAXPOINTS = 361;
+	
+	/** Undefined coordinate value.*/
+	public static final int UNDEFINED_COORDINATE = Short.MIN_VALUE;
+	
+	/** No-care or wild-card value for patterns. */
+	public static final byte NOCARE = Byte.MAX_VALUE;
 
-	public static void main(String[] args)
-	{
-		AbstractMonteCarloAdministration administration = new MCLibertyAdministration();
-		administration.setBoardSize(BOARD_SIZE);
-		administration.setKomi(KOMI);
-		MCPlayout playout = new MCPlayout(administration);
-		MCBenchmark.doPlayout(playout,NUMBER_OF_PLAYOUTS,NUMBER_OF_THREADS);
-	}
+	/** Set this to true to switch on data-structure consistency checks */
+	public static final boolean CHECK_CONSISTENCY = true;	
 }

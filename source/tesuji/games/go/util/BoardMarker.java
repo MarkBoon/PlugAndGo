@@ -23,28 +23,68 @@
  * <font color="#00000"><font size=+1>
  * 
  */
+package tesuji.games.go.util;
 
-package tesuji.games.go.test;
-
-import tesuji.games.go.monte_carlo.MCLibertyAdministration;
-import tesuji.games.go.monte_carlo.MCPlayout;
-import tesuji.games.go.monte_carlo.AbstractMonteCarloAdministration;
-
-/** Simply runs a bunch of playouts to test speed. */
-public class MCLibertyBenchmark
+/**
+ * This is an important class that is used to mark points that have already been
+ * processed. Each time the method getNewMarker is called, the information is
+ * reset and all points are not marked.
+ */
+public class BoardMarker
 {
-	public static final int BOARD_SIZE = 9;
-	public static final int KOMI = 5;
-	
-	public static final int NUMBER_OF_PLAYOUTS = 500000;
-	public static final int NUMBER_OF_THREADS = 1;
+	private int labelNr;
+	private int[] markers;
 
-	public static void main(String[] args)
+	/** Default constructor */
+	public BoardMarker()
 	{
-		AbstractMonteCarloAdministration administration = new MCLibertyAdministration();
-		administration.setBoardSize(BOARD_SIZE);
-		administration.setKomi(KOMI);
-		MCPlayout playout = new MCPlayout(administration);
-		MCBenchmark.doPlayout(playout,NUMBER_OF_PLAYOUTS,NUMBER_OF_THREADS);
+		markers = GoArray.createIntegers();
+		labelNr = 1;
+	}
+	
+	/**
+	 	This causes all points previously marked as 'set'
+	 	to be unmarked.
+	*/
+	public final void getNewMarker()
+	{
+		labelNr++;
+		if (labelNr==0)
+		{
+			labelNr = 1;
+			GoArray.clear(markers);
+		}
+	}
+
+	/**
+	 	Mark a point as set.
+	
+	 	@param xy is the coordinate of the point to mark as set.
+	*/
+	public final void set( int xy )
+	{
+		markers[xy] = labelNr;
+	}
+
+	/**
+	 	Test whether a point was already marked or not.
+	
+	 	@param xy coordinate of the point to test
+	 	@return whether the point was already marked or not.
+	*/
+	public final boolean notSet( int xy )
+	{
+		return markers[xy]!=labelNr;
+	}
+
+	/**
+	 	Test whether a point was already marked or not.
+	
+	 	@param xy coordinate of the point to test
+	 	@return whether the point was already marked or not.
+	*/
+	public final boolean isSet( int xy )
+	{
+		return markers[xy]==labelNr;
 	}
 }

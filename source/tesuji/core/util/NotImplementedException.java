@@ -24,27 +24,23 @@
  * 
  */
 
-package tesuji.games.go.test;
+package tesuji.core.util;
 
-import tesuji.games.go.monte_carlo.MCLibertyAdministration;
-import tesuji.games.go.monte_carlo.MCPlayout;
-import tesuji.games.go.monte_carlo.AbstractMonteCarloAdministration;
-
-/** Simply runs a bunch of playouts to test speed. */
-public class MCLibertyBenchmark
+/**
+ * This exception is thrown if a method is called that is not expected to be called
+ * and its implementation is empty.
+ */
+public class NotImplementedException
+	extends RuntimeException
 {
-	public static final int BOARD_SIZE = 9;
-	public static final int KOMI = 5;
-	
-	public static final int NUMBER_OF_PLAYOUTS = 500000;
-	public static final int NUMBER_OF_THREADS = 1;
 
-	public static void main(String[] args)
+	/**
+     * 
+     */
+    private static final long serialVersionUID = 8401091587706741804L;
+
+	public NotImplementedException(String message)
 	{
-		AbstractMonteCarloAdministration administration = new MCLibertyAdministration();
-		administration.setBoardSize(BOARD_SIZE);
-		administration.setKomi(KOMI);
-		MCPlayout playout = new MCPlayout(administration);
-		MCBenchmark.doPlayout(playout,NUMBER_OF_PLAYOUTS,NUMBER_OF_THREADS);
+		super(message);
 	}
 }

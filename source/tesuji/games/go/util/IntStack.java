@@ -1,16 +1,6 @@
-package tesuji.core.util;
-
-import tesuji.core.util.SynchronizedArrayStack;
-import tesuji.core.util.FlyWeight;
-
 /**
- * This class acts like a (usually small) list of integers. The only way to add
- * items is through the 'push' method. But otherwise it acts just like an array
- * of integers.<br>
- * <br>
  * Project: Tesuji Go Framework.<br>
  * <br>
- * 
  * <font color="#CC6600"><font size=-1> Copyright (c) 1985-2006 Mark Boon<br>
  * All rights reserved.<br>
  * <br>
@@ -33,6 +23,16 @@ import tesuji.core.util.FlyWeight;
  * <font color="#00000"><font size=+1>
  * 
  */
+package tesuji.games.go.util;
+
+import tesuji.core.util.SynchronizedArrayStack;
+import tesuji.core.util.FlyWeight;
+
+/**
+ * This class acts like a (usually small) list of integers. The only way to add
+ * items is through the 'push' method. But otherwise it acts just like an array
+ * of integers.
+ */
 public class IntStack
 	implements FlyWeight
 {
@@ -47,8 +47,6 @@ public class IntStack
 	 	Default constructor. A GoArray is used so that we're
 	 	sure the capacity is sufficient to store enough items
 	 	to fill a board.
-	
-	 	<br><br>Creation date: (17-May-01 2:01:22 PM)<br><br>
 	*/
 	IntStack()
 	{
@@ -58,9 +56,7 @@ public class IntStack
 	/**
 	 	IntStack constructor. The ownerStack is used so that
 	 	the method 'recycle' can be used for deallocation.
-	
-	 	<br><br>Creation date: (17-May-01 2:01:22 PM)<br><br>
-	 	
+
 	 	@param ownerStack
 	*/
 	public IntStack(SynchronizedArrayStack<IntStack> ownerStack)
@@ -74,8 +70,6 @@ public class IntStack
 	 	This one can be used for smaller lists.
 	 	The list doesn't grow automatically and no
 	 	explicit bounds-checking is done.
-	
-	 	<br><br>Creation date: (17-May-01 2:01:22 PM)<br><br>
 	 	
 	 	@param size is the maximum capacity of the stack
 	*/
@@ -89,11 +83,10 @@ public class IntStack
 	 	This one can be used for smaller lists.
 	 	The list doesn't grow automatically and no
 	 	explicit bounds-checking is done.
-	
-	 	<br><br>Creation date: (17-May-01 2:01:22 PM)<br><br>
 	 	
 	 	@param size is the maximum capacity of the stack
-	 * @param ownerStack used to recycle this IntStack instance
+	 	
+	 	@param ownerStack used to recycle this IntStack instance
 	*/
 	public IntStack(int size, SynchronizedArrayStack<IntStack> ownerStack)
 	{
@@ -221,7 +214,7 @@ public class IntStack
 	}
 	
 	/**
-	 * @see tesuji.games.general.FlyWeight#recycle()
+	 * @see tesuji.core.util.FlyWeight#recycle()
 	 */
 	public final void recycle()
 	{

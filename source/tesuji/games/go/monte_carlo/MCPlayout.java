@@ -26,25 +26,21 @@
 
 package tesuji.games.go.monte_carlo;
 
-import tesuji.games.general.Move;
-import tesuji.games.general.provider.DataProviderAdapter;
-import tesuji.games.general.provider.DataProviderList;
-import tesuji.games.go.util.DefaultIntegerArrayProvider;
-import tesuji.games.go.util.GoArray;
+import tesuji.games.go.common.GoMove;
 
 /**
  * 
  */
-public class MCPlayout<MoveType extends Move>
+public class MCPlayout
 	implements IPlayout
 {
 	private int[] wins = {0,0};
 	private int nrMovesPlayed;
 	
-	private MonteCarloAdministration<MoveType> _currentAdministration;
-	private MonteCarloAdministration<MoveType> _playoutAdministration;
+	private MonteCarloAdministration _currentAdministration;
+	private MonteCarloAdministration _playoutAdministration;
 	
-	public MCPlayout(MonteCarloAdministration<MoveType> administration)
+	public MCPlayout(MonteCarloAdministration administration)
 	{
 		_currentAdministration = administration;
 		_playoutAdministration = administration.createClone();
@@ -57,7 +53,7 @@ public class MCPlayout<MoveType extends Move>
 		nrMovesPlayed = 0;
 	}
 	
-	public void copyFrom(MonteCarloAdministration<MoveType> source)
+	public void copyFrom(MonteCarloAdministration source)
 	{
 		_currentAdministration.copyDataFrom(source);
 	}
@@ -78,7 +74,7 @@ public class MCPlayout<MoveType extends Move>
 				{
 					public void run()
 	                {
-						MonteCarloAdministration<MoveType> playoutAdministration = _currentAdministration.createClone();
+						MonteCarloAdministration playoutAdministration = _currentAdministration.createClone();
 						for (int i = 0; i < nrPlayouts/nrThreads; i++)
 						{
 							playoutAdministration.copyDataFrom(_currentAdministration);
@@ -159,7 +155,7 @@ public class MCPlayout<MoveType extends Move>
     	return _currentAdministration.isConsistent();
     }
     
-    public MoveType requestMove(byte color)
+    public GoMove requestMove(byte color)
     {
     	return _currentAdministration.selectSimulationMove();
     }

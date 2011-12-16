@@ -23,28 +23,41 @@
  * <font color="#00000"><font size=+1>
  * 
  */
+package tesuji.games.go.util;
 
-package tesuji.games.go.test;
+import tesuji.games.model.BoardArray;
 
-import tesuji.games.go.monte_carlo.MCLibertyAdministration;
-import tesuji.games.go.monte_carlo.MCPlayout;
-import tesuji.games.go.monte_carlo.AbstractMonteCarloAdministration;
-
-/** Simply runs a bunch of playouts to test speed. */
-public class MCLibertyBenchmark
+/**
+ * Interface for defining an array for a Go program that can be used both as a
+ * 1-dimensional array and as a 2-dimensional array.<br>
+ * <br>
+ * 
+ * The rule is that the index in the 1-dimensional can be computed from the
+ * 2-dimensional array as follows:<br>
+ * <code>xy = x+y*getWidth()</code><br>
+ * <br>
+ * Notes:<lu>
+ * <li>The first point is the 1,1 point and not the 0,0 point.</li>
+ * <li>The size of the 1-dimensional array is always at least
+ * getWidth()*(getWidth()+1)</li>
+ * <li>For the moment these arrays are always considerad as read-only.
+ * Therefore the behaviour of getSingleArray()[0] = 1 is undefined.</li>
+ * </lu>
+ */
+public interface ByteArray
+    extends BoardArray
 {
-	public static final int BOARD_SIZE = 9;
-	public static final int KOMI = 5;
-	
-	public static final int NUMBER_OF_PLAYOUTS = 500000;
-	public static final int NUMBER_OF_THREADS = 1;
-
-	public static void main(String[] args)
-	{
-		AbstractMonteCarloAdministration administration = new MCLibertyAdministration();
-		administration.setBoardSize(BOARD_SIZE);
-		administration.setKomi(KOMI);
-		MCPlayout playout = new MCPlayout(administration);
-		MCBenchmark.doPlayout(playout,NUMBER_OF_PLAYOUTS,NUMBER_OF_THREADS);
-	}
+	/**
+	 	Get the array as a 2-dimensional array.
+	*/
+	public byte[][] getDoubleArray();
+	/**
+	 	Get the array as a 1-dimensional array.
+	*/
+	public byte[] getSingleArray();
+	/**
+	 	Get the width that is used to do the coordinate
+	 	conversion between 1-dimensional and 2-dimensional.
+	*/
+	public int getWidth();
 }

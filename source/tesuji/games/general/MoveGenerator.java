@@ -24,27 +24,19 @@
  * 
  */
 
-package tesuji.games.go.test;
+package tesuji.games.general;
 
-import tesuji.games.go.monte_carlo.MCLibertyAdministration;
-import tesuji.games.go.monte_carlo.MCPlayout;
-import tesuji.games.go.monte_carlo.AbstractMonteCarloAdministration;
-
-/** Simply runs a bunch of playouts to test speed. */
-public class MCLibertyBenchmark
+/**
+ * Interface defining the minimum requirements for a move-generator.
+ */
+public interface MoveGenerator<MoveType extends Move>
 {
-	public static final int BOARD_SIZE = 9;
-	public static final int KOMI = 5;
-	
-	public static final int NUMBER_OF_PLAYOUTS = 500000;
-	public static final int NUMBER_OF_THREADS = 1;
+	void clearBoard();
+	void setup(Iterable<MoveType> moveList);
 
-	public static void main(String[] args)
-	{
-		AbstractMonteCarloAdministration administration = new MCLibertyAdministration();
-		administration.setBoardSize(BOARD_SIZE);
-		administration.setKomi(KOMI);
-		MCPlayout playout = new MCPlayout(administration);
-		MCBenchmark.doPlayout(playout,NUMBER_OF_PLAYOUTS,NUMBER_OF_THREADS);
-	}
+	void playMove(MoveType move);
+	void takeBack();
+	
+	MoveType requestMove(byte color);
+	MoveType requestMove(byte color, Iterable<MoveType> alreadyTriedList);
 }
