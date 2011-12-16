@@ -33,7 +33,6 @@ import tesuji.core.util.MersenneTwisterFast;
 import tesuji.games.general.Checksum;
 import tesuji.games.general.MoveIterator;
 
-import tesuji.games.go.common.GoConstant;
 import tesuji.games.go.common.GoMove;
 import tesuji.games.go.common.GoMoveFactory;
 import tesuji.games.go.common.Util;
