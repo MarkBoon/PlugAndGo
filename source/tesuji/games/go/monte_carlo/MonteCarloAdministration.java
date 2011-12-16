@@ -29,13 +29,14 @@ package tesuji.games.go.monte_carlo;
 import tesuji.games.general.Move;
 import tesuji.games.general.MoveFactory;
 import tesuji.games.general.MoveIterator;
+import tesuji.games.go.common.GoMove;
 import tesuji.games.go.util.IntStack;
 import tesuji.games.model.BoardModel;
 
 /**
  * This interface describes a board administration that can perform a Monte-Carlo simulation.
  */
-public interface MonteCarloAdministration<MoveType extends Move>
+public interface MonteCarloAdministration
 {
 	/**
 	 * Clear the administrative information. This is equivalent to starting
@@ -50,33 +51,33 @@ public interface MonteCarloAdministration<MoveType extends Move>
 	 * 
 	 * @param source
 	 */
-	public void copyDataFrom(MonteCarloAdministration<MoveType> source);
+	public void copyDataFrom(MonteCarloAdministration source);
 
 	/**
 	 * @return a perfect, newly created, copy.
 	 */
-	public MonteCarloAdministration<MoveType> createClone();
+	public MonteCarloAdministration createClone();
 			
 	/**
 	 * Decide whether a move is legal or not.
 	 */
-	public boolean isLegalMove(MoveType move);
+	public boolean isLegalMove(GoMove move);
 
 	/**
 	 * Decide whether a move will not be used during the playout sequence.
 	 * This is typically the case for moves that would fill the player's own eye(s).
 	 */
-	public boolean isVerboten(MoveType move);
+	public boolean isVerboten(GoMove move);
 
 	/**
 	 * Play a move of a certain color and update the administration, whatever information it is keeping.
 	 */
-	public void playMove(MoveType move);
+	public void playMove(GoMove move);
 
 	/**
 	 * Play a move of a certain color and update the administration, whatever information it is keeping.
 	 */
-	public void playExplorationMove(MoveType move);
+	public void playExplorationMove(GoMove move);
 
 	/**
 	 * Generate a playout sequence until the end.
@@ -91,9 +92,9 @@ public interface MonteCarloAdministration<MoveType extends Move>
 	 * 
 	 * @return coordinate of the move
 	 */
-	public MoveType selectSimulationMove();
+	public GoMove selectSimulationMove();
 	
-	public MoveIterator<MoveType> getMoves();
+	public MoveIterator<GoMove> getMoves();
 	
 	/**
 	 * Get the score. Although it will depend on the actual implementation, generally
@@ -194,7 +195,7 @@ public interface MonteCarloAdministration<MoveType extends Move>
 	 */
 	public void setIsTestVersion(boolean testVersion);
 	
-	public MoveFactory<MoveType> getMoveFactory();
+	public MoveFactory<GoMove> getMoveFactory();
 	
 	public byte[] getBlackOwnership();
 	public byte[] getWhiteOwnership();

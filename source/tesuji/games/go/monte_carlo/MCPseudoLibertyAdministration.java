@@ -145,7 +145,7 @@ public class MCPseudoLibertyAdministration
 		assert isLibertiesConsistent() : SGFUtil.createSGF(getMoveStack());
 	}
 
-	public MonteCarloAdministration<GoMove> createClone()
+	public MonteCarloAdministration createClone()
 	{
 		MCPseudoLibertyAdministration clone = new MCPseudoLibertyAdministration();
 		clone.setBoardSize(getBoardSize());

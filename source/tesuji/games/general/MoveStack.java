@@ -23,28 +23,61 @@
  * <font color="#00000"><font size=+1>
  * 
  */
+package tesuji.games.general;
 
-package tesuji.games.go.test;
+import tesuji.core.util.ArrayStack;
+import tesuji.core.util.StringBufferFactory;
 
-import tesuji.games.go.monte_carlo.MCLibertyAdministration;
-import tesuji.games.go.monte_carlo.MCPlayout;
-import tesuji.games.go.monte_carlo.AbstractMonteCarloAdministration;
-
-/** Simply runs a bunch of playouts to test speed. */
-public class MCLibertyBenchmark
+public class MoveStack<MoveType extends Move>
+	extends ArrayStack<MoveType>
 {
-	public static final int BOARD_SIZE = 9;
-	public static final int KOMI = 5;
-	
-	public static final int NUMBER_OF_PLAYOUTS = 500000;
-	public static final int NUMBER_OF_THREADS = 1;
 
-	public static void main(String[] args)
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 932701888638258553L;
+
+	public MoveStack()
 	{
-		AbstractMonteCarloAdministration administration = new MCLibertyAdministration();
-		administration.setBoardSize(BOARD_SIZE);
-		administration.setKomi(KOMI);
-		MCPlayout playout = new MCPlayout(administration);
-		MCBenchmark.doPlayout(playout,NUMBER_OF_PLAYOUTS,NUMBER_OF_THREADS);
+		super();
+	}
+	
+	public MoveStack(int size)
+	{
+		super(size);
+	}
+	
+	/**
+	 * @return The list of moves contained by this stack in SGF format.
+	 */
+	public String toSGF()
+	{
+		StringBuffer output = StringBufferFactory.createStringBuffer();
+		output.append("(");
+		for (MoveType move : this)
+		{
+			output.append(";");
+			output.append(move.toSGF());
+		}
+		output.append(")");
+		
+		String outputString = output.toString();
+		StringBufferFactory.recycleStringBuffer(output);
+		return outputString;
+	}
+	
+	/**
+	 * Empty the stack and recycle all the moves on it.
+	 */
+	public void recycleMoves()
+	{
+		while (!isEmpty())
+			pop().recycle();
+	}
+	
+	@Override
+	public String toString()
+	{
+		return toSGF();
 	}
 }

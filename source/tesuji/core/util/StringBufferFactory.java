@@ -1,0 +1,106 @@
+/**
+ * Project: Tesuji Go Framework.<br>
+ * <br>
+ * <font color="#CC6600"><font size=-1> Copyright (c) 1985-2006 Mark Boon<br>
+ * All rights reserved.<br>
+ * <br>
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, and/or sell copies of the
+ * Software, and to permit persons to whom the Software is furnished to do so,
+ * provided that the above copyright notice(s) and this permission notice appear
+ * in all copies of the Software and that both the above copyright notice(s) and
+ * this permission notice appear in supporting documentation.<br>
+ * <br>
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+ * IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.<br>
+ * <br>
+ * <font color="#00000"><font size=+1>
+ * 
+ */
+package tesuji.core.util;
+
+public class StringBufferFactory
+	implements Factory
+{
+    private static SynchronizedArrayStack<StringBuffer> largeStringBufferPool = new SynchronizedArrayStack<StringBuffer>();
+    private static SynchronizedArrayStack<StringBuffer> smallStringBufferPool = new SynchronizedArrayStack<StringBuffer>();
+
+    private static int nrSmallStringBuffers = 0;
+    private static int nrLargeStringBuffers = 0;
+    
+    private static StringBufferFactory _singleton;
+    
+    public static StringBufferFactory getSingleton()
+    {
+    	if (_singleton==null)
+    	{
+    		_singleton = new StringBufferFactory();
+    		FactoryReport.addFactory(_singleton);
+    	}
+    	
+    	return _singleton;
+    }
+    
+    private StringBufferFactory()
+    {	
+    }
+    
+    public String getFactoryName()
+    {
+    	return "StringBufferFactory";
+    }
+    
+    public String getFactoryReport()
+    {
+    	return "Number of large StringBuffer objects:\t\t\t"+nrLargeStringBuffers+"\n" +
+    			"Number of small StringBuffer objects:\t\t\t"+nrSmallStringBuffers;
+    }
+    
+    public static StringBuffer createStringBuffer()
+	{
+    	synchronized (largeStringBufferPool)
+        {
+			if (largeStringBufferPool.isEmpty())
+			{
+				nrLargeStringBuffers++;
+				return new StringBuffer();
+			}
+			
+			StringBuffer buffer = largeStringBufferPool.pop();
+			return buffer;
+        }
+	}
+    
+    public static void recycleStringBuffer(StringBuffer buffer)
+    {
+    	buffer.setLength(0);
+    	largeStringBufferPool.push(buffer);
+    }
+    
+    public static StringBuffer createSmallStringBuffer()
+	{
+    	synchronized (smallStringBufferPool)
+        {
+			if (smallStringBufferPool.isEmpty())
+			{
+				nrSmallStringBuffers++;
+				return new StringBuffer(4);
+			}
+			
+			StringBuffer buffer = smallStringBufferPool.pop();
+			return buffer;
+        }
+	}
+    
+    public static void recycleSmallStringBuffer(StringBuffer buffer)
+    {
+    	buffer.setLength(0);
+    	smallStringBufferPool.push(buffer);
+    }
+}

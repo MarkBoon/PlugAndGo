@@ -23,28 +23,72 @@
  * <font color="#00000"><font size=+1>
  * 
  */
+package tesuji.games.model;
 
-package tesuji.games.go.test;
+import tesuji.core.util.FlyWeight;
+import tesuji.core.util.SynchronizedArrayStack;
+import tesuji.games.go.util.GoArray;
 
-import tesuji.games.go.monte_carlo.MCLibertyAdministration;
-import tesuji.games.go.monte_carlo.MCPlayout;
-import tesuji.games.go.monte_carlo.AbstractMonteCarloAdministration;
-
-/** Simply runs a bunch of playouts to test speed. */
-public class MCLibertyBenchmark
+/**
+ * A class used to store and pass board-changes.
+ */
+public class BoardChange
+	implements FlyWeight
 {
-	public static final int BOARD_SIZE = 9;
-	public static final int KOMI = 5;
+	private int _xy;
+	private byte _newValue;
+	private byte _oldValue;
 	
-	public static final int NUMBER_OF_PLAYOUTS = 500000;
-	public static final int NUMBER_OF_THREADS = 1;
-
-	public static void main(String[] args)
+	private SynchronizedArrayStack<BoardChange> _owner;
+	
+	BoardChange(SynchronizedArrayStack<BoardChange> owner)
 	{
-		AbstractMonteCarloAdministration administration = new MCLibertyAdministration();
-		administration.setBoardSize(BOARD_SIZE);
-		administration.setKomi(KOMI);
-		MCPlayout playout = new MCPlayout(administration);
-		MCBenchmark.doPlayout(playout,NUMBER_OF_PLAYOUTS,NUMBER_OF_THREADS);
+		_owner = owner;
 	}
+	
+	public byte getOldValue()
+	{
+		return _oldValue;
+	}
+	
+	public byte getNewValue()
+	{
+		return _newValue;
+	}
+	
+	public int getXY()
+	{
+		return _xy;
+	}
+	
+	public int getX()
+	{
+		return GoArray.getX(_xy);
+	}
+	
+	public int getY()
+	{
+		return GoArray.getY(_xy);
+	}
+	
+	public void recycle()
+	{
+		_owner.push(this);
+	}
+
+	// These are package scope so they can only be set by the factory.
+	void setXY(int xy)
+    {
+    	this._xy = xy;
+    }
+
+	void setNewValue(byte newValue)
+    {
+    	this._newValue = newValue;
+    }
+
+	void setOldValue(byte oldValue)
+    {
+    	this._oldValue = oldValue;
+    }
 }

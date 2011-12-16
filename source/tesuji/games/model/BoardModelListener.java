@@ -23,28 +23,9 @@
  * <font color="#00000"><font size=+1>
  * 
  */
+package tesuji.games.model;
 
-package tesuji.games.go.test;
-
-import tesuji.games.go.monte_carlo.MCLibertyAdministration;
-import tesuji.games.go.monte_carlo.MCPlayout;
-import tesuji.games.go.monte_carlo.AbstractMonteCarloAdministration;
-
-/** Simply runs a bunch of playouts to test speed. */
-public class MCLibertyBenchmark
+public interface BoardModelListener
 {
-	public static final int BOARD_SIZE = 9;
-	public static final int KOMI = 5;
-	
-	public static final int NUMBER_OF_PLAYOUTS = 500000;
-	public static final int NUMBER_OF_THREADS = 1;
-
-	public static void main(String[] args)
-	{
-		AbstractMonteCarloAdministration administration = new MCLibertyAdministration();
-		administration.setBoardSize(BOARD_SIZE);
-		administration.setKomi(KOMI);
-		MCPlayout playout = new MCPlayout(administration);
-		MCBenchmark.doPlayout(playout,NUMBER_OF_PLAYOUTS,NUMBER_OF_THREADS);
-	}
+    public void changeBoard(BoardChange event);
 }

@@ -24,27 +24,23 @@
  * 
  */
 
-package tesuji.games.go.test;
+package tesuji.core.util;
 
-import tesuji.games.go.monte_carlo.MCLibertyAdministration;
-import tesuji.games.go.monte_carlo.MCPlayout;
-import tesuji.games.go.monte_carlo.AbstractMonteCarloAdministration;
-
-/** Simply runs a bunch of playouts to test speed. */
-public class MCLibertyBenchmark
+/**
+ * This exception is thrown if an inconsistency is found in a data-structure
+ * or in a state of a playing engine. This is defined as extending RuntimeException
+ * since it's not expected to be explicitly thrown or caught by any class.
+ */
+public class InconsistencyException
+	extends RuntimeException
 {
-	public static final int BOARD_SIZE = 9;
-	public static final int KOMI = 5;
-	
-	public static final int NUMBER_OF_PLAYOUTS = 500000;
-	public static final int NUMBER_OF_THREADS = 1;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7870871917822014288L;
 
-	public static void main(String[] args)
+	public InconsistencyException(String message)
 	{
-		AbstractMonteCarloAdministration administration = new MCLibertyAdministration();
-		administration.setBoardSize(BOARD_SIZE);
-		administration.setKomi(KOMI);
-		MCPlayout playout = new MCPlayout(administration);
-		MCBenchmark.doPlayout(playout,NUMBER_OF_PLAYOUTS,NUMBER_OF_THREADS);
+		super(message);
 	}
 }

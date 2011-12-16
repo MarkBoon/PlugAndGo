@@ -23,28 +23,41 @@
  * <font color="#00000"><font size=+1>
  * 
  */
+package tesuji.games.go.util;
 
-package tesuji.games.go.test;
-
-import tesuji.games.go.monte_carlo.MCLibertyAdministration;
-import tesuji.games.go.monte_carlo.MCPlayout;
-import tesuji.games.go.monte_carlo.AbstractMonteCarloAdministration;
-
-/** Simply runs a bunch of playouts to test speed. */
-public class MCLibertyBenchmark
+/**
+ * This is a four-way cursor. It will move to each direct neighbour of a given
+ * starting point.
+ * 
+ * Although using the cursor definition is more elegant, just looping over the
+ * offset array is more efficient.
+ */
+public class FourCursor
 {
-	public static final int BOARD_SIZE = 9;
-	public static final int KOMI = 5;
-	
-	public static final int NUMBER_OF_PLAYOUTS = 500000;
-	public static final int NUMBER_OF_THREADS = 1;
-
-	public static void main(String[] args)
+	private static final int[] intOffset = new int[]
 	{
-		AbstractMonteCarloAdministration administration = new MCLibertyAdministration();
-		administration.setBoardSize(BOARD_SIZE);
-		administration.setKomi(KOMI);
-		MCPlayout playout = new MCPlayout(administration);
-		MCBenchmark.doPlayout(playout,NUMBER_OF_PLAYOUTS,NUMBER_OF_THREADS);
+		GoArray.below(0),
+		GoArray.above(0),
+		GoArray.right(0),
+		GoArray.left(0)
+	};
+	
+	/** This field is public for efficiency. */
+	private static final short[] shortOffset = new short[]
+	{
+		(short)GoArray.below(0),
+		(short)GoArray.above(0),
+		(short)GoArray.right(0),
+		(short)GoArray.left(0)
+	};
+	
+	public static final int getNeighbour(int xy, int n)
+	{
+		return xy + intOffset[n];
+	}
+	
+	public static final short getNeighbour(short xy, int n)
+	{
+		return (short)(xy + shortOffset[n]);
 	}
 }

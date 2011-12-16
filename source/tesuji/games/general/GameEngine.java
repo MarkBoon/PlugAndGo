@@ -23,28 +23,51 @@
  * <font color="#00000"><font size=+1>
  * 
  */
+package tesuji.games.general;
 
-package tesuji.games.go.test;
+import tesuji.games.model.BoardModel;
 
-import tesuji.games.go.monte_carlo.MCLibertyAdministration;
-import tesuji.games.go.monte_carlo.MCPlayout;
-import tesuji.games.go.monte_carlo.AbstractMonteCarloAdministration;
-
-/** Simply runs a bunch of playouts to test speed. */
-public class MCLibertyBenchmark
+/**
+ * Definition of an interface for general game playing engines.
+ * This is designed to match the (minimum) GTP protocol but the Go-related
+ * definitions have been left out and are in GoEngine
+ */
+public interface GameEngine<MoveType extends Move>
+	extends MoveGenerator<MoveType>, Evaluator<MoveType, Double>
 {
-	public static final int BOARD_SIZE = 9;
-	public static final int KOMI = 5;
+	// Administrative commands
+	String getEngineName();
+	String getEngineVersion();
+	void quit();
 	
-	public static final int NUMBER_OF_PLAYOUTS = 500000;
-	public static final int NUMBER_OF_THREADS = 1;
-
-	public static void main(String[] args)
-	{
-		AbstractMonteCarloAdministration administration = new MCLibertyAdministration();
-		administration.setBoardSize(BOARD_SIZE);
-		administration.setKomi(KOMI);
-		MCPlayout playout = new MCPlayout(administration);
-		MCBenchmark.doPlayout(playout,NUMBER_OF_PLAYOUTS,NUMBER_OF_THREADS);
-	}
+	// Setup commands
+	void set(String propertyName, String propertyValue);
+	void clearBoard();
+	
+	// Core play commands
+	void playMove(MoveType move);
+	void takeBack();
+	MoveType generateMove(byte color);
+	
+	// Tournament commands
+	void setTimeConstraints(int mainTime, int byoYomiTime, int nrByoYomiStones);
+	void setTimeLeft(byte color, int timeRemaining, int nrStonesRemaining);
+	String getFinalScore();
+	
+	// Development commands
+	void setup(Iterable<MoveType> moveList);
+	void setup(String[] diagram);
+	Double getScore();	
+	MoveType requestMove(byte color);
+	Iterable<MoveType> requestCandidates(int n);
+	
+	/**
+	 * @return the factory type that is used to create moves for MoveType
+	 */
+	MoveFactory<MoveType> getMoveFactory();
+	
+	/**
+	 * @return the BoardModel as kept by the engine.
+	 */
+	BoardModel getBoardModel();
 }
