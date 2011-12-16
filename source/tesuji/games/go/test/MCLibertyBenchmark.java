@@ -45,7 +45,7 @@ public class MCLibertyBenchmark
 		AbstractMonteCarloAdministration administration = new MCLibertyAdministration();
 		administration.setBoardSize(BOARD_SIZE);
 		administration.setKomi(KOMI);
-		MCPlayout playout = new MCPlayout(administration);
+		MCPlayout<GoMove> playout = new MCPlayout<GoMove>(administration);
 		MCBenchmark.doPlayout(playout,NUMBER_OF_PLAYOUTS,NUMBER_OF_THREADS);
 	}
 }
