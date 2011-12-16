@@ -1,0 +1,1 @@
+java -jar gogui-twogtp.jar -verbose -black "java -Xmx512M -jar GoEngineGTP.jar PatternMonteCarloTreeSearchBot2K" -white "java -Xmx512M -jar GoEngineGTP.jar MonteCarloTreeSearchBot2K" -games 10000 -size 9 -alternate -auto -sgffile games/test &
