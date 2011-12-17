@@ -23,35 +23,16 @@
  * <font color="#00000"><font size=+1>
  * 
  */
-package tesuji.games.go.test;
-//Test
+package tesuji.games.general.search;
 
-import tesuji.games.go.monte_carlo.MCPlayout;
+import tesuji.core.util.FlyWeight;
 
-/** Simply runs a bunch of playouts to test speed. */
-public class MCBenchmark
+public interface SearchResult<MoveType extends tesuji.games.general.Move>
+	extends FlyWeight
 {
-	public static void doPlayout(MCPlayout playout, int boardSize, int komi, int nrPlayouts, int nrThreads)
-	{
-		long before;
-		long after;
-		before = System.currentTimeMillis();
-		playout.playout(nrPlayouts,nrThreads);
-		after = System.currentTimeMillis();
-		playout.isConsistent();
-		// Print the results
-		System.out.println("Initial board:");
-		System.out.println("komi: " + komi);
-		long total = after - before;
-		System.out.println("Performance:");
-		System.out.println("  " + nrPlayouts + " playouts");
-		System.out.println("  " + nrThreads + " threads");
-		System.out.println("  " + total / 1000.0 + " seconds");
-		System.out.println("  " + ((double) playout.getNrMovesPlayed() / (double) nrPlayouts) + " mpos");
-		System.out.println("  " + ((double) nrPlayouts) / total + " kpps");
-		System.out.println("Black wins = " + playout.getBlackWins());
-		System.out.println("White wins = " + playout.getWhiteWins());
-		System.out.println("P(black win) = " + ((double) playout.getBlackWins())
-				/ (playout.getBlackWins() + playout.getWhiteWins()));
-	}
+	public MoveType getMove();
+	public void setMove(MoveType move);
+	
+	public boolean isBetterResultThan(SearchResult<MoveType> compare);
+	public boolean isHopeless();
 }

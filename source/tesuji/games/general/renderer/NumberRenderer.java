@@ -23,35 +23,65 @@
  * <font color="#00000"><font size=+1>
  * 
  */
-package tesuji.games.go.test;
-//Test
 
-import tesuji.games.go.monte_carlo.MCPlayout;
+package tesuji.games.general.renderer;
 
-/** Simply runs a bunch of playouts to test speed. */
-public class MCBenchmark
+
+import java.awt.Color;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+
+import tesuji.games.general.provider.DataProvider;
+
+/**
+ * Renderer class that renders its data as simple numbers
+ */
+public class NumberRenderer extends AbstractDataRenderer
 {
-	public static void doPlayout(MCPlayout playout, int boardSize, int komi, int nrPlayouts, int nrThreads)
+	private int zeroWidth = -1;
+	
+	/**
+	 * NumberRenderer constructor
+	 */
+	public NumberRenderer(DataProvider provider)
 	{
-		long before;
-		long after;
-		before = System.currentTimeMillis();
-		playout.playout(nrPlayouts,nrThreads);
-		after = System.currentTimeMillis();
-		playout.isConsistent();
-		// Print the results
-		System.out.println("Initial board:");
-		System.out.println("komi: " + komi);
-		long total = after - before;
-		System.out.println("Performance:");
-		System.out.println("  " + nrPlayouts + " playouts");
-		System.out.println("  " + nrThreads + " threads");
-		System.out.println("  " + total / 1000.0 + " seconds");
-		System.out.println("  " + ((double) playout.getNrMovesPlayed() / (double) nrPlayouts) + " mpos");
-		System.out.println("  " + ((double) nrPlayouts) / total + " kpps");
-		System.out.println("Black wins = " + playout.getBlackWins());
-		System.out.println("White wins = " + playout.getWhiteWins());
-		System.out.println("P(black win) = " + ((double) playout.getBlackWins())
-				/ (playout.getBlackWins() + playout.getWhiteWins()));
+		super(provider.getName(),provider);
+	}
+	
+	/**
+	 * @see tesuji.games.general.DataRenderer#renderData(java.awt.Graphics, int, int, int, int)
+	 */
+	public void renderData(int i, int j, Graphics g, int x, int y, int width, int height)
+	{
+		FontMetrics metrics = g.getFontMetrics();
+		if (zeroWidth==-1)
+			zeroWidth = metrics.charWidth('0');
+		
+		int xOffset = (width-zeroWidth*3)/2;
+		
+		int iStartX = x+xOffset;
+		int iStartY = y+(height*2)/3;
+		
+		String strNr;
+		g.setColor(Color.blue);
+
+		int nr = _dataProvider.getData(i,j).intValue();
+		
+		if (nr==0)
+			return;
+		if (nr<0)
+		{
+			nr = -nr;
+			g.setColor(Color.red);
+		}
+		strNr = ""+nr;
+		if (nr<10) iStartX += zeroWidth;
+		else if (nr<100) iStartX += zeroWidth/2;
+		g.drawString(strNr,iStartX,iStartY);	
+	}
+	
+	public boolean isBackgroundRenderer()
+	{
+		return false;
 	}
 }

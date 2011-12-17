@@ -23,35 +23,16 @@
  * <font color="#00000"><font size=+1>
  * 
  */
-package tesuji.games.go.test;
-//Test
 
-import tesuji.games.go.monte_carlo.MCPlayout;
+package tesuji.games.general.provider;
 
-/** Simply runs a bunch of playouts to test speed. */
-public class MCBenchmark
+/**
+ * 
+ */
+public class DataProviderNames
 {
-	public static void doPlayout(MCPlayout playout, int boardSize, int komi, int nrPlayouts, int nrThreads)
-	{
-		long before;
-		long after;
-		before = System.currentTimeMillis();
-		playout.playout(nrPlayouts,nrThreads);
-		after = System.currentTimeMillis();
-		playout.isConsistent();
-		// Print the results
-		System.out.println("Initial board:");
-		System.out.println("komi: " + komi);
-		long total = after - before;
-		System.out.println("Performance:");
-		System.out.println("  " + nrPlayouts + " playouts");
-		System.out.println("  " + nrThreads + " threads");
-		System.out.println("  " + total / 1000.0 + " seconds");
-		System.out.println("  " + ((double) playout.getNrMovesPlayed() / (double) nrPlayouts) + " mpos");
-		System.out.println("  " + ((double) nrPlayouts) / total + " kpps");
-		System.out.println("Black wins = " + playout.getBlackWins());
-		System.out.println("White wins = " + playout.getWhiteWins());
-		System.out.println("P(black win) = " + ((double) playout.getBlackWins())
-				/ (playout.getBlackWins() + playout.getWhiteWins()));
-	}
+	public static final String BOARD_PROVIDER = "board";
+	public static final String ROW_PROVIDER = "row";
+	public static final String LIBERTY_PROVIDER = "liberties";
+	public static final String RATIO_PROVIDER = "win_loss";
 }

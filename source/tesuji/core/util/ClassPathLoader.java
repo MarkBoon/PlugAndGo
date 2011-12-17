@@ -23,35 +23,59 @@
  * <font color="#00000"><font size=+1>
  * 
  */
-package tesuji.games.go.test;
-//Test
+package tesuji.core.util;
 
-import tesuji.games.go.monte_carlo.MCPlayout;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 
-/** Simply runs a bunch of playouts to test speed. */
-public class MCBenchmark
+/**
+ * This is a helper class that represents a bit of an ugly hack in order to 
+ * dynamically add a JAR-file to the class-loader.
+ */
+public class ClassPathLoader
 {
-	public static void doPlayout(MCPlayout playout, int boardSize, int komi, int nrPlayouts, int nrThreads)
+	private static final Class<?>[] parameters = new Class[] { URL.class };
+
+	public static void addFile(String s)
+		throws IOException
 	{
-		long before;
-		long after;
-		before = System.currentTimeMillis();
-		playout.playout(nrPlayouts,nrThreads);
-		after = System.currentTimeMillis();
-		playout.isConsistent();
-		// Print the results
-		System.out.println("Initial board:");
-		System.out.println("komi: " + komi);
-		long total = after - before;
-		System.out.println("Performance:");
-		System.out.println("  " + nrPlayouts + " playouts");
-		System.out.println("  " + nrThreads + " threads");
-		System.out.println("  " + total / 1000.0 + " seconds");
-		System.out.println("  " + ((double) playout.getNrMovesPlayed() / (double) nrPlayouts) + " mpos");
-		System.out.println("  " + ((double) nrPlayouts) / total + " kpps");
-		System.out.println("Black wins = " + playout.getBlackWins());
-		System.out.println("White wins = " + playout.getWhiteWins());
-		System.out.println("P(black win) = " + ((double) playout.getBlackWins())
-				/ (playout.getBlackWins() + playout.getWhiteWins()));
+		File file = new File(s);
+
+		addFile(file);
+	}
+
+	public static void addFile(File file)
+		throws IOException
+	{
+		addURL(file.toURL());
+	}
+
+	public static void addURL(URL url)
+		throws IOException
+	{
+		URLClassLoader sysloader = (URLClassLoader) ClassLoader
+				.getSystemClassLoader();
+
+		Class<URLClassLoader> sysclass = URLClassLoader.class;
+
+		try 
+		{
+			Method method = sysclass.getDeclaredMethod("addURL", parameters);
+
+			method.setAccessible(true);
+
+			method.invoke(sysloader, new Object[] { url });
+
+		}
+		catch (Throwable throwable)
+		{
+			throwable.printStackTrace();
+			
+			throw new IOException(
+					"Error, could not add URL to system classloader");
+		}
 	}
 }

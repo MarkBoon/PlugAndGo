@@ -69,9 +69,6 @@ public class ArrayFactory
 	private SynchronizedArrayStack<IntStack> largeIntStackPool =	new SynchronizedArrayStack<IntStack>();
 	private SynchronizedArrayStack<UniqueList> uniqueListPool =		new SynchronizedArrayStack<UniqueList>();
 
-	private SynchronizedArrayStack<ChainStack> neighbourListPool = 	new SynchronizedArrayStack<ChainStack>();
-	private SynchronizedArrayStack<ChainStack> chainListPool = 		new SynchronizedArrayStack<ChainStack>();
-	
 	public static ArrayFactory getSingleton()
 	{
 		if (_singleton==null)
@@ -263,59 +260,6 @@ public class ArrayFactory
 			}
 	
 			return uniqueListPool.pop();
-        }
-	}
-
-	/**
-	 * Allocate an ObjectStack of size 4 for four neighbours. Instead of
-	 * allocating new objects each time, the objects created through this method
-	 * can be 'recycled' and then reused. This is much more efficient than
-	 * relying on the VM to allocate an object and then later garbage-collect it
-	 * again.
-	 * 
-	 * @return second-hand ChainStack of size 4
-	 */
-	public static ChainStack createNeighbourList()
-	{
-		return getSingleton()._createNeighbourList();
-	}
-	private ChainStack _createNeighbourList()
-	{
-		synchronized (neighbourListPool)
-        {
-			if (neighbourListPool.isEmpty())
-			{
-				nrNeighbourLists++;
-				return new ChainStack(neighbourListPool);
-			}
-	
-			return neighbourListPool.pop();
-        }
-	}
-	
-	/**
-	 * Allocate a ChainStack of size MAXCHAINS. Instead of allocating new
-	 * objects each time, the objects created through this method can be
-	 * 'recycled' and then reused. This is much more efficient than relying on
-	 * the VM to allocate an object and then later garbage-collect it again.
-	 * 
-	 * @return second-hand ChainStack of size MAXCHAINS
-	 */
-	public static ChainStack createChainList()
-	{
-		return getSingleton()._createChainList();
-	}
-	private ChainStack _createChainList()
-	{
-		synchronized (chainListPool)
-        {
-			if (chainListPool.isEmpty())
-			{
-				nrChainLists++;
-				return new ChainStack(GoConstant.MAXCHAINS, chainListPool);
-			}
-	
-			return chainListPool.pop();
         }
 	}
 }

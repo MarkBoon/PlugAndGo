@@ -23,35 +23,60 @@
  * <font color="#00000"><font size=+1>
  * 
  */
-package tesuji.games.go.test;
-//Test
 
-import tesuji.games.go.monte_carlo.MCPlayout;
+package tesuji.games.general.renderer;
 
-/** Simply runs a bunch of playouts to test speed. */
-public class MCBenchmark
+import tesuji.games.general.provider.DataProvider;
+
+/**
+ */
+public abstract class AbstractDataRenderer
+	implements DataRenderer
 {
-	public static void doPlayout(MCPlayout playout, int boardSize, int komi, int nrPlayouts, int nrThreads)
+	private String _name;
+    private boolean _active;
+	protected DataProvider _dataProvider;
+	
+	/**
+	 * 
+	 */
+	public AbstractDataRenderer(String name, DataProvider provider)
 	{
-		long before;
-		long after;
-		before = System.currentTimeMillis();
-		playout.playout(nrPlayouts,nrThreads);
-		after = System.currentTimeMillis();
-		playout.isConsistent();
-		// Print the results
-		System.out.println("Initial board:");
-		System.out.println("komi: " + komi);
-		long total = after - before;
-		System.out.println("Performance:");
-		System.out.println("  " + nrPlayouts + " playouts");
-		System.out.println("  " + nrThreads + " threads");
-		System.out.println("  " + total / 1000.0 + " seconds");
-		System.out.println("  " + ((double) playout.getNrMovesPlayed() / (double) nrPlayouts) + " mpos");
-		System.out.println("  " + ((double) nrPlayouts) / total + " kpps");
-		System.out.println("Black wins = " + playout.getBlackWins());
-		System.out.println("White wins = " + playout.getWhiteWins());
-		System.out.println("P(black win) = " + ((double) playout.getBlackWins())
-				/ (playout.getBlackWins() + playout.getWhiteWins()));
+		_name = name;
+		_dataProvider = provider;
 	}
+
+	public String getName()
+	{
+		return _name;
+	}
+	
+	public DataProvider getDataProvider()
+	{
+		return _dataProvider;
+	}
+	
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString()
+	{
+		return (isActive()?"+ ":"- ")+getName();
+	}
+
+    /**
+     * @param active The active to set.
+     */
+    public void setActive(boolean active)
+    {
+        _active = active;
+    }
+
+    /**
+     * @return Returns the active.
+     */
+    public boolean isActive()
+    {
+        return _active;
+    }
 }

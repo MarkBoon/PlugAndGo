@@ -34,7 +34,7 @@ import tesuji.games.go.monte_carlo.AbstractMonteCarloAdministration;
 public class MCLibertyBenchmark
 {
 	public static final int BOARD_SIZE = 9;
-	public static final int KOMI = 5;
+	public static final int KOMI = 2;
 	
 	public static final int NUMBER_OF_PLAYOUTS = 500000;
 	public static final int NUMBER_OF_THREADS = 1;
@@ -45,6 +45,6 @@ public class MCLibertyBenchmark
 		administration.setBoardSize(BOARD_SIZE);
 		administration.setKomi(KOMI);
 		MCPlayout playout = new MCPlayout(administration);
-		MCBenchmark.doPlayout(playout,NUMBER_OF_PLAYOUTS,NUMBER_OF_THREADS);
+		MCBenchmark.doPlayout(playout,BOARD_SIZE, KOMI, NUMBER_OF_PLAYOUTS, NUMBER_OF_THREADS);
 	}
 }

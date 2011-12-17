@@ -23,35 +23,36 @@
  * <font color="#00000"><font size=+1>
  * 
  */
-package tesuji.games.go.test;
-//Test
 
-import tesuji.games.go.monte_carlo.MCPlayout;
+package tesuji.games.go.util;
 
-/** Simply runs a bunch of playouts to test speed. */
-public class MCBenchmark
+import tesuji.games.general.provider.DataProviderAdapter;
+import tesuji.games.general.provider.DataProviderNames;
+import tesuji.games.model.BoardModel;
+
+/**
+ * Default provider of a GoArray of type byte.
+ */
+public class DefaultBoardProvider
+	extends DataProviderAdapter
 {
-	public static void doPlayout(MCPlayout playout, int boardSize, int komi, int nrPlayouts, int nrThreads)
+	private BoardModel _boardModel;
+	
+	public DefaultBoardProvider(BoardModel boardModel)
 	{
-		long before;
-		long after;
-		before = System.currentTimeMillis();
-		playout.playout(nrPlayouts,nrThreads);
-		after = System.currentTimeMillis();
-		playout.isConsistent();
-		// Print the results
-		System.out.println("Initial board:");
-		System.out.println("komi: " + komi);
-		long total = after - before;
-		System.out.println("Performance:");
-		System.out.println("  " + nrPlayouts + " playouts");
-		System.out.println("  " + nrThreads + " threads");
-		System.out.println("  " + total / 1000.0 + " seconds");
-		System.out.println("  " + ((double) playout.getNrMovesPlayed() / (double) nrPlayouts) + " mpos");
-		System.out.println("  " + ((double) nrPlayouts) / total + " kpps");
-		System.out.println("Black wins = " + playout.getBlackWins());
-		System.out.println("White wins = " + playout.getWhiteWins());
-		System.out.println("P(black win) = " + ((double) playout.getBlackWins())
-				/ (playout.getBlackWins() + playout.getWhiteWins()));
+		setName(DataProviderNames.BOARD_PROVIDER);
+		setBoardSize(boardModel.getBoardSize());
+		_boardModel = boardModel;
+	}
+	
+	public Number getData(int x, int y)
+	{
+		return _boardModel.get(x,y);
+	}
+	
+	@SuppressWarnings("unchecked")
+    public Class getDataClass()
+	{
+		return Byte.class;
 	}
 }

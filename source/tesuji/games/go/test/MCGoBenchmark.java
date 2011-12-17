@@ -26,26 +26,24 @@
 
 package tesuji.games.go.test;
 
-import tesuji.games.go.common.GoMove;
-import tesuji.games.go.monte_carlo.MCPseudoLibertyAdministration;
 import tesuji.games.go.monte_carlo.MCPlayout;
-import tesuji.games.go.monte_carlo.AbstractMonteCarloAdministration;
+import tesuji.games.go.monte_carlo.MonteCarloGoAdministration;
 
 /** Simply runs a bunch of playouts to test speed. */
-public class MCPseudoLibertyBenchmark
+public class MCGoBenchmark
 {
 	public static final int BOARD_SIZE = 9;
 	public static final int KOMI = 2;
 	
-	public static final int NUMBER_OF_PLAYOUTS = 100000;
-	public static final int NUMBER_OF_THREADS = 2;
+	public static final int NUMBER_OF_PLAYOUTS = 500000;
+	public static final int NUMBER_OF_THREADS = 1;
 
 	public static void main(String[] args)
 	{
-		AbstractMonteCarloAdministration administration = new MCPseudoLibertyAdministration();
+		MonteCarloGoAdministration administration = new MonteCarloGoAdministration();
 		administration.setBoardSize(BOARD_SIZE);
 		administration.setKomi(KOMI);
 		MCPlayout playout = new MCPlayout(administration);
-		MCBenchmark.doPlayout(playout,NUMBER_OF_PLAYOUTS,NUMBER_OF_THREADS);
+		MCBenchmark.doPlayout(playout,BOARD_SIZE, KOMI, NUMBER_OF_PLAYOUTS,NUMBER_OF_THREADS);
 	}
 }

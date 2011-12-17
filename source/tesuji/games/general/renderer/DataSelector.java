@@ -23,35 +23,53 @@
  * <font color="#00000"><font size=+1>
  * 
  */
-package tesuji.games.go.test;
-//Test
+package tesuji.games.general.renderer;
 
-import tesuji.games.go.monte_carlo.MCPlayout;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
-/** Simply runs a bunch of playouts to test speed. */
-public class MCBenchmark
+import tesuji.core.util.ComboBox;
+import tesuji.core.util.DefaultSelectableListModel;
+
+/**
+ * A component displaying a combo-box with a list of available renderers.
+ */
+public class DataSelector
+	extends JPanel
 {
-	public static void doPlayout(MCPlayout playout, int boardSize, int komi, int nrPlayouts, int nrThreads)
+	private static final long serialVersionUID = -6814353455008597618L;
+	
+    private DefaultSelectableListModel model;
+	
+	public DataSelector(DataRendererManager manager)
 	{
-		long before;
-		long after;
-		before = System.currentTimeMillis();
-		playout.playout(nrPlayouts,nrThreads);
-		after = System.currentTimeMillis();
-		playout.isConsistent();
-		// Print the results
-		System.out.println("Initial board:");
-		System.out.println("komi: " + komi);
-		long total = after - before;
-		System.out.println("Performance:");
-		System.out.println("  " + nrPlayouts + " playouts");
-		System.out.println("  " + nrThreads + " threads");
-		System.out.println("  " + total / 1000.0 + " seconds");
-		System.out.println("  " + ((double) playout.getNrMovesPlayed() / (double) nrPlayouts) + " mpos");
-		System.out.println("  " + ((double) nrPlayouts) / total + " kpps");
-		System.out.println("Black wins = " + playout.getBlackWins());
-		System.out.println("White wins = " + playout.getWhiteWins());
-		System.out.println("P(black win) = " + ((double) playout.getBlackWins())
-				/ (playout.getBlackWins() + playout.getWhiteWins()));
+		model = new DefaultSelectableListModel(manager.getRendererList());
+		
+		JLabel label = new JLabel("Data: ");
+		ComboBox comboBox = new ComboBox(model);
+		add(label);
+		add(comboBox);
+		
+		model.addListSelectionListener( new ListSelectionListener()
+				{
+					public void valueChanged(ListSelectionEvent event)
+					{
+						if (!model.isSelectionEmpty())
+						{
+							DataRenderer renderer = (DataRenderer)model.getSelectedItem();
+                            renderer.setActive(!renderer.isActive());
+							model.clearSelection();
+						}
+					}
+				}
+			);
+	}
+	
+	public ListSelectionModel getModel()
+	{
+		return model;
 	}
 }

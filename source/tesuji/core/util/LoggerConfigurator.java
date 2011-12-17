@@ -23,35 +23,26 @@
  * <font color="#00000"><font size=+1>
  * 
  */
-package tesuji.games.go.test;
-//Test
 
-import tesuji.games.go.monte_carlo.MCPlayout;
+package tesuji.core.util;
 
-/** Simply runs a bunch of playouts to test speed. */
-public class MCBenchmark
+import org.apache.log4j.BasicConfigurator;
+
+/**
+ * Log4J has the annoying feature of adding each standard appender again
+ * after each call to BasicConfigurator.configure(). This class prevents
+ * that from happening. This is necessary when using loggers in unit-tests.
+ */
+public class LoggerConfigurator
 {
-	public static void doPlayout(MCPlayout playout, int boardSize, int komi, int nrPlayouts, int nrThreads)
+	private static boolean configured = false;
+	
+	public static void configure()
 	{
-		long before;
-		long after;
-		before = System.currentTimeMillis();
-		playout.playout(nrPlayouts,nrThreads);
-		after = System.currentTimeMillis();
-		playout.isConsistent();
-		// Print the results
-		System.out.println("Initial board:");
-		System.out.println("komi: " + komi);
-		long total = after - before;
-		System.out.println("Performance:");
-		System.out.println("  " + nrPlayouts + " playouts");
-		System.out.println("  " + nrThreads + " threads");
-		System.out.println("  " + total / 1000.0 + " seconds");
-		System.out.println("  " + ((double) playout.getNrMovesPlayed() / (double) nrPlayouts) + " mpos");
-		System.out.println("  " + ((double) nrPlayouts) / total + " kpps");
-		System.out.println("Black wins = " + playout.getBlackWins());
-		System.out.println("White wins = " + playout.getWhiteWins());
-		System.out.println("P(black win) = " + ((double) playout.getBlackWins())
-				/ (playout.getBlackWins() + playout.getWhiteWins()));
+		if (!configured)
+		{
+			BasicConfigurator.configure();
+			configured = true;
+		}
 	}
 }

@@ -76,7 +76,6 @@ public class GoMoveFactory
     private ArrayStack<GoMoveImpl> movePool = new ArrayStack<GoMoveImpl>();
     private ArrayStack<BlackGoMoveImpl> blackMovePool = new ArrayStack<BlackGoMoveImpl>();
     private ArrayStack<WhiteGoMoveImpl> whiteMovePool = new ArrayStack<WhiteGoMoveImpl>();
-    private ArrayStack<GoMoveInfo> moveInfoPool = new ArrayStack<GoMoveInfo>();
 	
     private static final GoMove _blackPass = getSingleton().createLightMove(PASS, BLACK);
     private static final GoMove _whitePass = getSingleton().createLightMove(PASS, WHITE);
@@ -391,29 +390,6 @@ public class GoMoveFactory
 	}
 
 	
-   /**
-     * @return GoMoveInfo
-     */
-    public static GoMoveInfo createGoMoveInfo()
-    {
-    	return getSingleton()._createGoMoveInfo();
-    }
-    private GoMoveInfo _createGoMoveInfo()
-    {
-    	synchronized(moveInfoPool)
-    	{
-	        GoMoveInfo newMoveInfo;
-	        if (moveInfoPool.isEmpty())
-	        {
-	            newMoveInfo = new GoMoveInfo(moveInfoPool);
-	            nrMoveInfo++;
-	        }
-	        else
-	        	newMoveInfo = moveInfoPool.pop();
-	        return newMoveInfo;
-    	}
-    }
-
 	/* (non-Javadoc)
 	 * @see tesuji.games.general.MoveFactory#createPassMove(byte)
 	 */
