@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<bean id="mcExpandingAdministration" class="tesuji.games.go.monte_carlo.MCExpandingAdministration" singleton="false">
+	</bean>
+	
+	<bean id="mcHardPatternsAdministration" class="tesuji.games.go.monte_carlo.MCHardPatternsAdministration" singleton="false">
+	</bean>
+	
+	<bean id="mctsTacticsAdministration" class="tesuji.games.go.monte_carlo.MCTacticsAdministration" singleton="false"/>
+	<bean id="mctsLibertyAdministration" class="tesuji.games.go.monte_carlo.MCLibertyAdministration" singleton="false"/>
+	<bean id="mctsPatternsAdministration" class="tesuji.games.go.monte_carlo.MCPatternsAdministration" singleton="false">
+   		<constructor-arg>
+  			<value>Test-set</value>
+  		</constructor-arg>
+ 	</bean>	
+
+	<bean id="MonteCarloTreeSearchBot10x8" class="tesuji.games.go.engine.TreeSearchEngine" singleton="false">
+  		<property name="jar" value="TreeSearchEngine.jar"/>
+  		<constructor-arg>
+  			<ref bean="MonteCarloTreeSearch10x8"/>
+  		</constructor-arg>
+  		<property name="isTestVersion">
+  			<value>false</value>
+  		</property>
+  	</bean>
+
+	<bean id="MonteCarloTreeSearchBot2K" class="tesuji.games.go.engine.TreeSearchEngine" singleton="false">
+  		<property name="jar" value="TreeSearchEngine.jar"/>
+  		<constructor-arg>
+  			<ref bean="MonteCarloTreeSearch2K"/>
+  		</constructor-arg>
+  		<property name="isTestVersion">
+  			<value>false</value>
+  		</property>
+  	</bean>
+
+	<bean id="PatternMonteCarloTreeSearchBot2K" class="tesuji.games.go.engine.TreeSearchEngine" singleton="false">
+  		<property name="jar" value="TreeSearchEngine.jar"/>
+  		<constructor-arg>
+  			<ref bean="PatternMonteCarloTreeSearch2K"/>
+  		</constructor-arg>
+  		<property name="isTestVersion">
+  			<value>false</value>
+  		</property>
+  	</bean>
+
+	<bean id="MonteCarloTreeSearchBot4K" class="tesuji.games.go.engine.TreeSearchEngine" singleton="false">
+  		<property name="jar" value="TreeSearchEngine.jar"/>
+  		<constructor-arg>
+  			<ref bean="MonteCarloTreeSearch4K"/>
+  		</constructor-arg>
+  		<property name="isTestVersion">
+  			<value>false</value>
+  		</property>
+  	</bean>
+
+	<bean id="MonteCarloTreeSearchBot8K" class="tesuji.games.go.engine.TreeSearchEngine" singleton="false">
+  		<property name="jar" value="TreeSearchEngine.jar"/>
+  		<constructor-arg>
+  			<ref bean="MonteCarloTreeSearch8K"/>
+  		</constructor-arg>
+  		<property name="isTestVersion">
+  			<value>false</value>
+  		</property>
+  	</bean>
+
+	<bean id="MonteCarloTreeSearchBot16K" class="tesuji.games.go.engine.TreeSearchEngine" singleton="false">
+  		<property name="jar" value="TreeSearchEngine.jar"/>
+  		<constructor-arg>
+  			<ref bean="MonteCarloTreeSearch16K"/>
+  		</constructor-arg>
+  		<property name="isTestVersion">
+  			<value>false</value>
+  		</property>
+  	</bean>
+
+	<bean id="MonteCarloTreeSearchBot32K" class="tesuji.games.go.engine.TreeSearchEngine" singleton="false">
+  		<property name="jar" value="TreeSearchEngine.jar"/>
+  		<constructor-arg>
+  			<ref bean="MonteCarloTreeSearch32K"/>
+  		</constructor-arg>
+  		<property name="isTestVersion">
+  			<value>false</value>
+  		</property>
+  	</bean>
+
+	<bean id="MonteCarloTreeSearchBot64K" class="tesuji.games.go.engine.TreeSearchEngine" singleton="false">
+  		<property name="jar" value="TreeSearchEngine.jar"/>
+  		<constructor-arg>
+  			<ref bean="MonteCarloTreeSearch64K"/>
+  		</constructor-arg>
+  		<property name="isTestVersion">
+  			<value>false</value>
+  		</property>
+  	</bean>
+
+	<bean id="PatternBot2K" class="tesuji.games.go.engine.TreeSearchEngine" singleton="false">
+  		<property name="jar" value="TreeSearchEngine.jar"/>
+  		<constructor-arg>
+  			<ref bean="PatternSearch2K"/>
+  		</constructor-arg>
+  		<property name="isTestVersion">
+  			<value>false</value>
+  		</property>
+  	</bean>
+
+	<bean id="PatternBot16K" class="tesuji.games.go.engine.TreeSearchEngine" singleton="false">
+  		<property name="jar" value="TreeSearchEngine.jar"/>
+  		<constructor-arg>
+  			<ref bean="PatternSearch16K"/>
+  		</constructor-arg>
+  		<property name="isTestVersion">
+  			<value>false</value>
+  		</property>
+  	</bean>
+
+	<bean id="TestBot2K" class="tesuji.games.go.engine.TreeSearchEngine" singleton="false">
+  		<property name="jar" value="TreeSearchEngine.jar"/>
+  		<constructor-arg>
+  			<ref bean="MonteCarloTreeSearch2K"/>
+  		</constructor-arg>
+  		<property name="isTestVersion">
+  			<value>true</value>
+  		</property>
+  	</bean>
+
+	<bean id="TestBot4K" class="tesuji.games.go.engine.TreeSearchEngine" singleton="false">
+  		<property name="jar" value="TreeSearchEngine.jar"/>
+  		<constructor-arg>
+  			<ref bean="MonteCarloTreeSearch4K"/>
+  		</constructor-arg>
+  		<property name="isTestVersion">
+  			<value>true</value>
+  		</property>
+  	</bean>
+
+	<bean id="TestBot16K" class="tesuji.games.go.engine.TreeSearchEngine" singleton="false">
+  		<property name="jar" value="TreeSearchEngine.jar"/>
+  		<constructor-arg>
+  			<ref bean="MonteCarloTreeSearch16K"/>
+  		</constructor-arg>
+  		<property name="isTestVersion">
+  			<value>true</value>
+  		</property>
+  	</bean>
+
+	<bean id="TestBot32K" class="tesuji.games.go.engine.TreeSearchEngine" singleton="false">
+  		<property name="jar" value="TreeSearchEngine.jar"/>
+  		<constructor-arg>
+  			<ref bean="MonteCarloTreeSearch32K"/>
+  		</constructor-arg>
+  		<property name="isTestVersion">
+  			<value>true</value>
+  		</property>
+  	</bean>
+
+	<bean id="MonteCarloTreeSearch2K" class="tesuji.games.go.search.MonteCarloTreeSearch" singleton="false">
+		<property name="monteCarloAdministration">
+			<ref bean="mctsTacticsAdministration"/>
+		</property>
+  		<property name="secondsPerMove">
+  			<value>0</value>
+  		</property>
+  		<property name="minimumNrNodes">
+  			<value>2048</value>
+  		</property>
+  		<property name="useAMAF">
+  			<value>true</value>
+  		</property>
+  		<property name="nrSimulationsBeforeExpansion">
+  			<value>1</value>
+  		</property>
+	</bean>
+
+	<bean id="PatternMonteCarloTreeSearch2K" class="tesuji.games.go.search.MonteCarloTreeSearchWithPatterns" singleton="false">
+		<property name="monteCarloAdministration">
+			<ref bean="mctsTacticsAdministration"/>
+		</property>
+ 		<property name="patternSet" value="Minimal"/>
+  		<property name="secondsPerMove">
+  			<value>0</value>
+  		</property>
+  		<property name="minimumNrNodes">
+  			<value>2048</value>
+  		</property>
+  		<property name="useAMAF">
+  			<value>true</value>
+  		</property>
+  		<property name="nrSimulationsBeforeExpansion">
+  			<value>1</value>
+  		</property>
+	</bean>
+
+	<bean id="MonteCarloTreeSearch4K" class="tesuji.games.go.search.MonteCarloTreeSearch" singleton="false">
+		<property name="monteCarloAdministration">
+			<ref bean="mctsTacticsAdministration"/>
+		</property>
+  		<property name="secondsPerMove">
+  			<value>0</value>
+  		</property>
+  		<property name="minimumNrNodes">
+  			<value>4096</value>
+  		</property>
+  		<property name="useAMAF">
+  			<value>true</value>
+  		</property>
+  		<property name="nrSimulationsBeforeExpansion">
+  			<value>1</value>
+  		</property>
+	</bean>
+  	
+
+	<bean id="MonteCarloTreeSearch8K" class="tesuji.games.go.search.MonteCarloTreeSearch" singleton="false">
+		<property name="monteCarloAdministration">
+			<ref bean="mctsTacticsAdministration"/>
+		</property>
+  		<property name="secondsPerMove">
+  			<value>0</value>
+  		</property>
+  		<property name="minimumNrNodes">
+  			<value>8192</value>
+  		</property>
+  		<property name="useAMAF">
+  			<value>true</value>
+  		</property>
+  		<property name="nrSimulationsBeforeExpansion">
+  			<value>1</value>
+  		</property>
+	</bean>
+
+
+	<bean id="MonteCarloTreeSearch16K" class="tesuji.games.go.search.MonteCarloTreeSearch" singleton="false">
+		<property name="monteCarloAdministration">
+			<ref bean="mctsTacticsAdministration"/>
+		</property>
+  		<property name="secondsPerMove">
+  			<value>0</value>
+  		</property>
+  		<property name="minimumNrNodes">
+  			<value>16384</value>
+  		</property>
+  		<property name="useAMAF">
+  			<value>true</value>
+  		</property>
+  		<property name="nrSimulationsBeforeExpansion">
+  			<value>8</value>
+  		</property>
+	</bean>
+  	
+	<bean id="MonteCarloTreeSearch32K" class="tesuji.games.go.search.MonteCarloTreeSearch" singleton="false">
+		<property name="monteCarloAdministration">
+			<ref bean="mctsTacticsAdministration"/>
+		</property>
+  		<property name="secondsPerMove">
+  			<value>0</value>
+  		</property>
+  		<property name="minimumNrNodes">
+  			<value>32768</value>
+  		</property>
+  		<property name="useAMAF">
+  			<value>true</value>
+  		</property>
+  		<property name="nrSimulationsBeforeExpansion">
+  			<value>64</value>
+  		</property>
+	</bean>
+  	
+	<bean id="MonteCarloTreeSearch64K" class="tesuji.games.go.search.MonteCarloTreeSearch" singleton="false">
+		<property name="monteCarloAdministration">
+			<ref bean="mctsTacticsAdministration"/>
+		</property>
+  		<property name="secondsPerMove">
+  			<value>0</value>
+  		</property>
+  		<property name="minimumNrNodes">
+  			<value>65536</value>
+  		</property>
+  		<property name="useAMAF">
+  			<value>true</value>
+  		</property>
+  		<property name="nrSimulationsBeforeExpansion">
+  			<value>64</value>
+  		</property>
+	</bean>
+  	
+	<bean id="MonteCarloTreeSearch10x8" class="tesuji.games.go.search.MonteCarloTreeSearch" singleton="false">
+		<property name="monteCarloAdministration">
+			<ref bean="mctsTacticsAdministration"/>
+		</property>
+  		<property name="secondsPerMove">
+  			<value>10</value>
+  		</property>
+  		<property name="nrProcessors">
+  			<value>1</value>
+  		</property>
+  		<property name="minimumNrNodes">
+  			<value>10000</value>
+  		</property>
+  		<property name="useAMAF">
+  			<value>true</value>
+  		</property>
+  		<property name="nrSimulationsBeforeExpansion">
+  			<value>64</value>
+  		</property>
+	</bean>
+  	
+  	
+	<bean id="UCTBot2K" class="tesuji.games.go.engine.TreeSearchEngine" singleton="false">
+  		<property name="jar" value="TreeSearchEngine.jar"/>
+  		<constructor-arg>
+  			<ref bean="UCTSearch2K"/>
+  		</constructor-arg>
+  		<property name="isTestVersion">
+  			<value>false</value>
+  		</property>
+  	</bean>
+
+	<bean id="UCTBot16K" class="tesuji.games.go.engine.TreeSearchEngine" singleton="false">
+  		<property name="jar" value="TreeSearchEngine.jar"/>
+  		<constructor-arg>
+  			<ref bean="UCTSearch16K"/>
+  		</constructor-arg>
+  		<property name="isTestVersion">
+  			<value>false</value>
+  		</property>
+  	</bean>
+
+	<bean id="UCTPatternBot2K" class="tesuji.games.go.engine.TreeSearchEngine" singleton="false">
+  		<property name="jar" value="TreeSearchEngine.jar"/>
+  		<constructor-arg>
+  			<ref bean="UCTPatternSearch2K"/>
+  		</constructor-arg>
+  		<property name="isTestVersion">
+  			<value>false</value>
+  		</property>
+  	</bean>
+
+	<bean id="UCTPatternBot16K" class="tesuji.games.go.engine.TreeSearchEngine" singleton="false">
+  		<property name="jar" value="TreeSearchEngine.jar"/>
+  		<constructor-arg>
+  			<ref bean="UCTPatternSearch16K"/>
+  		</constructor-arg>
+  		<property name="isTestVersion">
+  			<value>true</value>
+  		</property>
+  	</bean>
+
+	<bean id="mcLibertyAdministration" class="tesuji.games.go.experimental.monte_carlo.MCLibertyAdministration" singleton="false"/>
+	<bean id="mcTacticsAdministration" class="tesuji.games.go.experimental.monte_carlo.MCTacticsAdministration" singleton="false"/>
+	<bean id="mcFastPatternAdministration" class="tesuji.games.go.experimental.monte_carlo.MCFastPatternAdministration" singleton="false">
+		<constructor-arg type="java.lang.String">
+			<value>Urgent</value>
+		</constructor-arg>
+	</bean>
+		
+
+	<bean id="UCTSearch2K" class="tesuji.games.go.search.uct.UCTSearch" singleton="false">
+		<property name="monteCarloAdministration">
+			<ref bean="mcTacticsAdministration"/>
+		</property>
+  		<property name="secondsPerMove">
+  			<value>0</value>
+  		</property>
+  		<property name="minimumNrNodes">
+  			<value>2048</value>
+  		</property>
+	</bean>
+
+	<bean id="UCTSearch16K" class="tesuji.games.go.search.uct.UCTSearch" singleton="false">
+		<property name="monteCarloAdministration">
+			<ref bean="mcTacticsAdministration"/>
+		</property>
+  		<property name="secondsPerMove">
+  			<value>0</value>
+  		</property>
+  		<property name="minimumNrNodes">
+  			<value>16384</value>
+  		</property>
+	</bean>
+
+	<bean id="UCTPatternSearch2K" class="tesuji.games.go.search.uct.UCTSearch" singleton="false">
+		<property name="monteCarloAdministration">
+			<ref bean="mcFastPatternAdministration"/>
+		</property>
+  		<property name="secondsPerMove">
+  			<value>0</value>
+  		</property>
+  		<property name="minimumNrNodes">
+  			<value>2048</value>
+  		</property>
+ 	</bean>
+
+	<bean id="UCTPatternSearch16K" class="tesuji.games.go.search.uct.UCTSearch" singleton="false">
+		<property name="monteCarloAdministration">
+			<ref bean="mcFastPatternAdministration"/>
+		</property>
+  		<property name="secondsPerMove">
+  			<value>0</value>
+  		</property>
+  		<property name="minimumNrNodes">
+  			<value>16384</value>
+  		</property>
+	</bean>
+
+	<bean id="PatternSearch2K" class="tesuji.games.go.search.MonteCarloTreeSearch" singleton="false">
+		<property name="monteCarloAdministration">
+			<ref bean="mctsPatternsAdministration"/>
+		</property>
+  		<property name="secondsPerMove">
+  			<value>0</value>
+  		</property>
+  		<property name="minimumNrNodes">
+  			<value>2048</value>
+  		</property>
+  		<property name="useAMAF">
+  			<value>true</value>
+  		</property>
+  		<property name="nrSimulationsBeforeExpansion">
+  			<value>1</value>
+  		</property>
+	</bean>
+
+
+	<bean id="PatternSearch16K" class="tesuji.games.go.search.MonteCarloTreeSearch" singleton="false">
+		<property name="monteCarloAdministration">
+			<ref bean="mctsPatternsAdministration"/>
+		</property>
+  		<property name="secondsPerMove">
+  			<value>0</value>
+  		</property>
+  		<property name="minimumNrNodes">
+  			<value>16384</value>
+  		</property>
+  		<property name="useAMAF">
+  			<value>true</value>
+  		</property>
+  		<property name="nrSimulationsBeforeExpansion">
+  			<value>8</value>
+  		</property>
+	</bean>
+
+</beans>
