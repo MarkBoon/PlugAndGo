@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+          "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+  <class name="tesuji.games.go.pattern.common.Pattern" table="go_pattern">
+    <meta attribute="class-description">
+      Represents a Go pattern as used by the pattern-manager
+      @author Mark Boon
+    </meta>
+
+    <id name="uniqueId" type="int">
+      <meta attribute="scope-set">protected</meta>
+      <generator class="native"/>
+    </id>
+
+    <property name="groupId" 		type="int"/>
+    <property name="patternNr" 		type="int"/>
+    <property name="width" 			type="int"/>
+    <property name="height" 		type="int"/>
+    <property name="type" 			type="int"/>
+    <property name="startX" 		type="int"/>
+    <property name="startY" 		type="int"/>
+    <property name="blackX" 		type="int"/>
+    <property name="blackY" 		type="int"/>
+    <property name="whiteX" 		type="int"/>
+    <property name="whiteY" 		type="int"/>
+    <property name="userX" 			type="int"/>
+    <property name="userY" 			type="int"/>
+    <property name="topEdge" 		type="boolean"/>
+    <property name="leftEdge" 		type="boolean"/>
+    <property name="text" 			type="string"/>
+    <property name="conditions" 	type="string"/>
+    
+    <property name="blackBits0"		type="long"/>
+    <property name="blackBits1" 	type="long"/>
+    <property name="blackBits2" 	type="long"/>
+    <property name="blackBits3" 	type="long"/>
+    
+    <property name="whiteBits0" 	type="long"/>
+    <property name="whiteBits1" 	type="long"/>
+    <property name="whiteBits2" 	type="long"/>
+    <property name="whiteBits3" 	type="long"/>
+    
+    <property name="emptyBits0" 	type="long"/>
+    <property name="emptyBits1" 	type="long"/>
+    <property name="emptyBits2" 	type="long"/>
+    <property name="emptyBits3" 	type="long"/>
+
+    <property name="urgencyValueBlack"	type="double"/>
+    <property name="urgencyValueWhite"	type="double"/>
+    <property name="blackNrOccurrences"	type="int"/>
+    <property name="whiteNrOccurrences"	type="int"/>
+    <property name="blackNrSuccesses"	type="int"/>
+    <property name="whiteNrSuccesses"	type="int"/>
+
+    <property name="generated"		type="boolean"/>
+    <property name="createdDate"	type="timestamp"/>
+    
+  </class>
+</hibernate-mapping>

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+          "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+  <class name="tesuji.games.go.pattern.common.PatternGroup" table="pattern_group">
+    <meta attribute="class-description">
+      Represents a group of Go patterns as used by the pattern-manager
+      @author Mark Boon
+    </meta>
+
+    <id name="groupId" type="int">
+      <meta attribute="scope-set">protected</meta>
+      <generator class="native"/>
+    </id>
+
+    <property name="groupName" type="string"/>
+    <property name="description" type="string"/>
+
+  </class>
+</hibernate-mapping>

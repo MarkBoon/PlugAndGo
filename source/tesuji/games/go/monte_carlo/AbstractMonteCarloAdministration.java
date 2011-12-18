@@ -33,6 +33,7 @@ import tesuji.core.util.MersenneTwisterFast;
 import tesuji.games.general.Checksum;
 import tesuji.games.general.MoveIterator;
 
+import tesuji.games.go.common.GoConstant;
 import tesuji.games.go.common.GoMove;
 import tesuji.games.go.common.GoMoveFactory;
 import tesuji.games.go.common.Util;
@@ -59,7 +60,7 @@ import static tesuji.games.go.common.GoConstant.*;
  * as it's the same across the different playout strategies implemented.
  */
 public abstract class AbstractMonteCarloAdministration
-	implements MonteCarloAdministration
+	implements MonteCarloAdministration<GoMove>
 {
 	public static final boolean USE_MERCY_RULE = false;
 	
@@ -329,7 +330,7 @@ public abstract class AbstractMonteCarloAdministration
 	 * (non-Javadoc)
 	 * @see tesuji.games.go.monte_carlo.MonteCarloAdministration#copyDataFrom(tesuji.games.go.monte_carlo.MonteCarloAdministration)
 	 */
-	public void copyDataFrom(MonteCarloAdministration sourceAdministration)
+	public void copyDataFrom(MonteCarloAdministration<GoMove> sourceAdministration)
 	{
 		AbstractMonteCarloAdministration source = (AbstractMonteCarloAdministration) sourceAdministration;
 		_copyDataFrom(source);
@@ -486,7 +487,7 @@ public abstract class AbstractMonteCarloAdministration
 	 * (non-Javadoc)
 	 * @see tesuji.games.go.monte_carlo.MonteCarloAdministration#createClone()
 	 */
-	public abstract MonteCarloAdministration createClone();
+	public abstract MonteCarloAdministration<GoMove> createClone();
 		
 	/*
 	 * (non-Javadoc)

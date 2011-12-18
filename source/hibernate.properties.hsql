@@ -1,0 +1,7 @@
+hibernate.dialect=org.hibernate.dialect.HSQLDialect
+hibernate.connection.driver_class=org.hsqldb.jdbcDriver
+hibernate.connection.url=jdbc\:hsqldb\:file\:../GoEngineGTP/db/go
+hibernate.connection.username=sa
+hibernate.connection.password=
+hibernate.showsql=false
+hibernate.bytecode.use_reflection_optimizer=true

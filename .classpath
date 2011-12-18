@@ -7,5 +7,17 @@
 	<classpathentry kind="lib" path="lib/spring/spring-context.jar"/>
 	<classpathentry kind="lib" path="lib/spring/spring-core.jar"/>
 	<classpathentry kind="lib" path="lib/spring/commons-logging-1.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate/antlr-2.7.6.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate/asm-attrs.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate/asm.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate/cglib-2.1.3.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate/commons-collections-2.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate/commons-logging-1.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate/dom4j-1.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate/hibernate3.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate/jdbc2_0-stdext.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate/jta.jar"/>
+	<classpathentry kind="lib" path="lib/hsql/hsqldb.jar"/>
+	<classpathentry kind="lib" path="lib/hsql/sqltool.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

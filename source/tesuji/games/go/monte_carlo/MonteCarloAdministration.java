@@ -26,17 +26,16 @@
 
 package tesuji.games.go.monte_carlo;
 
+import tesuji.games.general.Move;
 import tesuji.games.general.MoveFactory;
 import tesuji.games.general.MoveIterator;
-import tesuji.games.go.common.GoMove;
-import tesuji.games.go.monte_carlo.MCState;
 import tesuji.games.go.util.IntStack;
 import tesuji.games.model.BoardModel;
 
 /**
  * This interface describes a board administration that can perform a Monte-Carlo simulation.
  */
-public interface MonteCarloAdministration
+public interface MonteCarloAdministration<MoveType extends Move>
 {
 	/**
 	 * Clear the administrative information. This is equivalent to starting
@@ -51,33 +50,33 @@ public interface MonteCarloAdministration
 	 * 
 	 * @param source
 	 */
-	public void copyDataFrom(MonteCarloAdministration source);
+	public void copyDataFrom(MonteCarloAdministration<MoveType> source);
 
 	/**
 	 * @return a perfect, newly created, copy.
 	 */
-	public MonteCarloAdministration createClone();
+	public MonteCarloAdministration<MoveType> createClone();
 			
 	/**
 	 * Decide whether a move is legal or not.
 	 */
-	public boolean isLegalMove(GoMove move);
+	public boolean isLegalMove(MoveType move);
 
 	/**
 	 * Decide whether a move will not be used during the playout sequence.
 	 * This is typically the case for moves that would fill the player's own eye(s).
 	 */
-	public boolean isVerboten(GoMove move);
+	public boolean isVerboten(MoveType move);
 
 	/**
 	 * Play a move of a certain color and update the administration, whatever information it is keeping.
 	 */
-	public void playMove(GoMove move);
+	public void playMove(MoveType move);
 
 	/**
 	 * Play a move of a certain color and update the administration, whatever information it is keeping.
 	 */
-	public void playExplorationMove(GoMove move);
+	public void playExplorationMove(MoveType move);
 
 	/**
 	 * Generate a playout sequence until the end.
@@ -87,36 +86,14 @@ public interface MonteCarloAdministration
 	public boolean playout();
 
 	/**
-	 * Create a MCState object which represents the state of the MonteCarloAdministration.
-	 * This is necessary for 'selection' to select the next move in the search-tree.
-	 * 
-	 * @return
-	 */
-	public MCState createState();
-
-	/**
 	 * Select a move but don't play it.
 	 * This method assumes the color to move is known.
 	 * 
 	 * @return coordinate of the move
 	 */
-	public GoMove selectSimulationMove();
+	public MoveType selectSimulationMove();
 	
-	/**
-	 * Select a move given a 'state' but don't play it.
-	 * The move chosen gets removed from the MCState so that subsequent calls
-	 * will select different moves.
-	 * 
-	 * @return coordinate of the move
-	 */
-	public GoMove selectExplorationMove(byte color, MCState mcState);
-
-//	public MoveIterator<GoMove> getMoves();
-	
-	/**
-	 * @return the set of all possible moves.
-	 */
-	public GoMove[] getMoveSet(byte color);
+	public MoveIterator<MoveType> getMoves();
 	
 	/**
 	 * Get the score. Although it will depend on the actual implementation, generally
@@ -165,7 +142,7 @@ public interface MonteCarloAdministration
 	/**
 	 * @return whether the current position is a repetition of a previous position.
 	 */
-	public boolean hasRepetition();
+	public boolean hasRepetition(int checksum);
 
 	/**
 	 * @return the number of moves played until the end of the game.
@@ -184,12 +161,6 @@ public interface MonteCarloAdministration
 	 * @param propertyValue
 	 */
 	public void set(String propertyName, String propertyValue);
-	
-	public int getBoardSize();
-	public void setBoardSize(int size);
-	
-	public double getKomi();
-	public void setKomi(double komi);
 	
 	/**
 	 * Get a key-value property.
@@ -223,7 +194,7 @@ public interface MonteCarloAdministration
 	 */
 	public void setIsTestVersion(boolean testVersion);
 	
-	public MoveFactory<GoMove> getMoveFactory();
+	public MoveFactory<MoveType> getMoveFactory();
 	
 	public byte[] getBlackOwnership();
 	public byte[] getWhiteOwnership();

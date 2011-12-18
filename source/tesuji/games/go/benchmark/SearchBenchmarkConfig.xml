@@ -12,7 +12,7 @@
 			<value>0.5</value>
 		</property>
 		<property name="nrPlayouts">
-			<value>30000</value>
+			<value>50000</value>
 		</property>
 		<property name="nrProcessors">
 			<value>1</value>
@@ -21,10 +21,10 @@
 		<!-- List with Monte-Carlo playout strategies to benchmark -->
 		<property name="list">
 			<list>
-			  <ref bean="UCTSearch"/>
-			  <ref bean="UCTRaveSearch"/>
+			<!--  <ref bean="UCTSearch"/> -->
+			<!--  <ref bean="UCTRaveSearch"/> -->
 			 <!-- <ref bean="ReferenceMonteCarloTreeSearch"/> -->
-			<!--	<ref bean="MonteCarloTreeSearch"/> -->
+				<ref bean="MonteCarloTreeSearch"/>
 			<!-- 	<ref bean="PatternSearch"/> -->
 			</list>
 		</property>
@@ -89,6 +89,7 @@
 	</bean>
  	
 	<bean id="mctsLibertyAdministration" class="tesuji.games.go.monte_carlo.MCLibertyAdministration" singleton="false"/>
+	<bean id="mctsGoAdministration" class="tesuji.games.go.monte_carlo.MonteCarloGoAdministration" singleton="false"/>
 
 	<bean id="mctsTacticsAdministration" class="tesuji.games.go.monte_carlo.MCTacticsAdministration" singleton="false"/>
 	<bean id="mctsPatternsAdministration" class="tesuji.games.go.monte_carlo.MCPatternsAdministration" singleton="false">
@@ -99,7 +100,7 @@
  	
 	<bean id="MonteCarloTreeSearch" class="tesuji.games.go.search.MonteCarloTreeSearch" singleton="false">
 		<property name="monteCarloAdministration">
-			<ref bean="mctsTacticsAdministration"/>
+			<ref bean="mctsGoAdministration"/>
 		</property>
   		<property name="isTestVersion">
   			<value>false</value>

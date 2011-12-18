@@ -154,7 +154,7 @@ public class MCPlayout<MoveType extends Move>
     	return _currentAdministration.isConsistent();
     }
     
-    public GoMove requestMove(byte color)
+    public Move requestMove(byte color)
     {
     	return _currentAdministration.selectSimulationMove();
     }
