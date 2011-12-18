@@ -24,27 +24,43 @@
  * 
  */
 
-package tesuji.games.go.test;
+package tesuji.core.util;
 
-import tesuji.games.go.monte_carlo.MCLibertyAdministration;
-import tesuji.games.go.monte_carlo.MCPlayout;
-import tesuji.games.go.monte_carlo.AbstractMonteCarloAdministration;
-
-/** Simply runs a bunch of playouts to test speed. */
-public class MCLibertyBenchmark
+/**
+ * This class simply wraps a double value and its value can be changed. Double is not mutable. 
+ */
+public class MutableDouble
 {
-	public static final int BOARD_SIZE = 9;
-	public static final int KOMI = 2;
+	private double _value;
 	
-	public static final int NUMBER_OF_PLAYOUTS = 500000;
-	public static final int NUMBER_OF_THREADS = 1;
-
-	public static void main(String[] args)
+	public MutableDouble()
 	{
-		AbstractMonteCarloAdministration administration = new MCLibertyAdministration();
-		administration.setBoardSize(BOARD_SIZE);
-		administration.setKomi(KOMI);
-		MCPlayout playout = new MCPlayout(administration);
-		MCBenchmark.doPlayout(playout,BOARD_SIZE, KOMI, NUMBER_OF_PLAYOUTS, NUMBER_OF_THREADS);
 	}
+	
+	public MutableDouble(double value)
+	{
+		_value = value;
+	}
+
+	/**
+     * @return the value
+     */
+    public double getValue()
+    {
+    	return _value;
+    }
+
+	/**
+     * @param value the value to set
+     */
+    public void setValue(double value)
+    {
+    	_value = value;
+    }
+    
+    @Override
+	public String toString()
+    {
+    	return ""+_value;
+    }
 }

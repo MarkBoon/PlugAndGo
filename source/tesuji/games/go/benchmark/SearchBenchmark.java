@@ -1,0 +1,67 @@
+/**
+ * Project: Tesuji Go Framework.<br>
+ * <br>
+ * <font color="#CC6600"><font size=-1> Copyright (c) 1985-2006 Mark Boon<br>
+ * All rights reserved.<br>
+ * <br>
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, and/or sell copies of the
+ * Software, and to permit persons to whom the Software is furnished to do so,
+ * provided that the above copyright notice(s) and this permission notice appear
+ * in all copies of the Software and that both the above copyright notice(s) and
+ * this permission notice appear in supporting documentation.<br>
+ * <br>
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+ * IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.<br>
+ * <br>
+ * <font color="#00000"><font size=+1>
+ * 
+ */
+package tesuji.games.go.benchmark;
+
+//import tesuji.core.util.FactoryReport;
+import tesuji.core.util.MemoryUtil;
+import tesuji.games.general.ColorConstant;
+import tesuji.games.general.search.Search;
+import tesuji.games.general.search.SearchResult;
+import tesuji.games.go.common.GoMove;
+
+public class SearchBenchmark
+{
+	public static void doSearch(Search<GoMove> search)
+	{
+		long beforeTime;
+		long afterTime;
+		long beforeMemory = MemoryUtil.getFreeMemory();
+		long afterMemory;
+		beforeTime = System.currentTimeMillis();
+		SearchResult<GoMove> result;
+        try
+        {
+	        result = search.doSearch(ColorConstant.BLACK);
+	        search.clear();
+	        result = search.doSearch(ColorConstant.BLACK);
+	        search.clear();
+	        result = search.doSearch(ColorConstant.BLACK);
+			GoMove move = result.getMove();
+			afterTime = System.currentTimeMillis();
+			afterMemory = MemoryUtil.getFreeMemory();
+			double total = (afterTime - beforeTime)/1000;
+			System.out.println("Time taken: "+total+ " seconds");
+			System.out.println("Move chosen: "+move);
+			System.out.println("Memory used: "+(afterMemory-beforeMemory));
+//			System.out.println(FactoryReport.getFactoryReport());
+        }
+        catch (Exception e)
+        {
+			System.out.println("Unexpected exception "+e.getClass()+": "+e.getMessage());
+	        e.printStackTrace();
+        }		
+	}
+}

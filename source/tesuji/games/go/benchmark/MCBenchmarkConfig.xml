@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<bean id="BenchmarkSuite" class="tesuji.games.go.benchmark.MCBenchmarkSuite" singleton="false">
+	
+		<!-- Benchmark parameters -->
+		<property name="boardSize">
+			<value>9</value>
+		</property>
+		<property name="komi">
+			<value>0.5</value>
+		</property>
+		<property name="nrPlayouts">
+			<value>100000</value>
+		</property>
+		<property name="nrProcessors">
+			<value>1</value>
+		</property>
+		
+		<!-- List with Monte-Carlo playout strategies to benchmark -->
+		<property name="list">
+			<list>
+				<ref bean="mcLibertyAdministration"/>
+				<ref bean="mcTacticsAdministration"/>
+				<ref bean="mcPatternsAdministration"/>
+			</list>
+		</property>
+ 	</bean>
+ 	
+	<bean id="mcLibertyAdministration" class="tesuji.games.go.monte_carlo.MCLibertyAdministration" singleton="false">
+	</bean>
+ 	
+	<bean id="mcTacticsAdministration" class="tesuji.games.go.monte_carlo.MCTacticsAdministration" singleton="false">
+	</bean>
+ 	
+</beans>

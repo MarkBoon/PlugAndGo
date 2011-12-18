@@ -36,6 +36,8 @@ import tesuji.games.general.MoveIterator;
 import tesuji.games.go.common.GoMove;
 import tesuji.games.go.common.GoMoveFactory;
 import tesuji.games.go.common.Util;
+import tesuji.games.go.monte_carlo.MCState;
+import tesuji.games.go.monte_carlo.MCStateFactory;
 
 import tesuji.games.go.util.ArrayFactory;
 import tesuji.games.go.util.BoardMarker;
@@ -173,6 +175,11 @@ public class MonteCarloGoAdministration
 	protected IntStack _moveStack;
 	
 	/**
+	 * A stack with the move-coordinates of possible moves.
+	 */
+	protected IntStack _possibleMoveStack;
+
+	/**
 	 * A stack with the move-coordinates that have priority.
 	 */
 	protected IntStack _priorityMoveStack;
@@ -215,7 +222,7 @@ public class MonteCarloGoAdministration
 	
 	protected int _lastRandomNumber;
 	
-	private ArrayStack<GoMoveIterator> _iteratorPool =	new ArrayStack<GoMoveIterator>();
+//	private ArrayStack<GoMoveIterator> _iteratorPool =	new ArrayStack<GoMoveIterator>();
 	
 	private BoardMarker _boardMarker = new BoardMarker();
 	
@@ -241,6 +248,7 @@ public class MonteCarloGoAdministration
 		_checksum = new Checksum();
 
 		_moveStack = ArrayFactory.createLargeIntStack();
+		_possibleMoveStack = ArrayFactory.createIntStack();
 		_checksumStack = ArrayFactory.createLargeIntStack();
 		_priorityMoveStack = ArrayFactory.createIntStack();
 		_urgencyStack = ArrayFactory.createIntStack();
@@ -330,6 +338,7 @@ public class MonteCarloGoAdministration
 		_mercyThreshold = _boardSize*3;
 		
 		_moveStack.clear();
+		_possibleMoveStack.clear();
 		_checksumStack.clear();
 		_liberties[0] = 1000;
 	}
@@ -378,6 +387,7 @@ public class MonteCarloGoAdministration
 		copy(source._stoneAge, _stoneAge);
 		
 		_moveStack.copyFrom(source._moveStack);
+		_possibleMoveStack.copyFrom(source._possibleMoveStack); //?
 		_checksumStack.copyFrom(source._checksumStack);
 		
 		_ownNeighbours = source._ownNeighbours;
@@ -464,11 +474,15 @@ public class MonteCarloGoAdministration
 	 * (non-Javadoc)
 	 * @see tesuji.games.go.monte_carlo.MonteCarloAdministration#hasRepetition()
 	 */
-	public boolean hasRepetition(int checksum)
+	public boolean hasRepetition()
 	{
-		for (int i=_checksumStack.getSize(); --i>=0;)
+		if (_checksumStack.getSize()==0)
+			return false;
+		
+		int currentChecksum = _checksumStack.peek();
+		for (int i=_checksumStack.getSize()-1; --i>=0;)
 		{
-			if (_checksumStack.get(i)==checksum)
+			if (_checksumStack.get(i)==currentChecksum)
 				return true;
 		}
 		return false;
@@ -763,6 +777,16 @@ public class MonteCarloGoAdministration
 	
 	/*
 	 * (non-Javadoc)
+	 * @see tesuji.games.go.monte_carlo.MonteCarloAdministration#createState()
+	 */
+	public MCState createState()
+	{
+		MCState mcState = MCStateFactory.createMCState();
+		mcState.getEmptyPoints().copyFrom(getEmptyPoints());
+		return mcState;
+	}
+	/*
+	 * (non-Javadoc)
 	 * @see tesuji.games.go.monte_carlo.MonteCarloAdministration#selectSimulationMove()
 	 */
 	public GoMove selectSimulationMove()
@@ -809,18 +833,52 @@ public class MonteCarloGoAdministration
 		return selectRandomMoveCoordinate(emptyPoints);
 	}
 	
-	/**
-	 * Select a move during exploration as the next move.
-	 * 
-	 * @param emptyPoints - set of points to choose from.
-	 * 
-	 * @return the selected move
-	 */
-	protected int selectExplorationMove(PointSet emptyPoints)
-	{
-		return selectRandomMoveCoordinate(emptyPoints);
-	}
+//	/**
+//	 * Select a move during exploration as the next move.
+//	 * 
+//	 * @param emptyPoints - set of points to choose from.
+//	 * 
+//	 * @return the selected move
+//	 */
+//	protected int selectExplorationMove(PointSet emptyPoints)
+//	{
+//		return selectRandomMoveCoordinate(emptyPoints);
+//	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see tesuji.games.go.monte_carlo.MonteCarloAdministration#selectExplorationMove(byte, tesuji.games.go.monte_carlo.MCState)
+	 */
+	public GoMove selectExplorationMove(byte color, MCState mcState)
+	{
+		if (!mcState.isInitialised())
+		{
+			getPriorityMoves(mcState);
+			mcState.setInitialised(true);
+		}
+		
+		if (mcState.isEmpty())
+			return GoMoveFactory.getSingleton().createMove(PASS, color);
+
+		setColorToMove(color);
+		
+		while (mcState.hasPriorityMove())
+		{
+			int xy = mcState.getNextPriorityMove();
+			if (isLegal(xy))
+			{
+				mcState.getEmptyPoints().remove(xy);
+				GoMove move = GoMoveFactory.getSingleton().createMove(xy, color);
+				return move;
+			}
+		}
+		
+		int xy = selectRandomMoveCoordinate(mcState.getEmptyPoints());
+		mcState.getEmptyPoints().remove(xy);
+		GoMove move = GoMoveFactory.getSingleton().createMove(xy, color);
+		return move;
+	}
+
 	/**
 	 * Randomly select an empty point from a set of empty points.
 	 * 
@@ -1231,29 +1289,53 @@ public class MonteCarloGoAdministration
     	return _emptyPoints;
     }
     
+    public GoMove[] getMoveSet(byte color)
+    {
+    	while (_emptyPoints.getSize()!=0)
+    	{
+    		int moveXY = selectRandomMoveCoordinate(_emptyPoints);
+    		if (moveXY==PASS)
+    			break;
+    		_possibleMoveStack.push(moveXY);
+    		_emptyPoints.remove(moveXY);
+    	}
+    	if (_possibleMoveStack.getSize()<3)
+    		_possibleMoveStack.push(PASS);
+    	GoMove[] moves = new GoMove[_possibleMoveStack.getSize()];
+    	for (int i=_possibleMoveStack.getSize(); --i>=0;)
+    	{
+    		int moveXY = _possibleMoveStack.pop();
+    		moves[i] = GoMoveFactory.getSingleton().createMove(moveXY, color);
+    		_emptyPoints.add(moveXY);
+    	}
+    	return moves;
+    }
+    
     /*
      * (non-Javadoc)
      * @see tesuji.games.go.monte_carlo.MonteCarloAdministration#getMoves()
      */
-    public MoveIterator<GoMove> getMoves()
-    {
-    	GoMoveIterator moveIterator;
-    	if (_iteratorPool.isEmpty())
-    		moveIterator = new GoMoveIterator();
-    	else
-    		moveIterator = _iteratorPool.pop();
-    	moveIterator.init();
-    	return moveIterator;
-    }
+//    public MoveIterator<GoMove> getMoves()
+//    {
+//    	GoMoveIterator moveIterator;
+//    	if (_iteratorPool.isEmpty())
+//    		moveIterator = new GoMoveIterator();
+//    	else
+//    		moveIterator = _iteratorPool.pop();
+//    	moveIterator.init();
+//    	return moveIterator;
+//    }
     
-    /**
-     * Fill _priorityMoveStack with priority moves.
-     * Subclasses must override this method to give certain moves priority.
-     */
-    protected void getPriorityMoves()
-    {
-    }
-    
+	/**
+	 * Populate the MCState object with moves that have priority in the exploration selection.
+	 * 
+	 * @param mcState
+	 */
+	protected void getPriorityMoves(MCState mcState)
+	{
+		// Do nothing by default.
+	}
+	
     protected void addPriorityMove(int xy, int urgency, int visits, int wins)
     {
     	_priorityMoveStack.push(xy);
@@ -1379,75 +1461,74 @@ public class MonteCarloGoAdministration
     	return SGFUtil.createSGF(getMoveStack()) +"\n\n"+_boardModel.toString();
     }
     
-    /**
-     * When the getMoves() method is called it returns an instance of this inner-class.
-     */
-    private class GoMoveIterator
-		implements MoveIterator<GoMove>
-	{
-		private PointSet _emptyPoints;
-		private boolean _hasNext;
-		private byte _color;
-		private byte priorityIndex;
-		
-		GoMoveIterator()
-		{
-			_emptyPoints = PointSetFactory.createPointSet();
-		}
-		
-		public void init()
-		{
-			_priorityMoveStack.clear();
-			_urgencyStack.clear();
-			_visitStack.clear();
-			_winStack.clear();
-			getPriorityMoves();
-			priorityIndex = 0;
-			
-			_emptyPoints.copyFrom(getEmptyPoints());
-			_hasNext = true;
-			_color = getColorToMove();
-			_marker.getNewMarker();
-		}
-		
-		public boolean hasNext()
-	    {
-		    return _hasNext;
-	    }
-	
-		public GoMove next()
-	    {
-			if (priorityIndex<_priorityMoveStack.getSize())
-			{
-				int priorityMoveXY = _priorityMoveStack.get(priorityIndex++);
-				if (priorityMoveXY!=PASS && _marker.notSet(priorityMoveXY) && isLegal(priorityMoveXY))
-				{
-					GoMove move = GoMoveFactory.getSingleton().createLightMove(priorityMoveXY,_color);
-					move.setUrgency(_urgencyStack.get(priorityIndex-1));
-					move.setVisits(_visitStack.get(priorityIndex-1));
-					move.setWins(_winStack.get(priorityIndex-1));
-					_emptyPoints.remove(priorityMoveXY);
-					_marker.set(priorityMoveXY);
-					return move;
-				}
-			}
-			
-			int moveXY = selectExplorationMove(_emptyPoints);
-			if (moveXY==PASS)
-			{
-				_hasNext = false;
-				return GoMoveFactory.getSingleton().createLightPassMove(_color);
-			}
-			_emptyPoints.remove(moveXY);
-		    return GoMoveFactory.getSingleton().createLightMove(moveXY,_color);
-	    }
-	
-		public void remove() {}
-		
-		public void recycle()
-		{
-			_emptyPoints.recycle();
-			_iteratorPool.push(this);
-		}
-	}
+//    /**
+//     * When the getMoves() method is called it returns an instance of this inner-class.
+//     */
+//    private class GoMoveIterator
+//		implements MoveIterator<GoMove>
+//	{
+//		private PointSet _emptyPoints;
+//		private boolean _hasNext;
+//		private byte _color;
+//		private byte priorityIndex;
+//		
+//		GoMoveIterator()
+//		{
+//			_emptyPoints = PointSetFactory.createPointSet();
+//		}
+//		
+//		public void init()
+//		{
+//			_priorityMoveStack.clear();
+//			_urgencyStack.clear();
+//			_visitStack.clear();
+//			_winStack.clear();
+//			priorityIndex = 0;
+//			
+//			_emptyPoints.copyFrom(getEmptyPoints());
+//			_hasNext = true;
+//			_color = getColorToMove();
+//			_marker.getNewMarker();
+//		}
+//		
+//		public boolean hasNext()
+//	    {
+//		    return _hasNext;
+//	    }
+//	
+//		public GoMove next()
+//	    {
+//			if (priorityIndex<_priorityMoveStack.getSize())
+//			{
+//				int priorityMoveXY = _priorityMoveStack.get(priorityIndex++);
+//				if (priorityMoveXY!=PASS && _marker.notSet(priorityMoveXY) && isLegal(priorityMoveXY))
+//				{
+//					GoMove move = GoMoveFactory.getSingleton().createLightMove(priorityMoveXY,_color);
+//					move.setUrgency(_urgencyStack.get(priorityIndex-1));
+//					move.setVisits(_visitStack.get(priorityIndex-1));
+//					move.setWins(_winStack.get(priorityIndex-1));
+//					_emptyPoints.remove(priorityMoveXY);
+//					_marker.set(priorityMoveXY);
+//					return move;
+//				}
+//			}
+//			
+//			int moveXY = selectExplorationMove(_emptyPoints);
+//			if (moveXY==PASS)
+//			{
+//				_hasNext = false;
+//				return GoMoveFactory.getSingleton().createLightPassMove(_color);
+//			}
+//			_emptyPoints.remove(moveXY);
+//		    return GoMoveFactory.getSingleton().createLightMove(moveXY,_color);
+//	    }
+//	
+//		public void remove() {}
+//		
+//		public void recycle()
+//		{
+//			_emptyPoints.recycle();
+//			_iteratorPool.push(this);
+//		}
+//	}
 }

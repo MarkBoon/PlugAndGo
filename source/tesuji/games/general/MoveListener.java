@@ -23,36 +23,40 @@
  * <font color="#00000"><font size=+1>
  * 
  */
-
-package tesuji.games.go.util;
-
-import tesuji.games.general.provider.DataProviderAdapter;
-import tesuji.games.general.provider.DataProviderNames;
-import tesuji.games.model.BoardModel;
+package tesuji.games.general;
 
 /**
- * Default provider of a GoArray of type byte.
- */
-public class DefaultBoardProvider
-	extends DataProviderAdapter
+ * Interface defining a MoveListener. These can be registered so that
+ * whenever a move gets played the method playMove() is called or the
+ * method takeBack() in case a move was taken back.<br>
+ * <br>
+ * In case a sequence of moves is expected startMultiple() is called before
+ * the firstmove in the sequence is sent, and stopMultiple() is called
+ * after the last move in the sequenceis sent. This allows the MoveListener
+ * to queue the moves for improved efficiency.<br>
+  */
+public interface MoveListener<MoveType extends Move>
 {
-	private BoardModel _boardModel;
-	
-	public DefaultBoardProvider(BoardModel boardModel)
-	{
-		setName(DataProviderNames.BOARD_PROVIDER);
-		setBoardSize(boardModel.getBoardSize());
-		_boardModel = boardModel;
-	}
-	
-	public Number getData(int x, int y)
-	{
-		return _boardModel.get(x,y);
-	}
-	
-	@SuppressWarnings("all")
-    public Class getDataClass()
-	{
-		return Byte.class;
-	}
+	/**
+	 * Play a move
+	 * 
+	 * @param event
+	 */
+	void playMove(MoveEvent<MoveType> event);
+	/**
+	 * Take back a move
+	 */
+	void takeBack();
+	/**
+	 * Mark the start of a sequence of MoveEvents
+	 * 
+	 * @param event
+	 */
+	void startMultiple(MoveEvent<MoveType> event);
+	/**
+	 * Mark the end of a sequence of MoveEvents
+	 * 
+	 * @param event
+	 */
+	void stopMultiple(MoveEvent<MoveType> event);
 }

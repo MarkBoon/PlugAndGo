@@ -23,36 +23,57 @@
  * <font color="#00000"><font size=+1>
  * 
  */
+package tesuji.games.general;
 
-package tesuji.games.go.util;
-
-import tesuji.games.general.provider.DataProviderAdapter;
-import tesuji.games.general.provider.DataProviderNames;
-import tesuji.games.model.BoardModel;
+import java.io.Serializable;
 
 /**
- * Default provider of a GoArray of type byte.
+ * Nothing more than a wrapper around a Move-object so that a 'source' object 
+ * can be associated with it. This is used to prevent an event to keep looping 
+ * around.
  */
-public class DefaultBoardProvider
-	extends DataProviderAdapter
+public class MoveEvent<MoveType extends Move>
+    implements Serializable
 {
-	private BoardModel _boardModel;
+	private static final long serialVersionUID = 2183708471940378767L;
 	
-	public DefaultBoardProvider(BoardModel boardModel)
+	private transient Object _eventSource;
+	private MoveType _move;
+
+	/**
+	 * MoveEvent constructor
+	 * 
+	 * @param source
+	 * @param move
+	 */
+	public MoveEvent(Object source, MoveType move)
 	{
-		setName(DataProviderNames.BOARD_PROVIDER);
-		setBoardSize(boardModel.getBoardSize());
-		_boardModel = boardModel;
+		_eventSource = source;
+		_move = move;
 	}
 	
-	public Number getData(int x, int y)
+	/**
+	 * @return the source where the event originated
+	 * Note that this field is read-only.
+	 */
+	public Object getSource()
 	{
-		return _boardModel.get(x,y);
+		return _eventSource;
 	}
 	
-	@SuppressWarnings("all")
-    public Class getDataClass()
+	/**
+	 * @return the _move this event was created for
+	 */
+	public MoveType getMove()
 	{
-		return Byte.class;
+		return _move;
+	}
+	
+	/**
+	 * @param move
+	 */
+	public void setMove(MoveType move)
+	{
+		_move = move;
 	}
 }

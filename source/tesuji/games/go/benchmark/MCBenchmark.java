@@ -24,35 +24,36 @@
  * 
  */
 
-package tesuji.games.go.util;
+package tesuji.games.go.benchmark;
 
-import tesuji.games.general.provider.DataProviderAdapter;
-import tesuji.games.general.provider.DataProviderNames;
-import tesuji.games.model.BoardModel;
+import org.apache.log4j.Logger;
 
-/**
- * Default provider of a GoArray of type byte.
- */
-public class DefaultBoardProvider
-	extends DataProviderAdapter
+import tesuji.games.go.common.GoMove;
+
+/** Simply runs a bunch of playouts to test speed. */
+public class MCBenchmark
 {
-	private BoardModel _boardModel;
+	private static Logger _logger = Logger.getLogger("MCBenchmark");
 	
-	public DefaultBoardProvider(BoardModel boardModel)
+	public static void doPlayout(MCPlayout<GoMove> playout, int nrPlayouts, int nrThreads)
 	{
-		setName(DataProviderNames.BOARD_PROVIDER);
-		setBoardSize(boardModel.getBoardSize());
-		_boardModel = boardModel;
-	}
-	
-	public Number getData(int x, int y)
-	{
-		return _boardModel.get(x,y);
-	}
-	
-	@SuppressWarnings("all")
-    public Class getDataClass()
-	{
-		return Byte.class;
+		long before;
+		long after;
+		before = System.currentTimeMillis();
+		playout.playout(nrPlayouts,nrThreads);
+		after = System.currentTimeMillis();
+		playout.isConsistent();
+		// Print the results
+		long total = after - before;
+		_logger.info("");
+		_logger.info("Testing '"+playout.getAdministration().getClass().getName()+"'");
+		_logger.info("Performance:");
+		_logger.info("  " + total / 1000.0 + " seconds");
+		_logger.info("  " + ((double) playout.getNrMovesPlayed() / (double) nrPlayouts) + " mpos");
+		_logger.info("  " + ((double) nrPlayouts) / total + " kpps");
+		_logger.info("Black wins = " + playout.getBlackWins());
+		_logger.info("White wins = " + playout.getWhiteWins());
+		_logger.info("P(black win) = " + ((double) playout.getBlackWins())
+				/ (playout.getBlackWins() + playout.getWhiteWins()));
 	}
 }
