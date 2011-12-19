@@ -43,6 +43,7 @@ import tesuji.games.general.provider.DataProviderList;
 import tesuji.games.general.search.Search;
 import tesuji.games.general.search.SearchProperties;
 
+import tesuji.games.go.monte_carlo.MCTacticsAdministration;
 import tesuji.games.go.monte_carlo.MonteCarloAdministration;
 import tesuji.games.go.pattern.common.HibernatePatternManager;
 import tesuji.games.go.pattern.common.Pattern;

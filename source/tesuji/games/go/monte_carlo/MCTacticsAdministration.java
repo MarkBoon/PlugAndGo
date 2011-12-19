@@ -59,6 +59,13 @@ public class MCTacticsAdministration
 	private byte[] _row;
 	private byte[] _fogOfWar;
 	
+	private static int _nrPatternsUsed = 0;
+	private static int _nrPatternsGenerated = 0;
+	
+	public static int getNrPatternsUsed() { return _nrPatternsUsed; }
+	public static int getNrPatternsGenerated() { return _nrPatternsGenerated; }
+	public static void reset() { _nrPatternsUsed = _nrPatternsGenerated = 0; }
+	
 //	public boolean USE_STONE_AGE = 					true;
 //	public boolean FOG_OF_WAR = 					true;		// -RefBot2K=54.2%, MCTS10K=51.8%
 //	public boolean NO_FIRST_LINE = 					true;		// -RefBot2K=58.1%, MCTS10K=50.7%?
@@ -409,8 +416,12 @@ public class MCTacticsAdministration
 //				int patternXY = getPatternMove();
 				if (patternXY!=UNDEFINED_COORDINATE && isLegal(patternXY))
 				{
+					_nrPatternsGenerated++;
 					if (RANDOM.nextInt(2+GoArray.getDistance(_previousMove, patternXY)/2)==0)
+					{
+						_nrPatternsUsed++;
 						return patternXY;
+					}
 				}
 			}
 			if (isCAPTURE_STONES())

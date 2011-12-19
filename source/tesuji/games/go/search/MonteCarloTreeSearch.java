@@ -42,6 +42,7 @@ import tesuji.games.general.provider.DataProviderList;
 import tesuji.games.general.search.Search;
 import tesuji.games.general.search.SearchProperties;
 
+import tesuji.games.go.monte_carlo.MCTacticsAdministration;
 import tesuji.games.go.monte_carlo.MonteCarloAdministration;
 
 import tesuji.games.go.common.GoMove;
@@ -143,6 +144,8 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 
 		assert _monteCarloAdministration.isConsistent() : "Inconsistent Monte-Carlo administration at the start of the search.";
 
+		MCTacticsAdministration.reset();
+		
 		GoArray.clear(_ownershipArray);
 		_monteCarloAdministration.setIsTestVersion(getIsTestVersion());
 		_monteCarloAdministration.setColorToMove(startColor);
@@ -208,6 +211,8 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 		_logger.info("Percentage saved "+saved+"%");
 		_logger.info("Average nr playouts "+_averagePlayouts);
 		_logger.info("Nr pattern moves per playout "+(Statistics.nrPatternsPlayed/_totalNrPlayouts));
+		_logger.info("Nr hard-coded patterns generated: "+MCTacticsAdministration.getNrPatternsGenerated());
+		_logger.info("Nr hard-coded patterns played: "+MCTacticsAdministration.getNrPatternsUsed());
 		
 		TreeNode<MonteCarloTreeSearchResult<MoveType>> bestNode = getBestChildNode(_rootNode);
 		if (bestNode==null)
