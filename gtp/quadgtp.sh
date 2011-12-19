@@ -5,8 +5,8 @@
 #WHITE="java -Xmx240M -jar GoEngineGTP.jar TesujiRefBot"
 #WHITE="java -Xmx240M -jar GoEngineGTP.jar MonteCarloTreeSearchBot"
 
-BLACK="nice java -server -Xmx240M -jar GoEngineGTP.jar TestBot32K"
-WHITE="nice java -server -Xmx240M -jar GoEngineGTP.jar MonteCarloTreeSearchBot32K"
+BLACK="nice java -server -Xmx120M -jar GoEngineGTP.jar Bot1"
+WHITE="nice java -server -Xmx120M -jar GoEngineGTP.jar Bot2"
 
 #BLACK="nice java -server -Xmx240M -jar GoEngineGTP.jar UCTBot16K"
 #WHITE="nice java -server -Xmx240M -jar GoEngineGTP.jar UCTPatternBot16K"

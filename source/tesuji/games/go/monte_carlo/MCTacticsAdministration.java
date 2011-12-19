@@ -29,7 +29,6 @@ package tesuji.games.go.monte_carlo;
 import org.apache.log4j.Logger;
 
 import tesuji.games.go.common.GoMove;
-import tesuji.games.go.monte_carlo.MCLibertyAdministration;
 import tesuji.games.go.monte_carlo.MonteCarloAdministration;
 import tesuji.games.go.tactics.LadderReader;
 import tesuji.games.go.tactics.TacticsConstant;
@@ -48,7 +47,7 @@ import static tesuji.games.go.util.GoArray.*;
  * 
  */
 public class MCTacticsAdministration
-	extends MCLibertyAdministration
+	extends MonteCarloGoAdministration
 {
 	private static Logger _logger = Logger.getLogger(MCTacticsAdministration.class);
 	
@@ -131,7 +130,7 @@ public class MCTacticsAdministration
 	
 	private void createFogOfWar()
 	{
-		if (FOG_OF_WAR)
+		if (useFogOfWar())
 		{
 			_fogOfWar = createBytes();
 			_row = createRowArray(getBoardSize());
@@ -367,7 +366,7 @@ public class MCTacticsAdministration
 			{
 //				if (!isTestVersion() || _lastRandomNumber<(_boardSize*_boardSize)/2+_boardSize)
 				{
-					_marker.getNewMarker();
+					_boardMarker.getNewMarker();
 					int tacticalXY = getTacticalMove(_previousMove);
 					if (tacticalXY!=UNDEFINED_COORDINATE && isLegal(tacticalXY))
 						return tacticalXY;
@@ -421,11 +420,11 @@ public class MCTacticsAdministration
 				if (_boardModel.get(next)==_colorToPlay)
 				{
 					int chainNext = _chain[next];
-					if (_marker.notSet(chainNext))
+					if (_boardMarker.notSet(chainNext))
 					{
 						if (_liberties[chainNext]==1 && isPrehistoric(chainNext))
 						{
-							_marker.set(chainNext);
+							_boardMarker.set(chainNext);
 							_ladderReader.setBoardArray(_boardModel.getSingleArray());
 							_ladderReader.setKoPoint(_koPoint);
 							if (_ladderReader.tryEscape(next)==TacticsConstant.CANNOT_CATCH)
@@ -442,9 +441,9 @@ public class MCTacticsAdministration
 		if (CAPTURE_LAST_MOVE_IN_ATARI)
 		{
 			int chain = _chain[previousMove];
-			if (_liberties[chain]==1  && _marker.notSet(chain) && isPrehistoric(chain))
+			if (_liberties[chain]==1  && _boardMarker.notSet(chain) && isPrehistoric(chain))
 			{
-				_marker.set(chain);
+				_boardMarker.set(chain);
 				_ladderReader.setBoardArray(_boardModel.getSingleArray());
 				_ladderReader.setKoPoint(_koPoint);
 				if (_ladderReader.tryEscape(previousMove)==TacticsConstant.CANNOT_CATCH)
@@ -458,10 +457,10 @@ public class MCTacticsAdministration
 		if (CAPTURE_LAST_MOVE_IN_LADDER)
 		{
 			int chain = _chain[previousMove];
-			if (_liberties[chain]==2 && _marker.notSet(chain) && isPrehistoric(chain)
+			if (_liberties[chain]==2 && _boardMarker.notSet(chain) && isPrehistoric(chain)
 				&& (_row[previousMove]>1 || _ownDiagonalNeighbours[previousMove]>0 || _otherDiagonalNeighbours[previousMove]>0))
 			{
-				_marker.set(chain);
+				_boardMarker.set(chain);
 				_ladderReader.setBoardArray(_boardModel.getSingleArray());
 				_ladderReader.setKoPoint(_koPoint);
 				if (_ladderReader.tryLadder(previousMove)==TacticsConstant.CAN_CATCH)
@@ -531,13 +530,13 @@ public class MCTacticsAdministration
 			}
 		}
 		// TODO - instead of looping over the whole board it's probably faster to keep lists with chains with 1 and 2 liberties.
-		_marker.getNewMarker();
+		_boardMarker.getNewMarker();
 		for (int i=FIRST; i<=LAST; i++)
 		{
 			int chain = _chain[i];
-			if (i!=_previousMove && !isNeighbour(i,_previousMove) && _marker.notSet(chain))
+			if (i!=_previousMove && !isNeighbour(i,_previousMove) && _boardMarker.notSet(chain))
 			{
-				_marker.set(chain);
+				_boardMarker.set(chain);
 				byte boardValue = _boardModel.get(i);
 				if (ESCAPE_ATARI)
 				{

@@ -1,7 +1,7 @@
 #!/bin/sh
 
-BLACK="nice java -server -Xmx240M -jar GoEngineGTP.jar PatternBot2K"
-WHITE="nice java -server -Xmx240M -jar GoEngineGTP.jar MonteCarloTreeSearchBot2K"
+BLACK="nice java -server -Xmx240M -jar GoEngineGTP.jar Bot1"
+WHITE="nice java -server -Xmx240M -jar GoEngineGTP.jar Bot2"
 
 #BLACK="nice java -server -Xmx240M -jar GoEngineGTP.jar UCTBot2K"
 #WHITE="nice java -server -Xmx240M -jar GoEngineGTP.jar UCTPatternBot2K"

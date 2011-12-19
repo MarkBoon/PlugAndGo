@@ -635,7 +635,7 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 			TreeNode<MonteCarloTreeSearchResult<MoveType>> secondBestNode;
 			bestNode = getBestChildNode(_rootNode);
 			secondBestNode = getSecondBestChildNode(_rootNode,bestNode);
-			if (bestNode.getContent().getNrPlayouts()-secondBestNode.getContent().getNrPlayouts()>_nodeLimit-_nrPlayouts)
+			if (secondBestNode!=null && bestNode.getContent().getNrPlayouts()-secondBestNode.getContent().getNrPlayouts()>_nodeLimit-_nrPlayouts)
 				return true;
 /*    				if (_isTestVersion && _nrPlayouts > _nodeLimit/4)
 			{
@@ -792,9 +792,12 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 						
 						while (playoutNode!=null)
 						{
-					    	if (playoutNode.getContent().getNrPlayouts()<MonteCarloTreeSearchResult.OWNERSHIP_MAXIMUM)
-					    		playoutNode.getContent().addOwnership(_searchAdministration.getBlackOwnership(), _searchAdministration.getWhiteOwnership());
-
+							synchronized(playoutNode)
+							{
+								if (playoutNode.getContent().getNrPlayouts()<MonteCarloTreeSearchResult.OWNERSHIP_MAXIMUM)
+									playoutNode.getContent().addOwnership(_searchAdministration.getBlackOwnership(), _searchAdministration.getWhiteOwnership());
+							}
+							
 					    	color = opposite(playoutNode.getContent().getMove().getColor());
 							boolean playerWins = (blackWins && color==BLACK) || (!blackWins && color==WHITE);
 							double score = playerWins ? MonteCarloTreeSearchResult.MAX_SCORE : MonteCarloTreeSearchResult.MIN_SCORE;

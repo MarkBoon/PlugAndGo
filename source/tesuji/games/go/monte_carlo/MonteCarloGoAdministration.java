@@ -33,7 +33,6 @@ import tesuji.core.util.MersenneTwisterFast;
 import tesuji.games.general.Checksum;
 import tesuji.games.general.MoveIterator;
 
-import tesuji.games.go.common.GoConstant;
 import tesuji.games.go.common.GoMove;
 import tesuji.games.go.common.GoMoveFactory;
 import tesuji.games.go.common.Util;
@@ -217,7 +216,9 @@ public class MonteCarloGoAdministration
 	protected int _lastRandomNumber;
 	
 	private ArrayStack<GoMoveIterator> _iteratorPool =	new ArrayStack<GoMoveIterator>();
-	
+
+	private boolean _spreadTest = false;
+
 	
 	public MonteCarloGoAdministration()
 	{
@@ -733,7 +734,7 @@ public class MonteCarloGoAdministration
 	 */
 	public GoMove selectSimulationMove()
 	{
-		return GoMoveFactory.getSingleton().createMove(selectSimulationMove(_emptyPoints), _colorToPlay);
+		return GoMoveFactory.getSingleton().createMove(selectSimulationMove(_emptyPoints),_colorToPlay);
 	}
 
 	/**
@@ -772,7 +773,19 @@ public class MonteCarloGoAdministration
 	 */
 	protected int selectSimulationMove(PointSet emptyPoints)
 	{
-		return selectRandomMoveCoordinate(emptyPoints);
+		if (getIsSpreadTest())
+		{
+			int xy;
+			do
+			{
+				xy = selectRandomMoveCoordinate(emptyPoints);
+			}
+			while (xy!=PASS && !accept(xy));
+	
+			return xy;			
+		}
+		else
+			return selectRandomMoveCoordinate(emptyPoints);
 	}
 	
 	/**
@@ -785,6 +798,26 @@ public class MonteCarloGoAdministration
 	protected int selectExplorationMove(PointSet emptyPoints)
 	{
 		return selectRandomMoveCoordinate(emptyPoints);
+	}
+	
+	private  boolean accept(int xy)
+	{
+		if (!isTestVersion() || _otherNeighbours[xy]!=0 || _otherDiagonalNeighbours[xy]>=_maxDiagonalsOccupied[xy])
+		{
+			return true;
+		}
+		int points = _ownNeighbours[xy] + _ownDiagonalNeighbours[xy];
+		byte[] board = _boardModel.getSingleArray();
+		if (board[left(above(xy))]==EMPTY && _ownNeighbours[left(above(xy))]>2)
+			points++;
+		if (board[left(below(xy))]==EMPTY && _ownNeighbours[left(below(xy))]>2)
+			points++;
+		if (board[right(above(xy))]==EMPTY && _ownNeighbours[right(above(xy))]>2)
+			points++;
+		if (board[right(below(xy))]==EMPTY && _ownNeighbours[right(below(xy))]>2)
+			points++;
+		
+		return (points==0 || RANDOM.nextInt(points)==0);
 	}
 	
 	/**
@@ -1366,7 +1399,17 @@ public class MonteCarloGoAdministration
     	return SGFUtil.createSGF(getMoveStack()) +"\n\n"+_boardModel.toString();
     }
     
-    /**
+    public void setIsSpreadTest(boolean spreadTest)
+    {
+	    _spreadTest = spreadTest;
+    }
+
+	public boolean getIsSpreadTest()
+    {
+	    return _spreadTest;
+    }
+
+	/**
      * When the getMoves() method is called it returns an instance of this inner-class.
      */
     private class GoMoveIterator
