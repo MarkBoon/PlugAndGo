@@ -26,8 +26,11 @@
 
 package tesuji.games.go.monte_carlo;
 
+import java.util.Enumeration;
+
 import org.apache.log4j.Logger;
 
+import tesuji.core.util.MultiTypeProperties;
 import tesuji.games.go.common.GoMove;
 import tesuji.games.go.monte_carlo.MonteCarloAdministration;
 import tesuji.games.go.tactics.LadderReader;
@@ -56,59 +59,81 @@ public class MCTacticsAdministration
 	private byte[] _row;
 	private byte[] _fogOfWar;
 	
-	public static boolean USE_STONE_AGE = 					true;
-	public static boolean FOG_OF_WAR = 						true;		// -RefBot2K=54.2%, MCTS10K=51.8%
-	public static boolean NO_FIRST_LINE = 					true;		// -RefBot2K=58.1%, MCTS10K=50.7%?
-	public static boolean NO_EMPTY_TRIANGLE = 				false;		// -RefBot2K=51.4%, MCTS10K=?
-	public static boolean NO_AUTO_ATARI = 					true;		// -RefBot2K=56.1%, MCTS10K=?
-	public static boolean USE_TACTICS_IN_SIMULATION = 		true;		// MCTS50K=88.6%
-	public static boolean USE_TACTICS_IN_EXPLORATION = 		true;
-	public static boolean IMMEDIATE_ESCAPE_ATARI = 			true;		// RefBot2K=86.6%, MCTS10K=82.2%, MCTS50K=83.8%
-																		// RefBot2K=53.3%, MCTS10K=?
-																		// 10*1-RefBot2K=59.5%, MCTS10K=?
-	public static boolean CAPTURE_LAST_MOVE_IN_ATARI = 		false;		// RefBot2K=62.7%, MCTS10K=?
+//	public boolean USE_STONE_AGE = 					true;
+//	public boolean FOG_OF_WAR = 					true;		// -RefBot2K=54.2%, MCTS10K=51.8%
+//	public boolean NO_FIRST_LINE = 					true;		// -RefBot2K=58.1%, MCTS10K=50.7%?
+//	public boolean NO_EMPTY_TRIANGLE = 				false;		// -RefBot2K=51.4%, MCTS10K=?
+//	public boolean NO_AUTO_ATARI = 					true;		// -RefBot2K=56.1%, MCTS10K=?
+//	public boolean USE_TACTICS_IN_SIMULATION = 		true;		// MCTS50K=88.6%
+//	public boolean USE_TACTICS_IN_EXPLORATION = 	true;
+//	public boolean IMMEDIATE_ESCAPE_ATARI = 		true;		// RefBot2K=86.6%, MCTS10K=82.2%, MCTS50K=83.8%
+//																// RefBot2K=53.3%, MCTS10K=?
+//																// 10*1-RefBot2K=59.5%, MCTS10K=?
+//	public boolean CAPTURE_LAST_MOVE_IN_ATARI = 	false;		// RefBot2K=62.7%, MCTS10K=?
+//	
+//	public boolean CAPTURE_LAST_MOVE_IN_LADDER =	true;		// RefBot2K=74.7%, MCTS10K=78.4%, MCTS50K=81.9%
+//
+//	
+//	public boolean ESCAPE_ATARI = 					true;
+//	public boolean CAPTURE_STONES_IN_ATARI = 		true;
+//	public boolean CAPTURE_STONES_IN_LADDER = 		true;
+//	
+//	public boolean CAPTURE_STONES = 				true;
+//	
+	public final int IMMEDIATE_ESCAPE_PRIORITY =	1;
+	public final int IMMEDIATE_CAPTURE_PRIORITY =	3;
+	public final int IMMEDIATE_LADDER_PRIORITY =	2;
+	public final int ESCAPE_PRIORITY =				4;
+	public final int CAPTURE_PRIORITY =				5;
+	public final int LADDER_PRIORITY =				6;
+	public final int IMMEDIATE_VISITS =				5;
+	public final int IMMEDIATE_WINS =				5;
+//	
+//	public boolean USE_HARD_PATTERNS = 				false;
+//	public boolean SEPARATE_PATTERN = 				true;
+//	public boolean CUT_PATTERN = 					true;
+//	public boolean TOBI_CUT_PATTERN = 				false;
+//	public boolean KEIMA_CUT_PATTERN = 				true; // MCTS-2K=55%
+//	public boolean TOBI_CONNECT_PATTERN = 			false;
+//	public boolean FIRST_LINE_ATARI_PATTERN = 		false;
+//	public boolean SECOND_LINE_ATARI_PATTERN = 		false;
+//	public boolean FIRST_LINE_BLOCK_PATTERN = 		false;
+//	public boolean SECOND_LINE_BLOCK_PATTERN = 		false;
+//	public boolean EYE_PATTERN = 					false;
 	
-	public static boolean CAPTURE_LAST_MOVE_IN_LADDER =		true;		// RefBot2K=74.7%, MCTS10K=78.4%, MCTS50K=81.9%
-
-	
-	public static boolean ESCAPE_ATARI = 					true;
-	public static boolean CAPTURE_STONES_IN_ATARI = 		true;
-	public static boolean CAPTURE_STONES_IN_LADDER = 		true;
-	
-	public static boolean CAPTURE_STONES = 					true;
-	
-	public static final int IMMEDIATE_ESCAPE_PRIORITY =		1;
-	public static final int IMMEDIATE_CAPTURE_PRIORITY =	3;
-	public static final int IMMEDIATE_LADDER_PRIORITY =		2;
-	public static final int ESCAPE_PRIORITY =				4;
-	public static final int CAPTURE_PRIORITY =				5;
-	public static final int LADDER_PRIORITY =				6;
-	public static final int IMMEDIATE_VISITS =				5;
-	public static final int IMMEDIATE_WINS =				5;
-	
-	public static boolean USE_HARD_PATTERNS = 				false;
-	public static boolean SEPARATE_PATTERN = 				true;
-	public static boolean CUT_PATTERN = 					true;
-	public static boolean TOBI_CUT_PATTERN = 				false;
-	public static boolean KEIMA_CUT_PATTERN = 				true; // MCTS-2K=55%
-	public static boolean TOBI_CONNECT_PATTERN = 			false;
-	public static boolean FIRST_LINE_ATARI_PATTERN = 		true;
-	public static boolean SECOND_LINE_ATARI_PATTERN = 		true;
-	public static boolean FIRST_LINE_BLOCK_PATTERN = 		true;
-	public static boolean SECOND_LINE_BLOCK_PATTERN = 		true;
-	public static boolean EYE_PATTERN = 					false;
+	private MultiTypeProperties _properties;
 	
 	public MCTacticsAdministration()
 	{
-		super();		
+		super();
+		initProperties();
 	}
 
 	protected MCTacticsAdministration(int boardSize)
 	{
 		super(boardSize);
 		
+		initProperties();
 		_ladderReader = new LadderReader(boardSize);
 		createFogOfWar();
+	}
+	
+	private void initProperties()
+	{
+		_properties = new MultiTypeProperties();
+		_properties.setBooleanProperty("USE_STONE_AGE", true);
+		_properties.setBooleanProperty("FOG_OF_WAR", true);
+		_properties.setBooleanProperty("NO_FIRST_LINE", true);
+		_properties.setBooleanProperty("NO_AUTO_ATARI", true);
+		_properties.setBooleanProperty("USE_TACTICS_IN_SIMULATION", true);
+		_properties.setBooleanProperty("USE_TACTICS_IN_EXPLORATION", true);
+		_properties.setBooleanProperty("IMMEDIATE_ESCAPE_ATARI", true);
+		_properties.setBooleanProperty("CAPTURE_LAST_MOVE_IN_LADDER", true);
+		_properties.setBooleanProperty("ESCAPE_ATARI", true);
+		_properties.setBooleanProperty("CAPTURE_STONES_IN_ATARI", true);
+		_properties.setBooleanProperty("CAPTURE_STONES_IN_LADDER", true);
+		_properties.setBooleanProperty("CAPTURE_STONES", true);
+		_properties.setBooleanProperty("SEPARATE_PATTERN", true);
 	}
 
 	@Override
@@ -144,12 +169,12 @@ public class MCTacticsAdministration
 	
 	private boolean useFogOfWar()
 	{
-		return FOG_OF_WAR;
+		return isFOG_OF_WAR();
 	}
 
 	private boolean useHardPatterns()
 	{
-		return USE_HARD_PATTERNS;
+		return isUSE_HARD_PATTERNS();
 	}
 
 	@Override
@@ -157,9 +182,15 @@ public class MCTacticsAdministration
 	{
 		super.copyDataFrom(sourceAdmin);
 		
+		MCTacticsAdministration source = (MCTacticsAdministration) sourceAdmin;
+		for (Enumeration e = source._properties.propertyNames(); e.hasMoreElements();)
+		{
+			String key = (String)e.nextElement();
+			Object value = source._properties.get(key);
+			_properties.put(key, value);
+		}
 		if (useFogOfWar())
 		{
-			MCTacticsAdministration source = (MCTacticsAdministration) sourceAdmin;
 			copy(source._fogOfWar,_fogOfWar);
 		}
 	}
@@ -188,7 +219,7 @@ public class MCTacticsAdministration
 		if (_ownNeighbours[xy]==4 && _otherDiagonalNeighbours[xy]<_maxDiagonalsOccupied[xy])
 			return true;
 		
-		if (NO_EMPTY_TRIANGLE)
+		if (isNO_EMPTY_TRIANGLE())
 		{
 			if (_inPlayout && _neighbours[xy]==2 && _boardModel.get(left(xy))!=_boardModel.get(right(xy)))
 			{
@@ -203,13 +234,13 @@ public class MCTacticsAdministration
 			if (_fogOfWar[xy]!=0)
 				return true;
 
-		if (NO_FIRST_LINE)
+		if (isNO_FIRST_LINE())
 		{
 			if (_inPlayout && _row[xy]==1 && _neighbours[xy]==1 && _blackDiagonalNeighbours[xy]==0 && _whiteDiagonalNeighbours[xy]==0)
 				return true;
 		}
 		
-		if (NO_AUTO_ATARI)
+		if (isNO_AUTO_ATARI())
 		{
 			if (_inPlayout)
 			{
@@ -362,7 +393,7 @@ public class MCTacticsAdministration
 	{
 		if (_previousMove!=PASS)
 		{
-			if (USE_TACTICS_IN_SIMULATION)
+			if (isUSE_TACTICS_IN_SIMULATION())
 			{
 //				if (!isTestVersion() || _lastRandomNumber<(_boardSize*_boardSize)/2+_boardSize)
 				{
@@ -374,15 +405,15 @@ public class MCTacticsAdministration
 			}
 			if (useHardPatterns())
 			{
-//				int patternXY = getPatternMove(_previousMove);
-				int patternXY = getPatternMove();
+				int patternXY = getPatternMove(_previousMove);
+//				int patternXY = getPatternMove();
 				if (patternXY!=UNDEFINED_COORDINATE && isLegal(patternXY))
 				{
-					if (RANDOM.nextInt(1+GoArray.getDistance(_previousMove, patternXY)/2)==0)
+					if (RANDOM.nextInt(2+GoArray.getDistance(_previousMove, patternXY)/2)==0)
 						return patternXY;
 				}
 			}
-			if (CAPTURE_STONES)
+			if (isCAPTURE_STONES())
 			{
 				int random = RANDOM.nextInt(64);
 				if ((random&7)==0)
@@ -406,13 +437,13 @@ public class MCTacticsAdministration
 	@Override
 	protected void getPriorityMoves()
 	{
-		if (USE_TACTICS_IN_EXPLORATION)
+		if (isUSE_TACTICS_IN_EXPLORATION())
 			getTacticalPriorityMoves();
 	}
 	
 	public int getTacticalMove(int previousMove)
 	{
-		if (IMMEDIATE_ESCAPE_ATARI)
+		if (isIMMEDIATE_ESCAPE_ATARI())
 		{
 			for (int n=0; n<4; n++)
 			{
@@ -438,7 +469,7 @@ public class MCTacticsAdministration
 				}
 			}
 		}
-		if (CAPTURE_LAST_MOVE_IN_ATARI)
+		if (isCAPTURE_LAST_MOVE_IN_ATARI())
 		{
 			int chain = _chain[previousMove];
 			if (_liberties[chain]==1  && _boardMarker.notSet(chain) && isPrehistoric(chain))
@@ -454,7 +485,7 @@ public class MCTacticsAdministration
 				}
 			}
 		}
-		if (CAPTURE_LAST_MOVE_IN_LADDER)
+		if (isCAPTURE_LAST_MOVE_IN_LADDER())
 		{
 			int chain = _chain[previousMove];
 			if (_liberties[chain]==2 && _boardMarker.notSet(chain) && isPrehistoric(chain)
@@ -479,7 +510,7 @@ public class MCTacticsAdministration
 	{
 		if (_previousMove!=PASS)
 		{
-			if (IMMEDIATE_ESCAPE_ATARI)
+			if (isIMMEDIATE_ESCAPE_ATARI())
 			{
 				for (int n=0; n<4; n++)
 				{
@@ -499,7 +530,7 @@ public class MCTacticsAdministration
 					}
 				}
 			}
-			if (CAPTURE_LAST_MOVE_IN_ATARI)
+			if (isCAPTURE_LAST_MOVE_IN_ATARI())
 			{
 				if (_liberties[_chain[_previousMove]]==1)
 				{
@@ -515,7 +546,7 @@ public class MCTacticsAdministration
 					}
 				}
 			}
-			if (CAPTURE_LAST_MOVE_IN_LADDER)
+			if (isCAPTURE_LAST_MOVE_IN_LADDER())
 			{
 				if (_liberties[_chain[_previousMove]]==2)
 				{
@@ -538,7 +569,7 @@ public class MCTacticsAdministration
 			{
 				_boardMarker.set(chain);
 				byte boardValue = _boardModel.get(i);
-				if (ESCAPE_ATARI)
+				if (isESCAPE_ATARI())
 				{
 					if (boardValue==_colorToPlay && _liberties[chain]==1)
 					{
@@ -554,7 +585,7 @@ public class MCTacticsAdministration
 						}
 					}
 				}
-				if (CAPTURE_STONES_IN_ATARI)
+				if (isCAPTURE_STONES_IN_ATARI())
 				{
 					if (boardValue==_oppositeColor && _liberties[chain]==1)
 					{
@@ -570,7 +601,7 @@ public class MCTacticsAdministration
 						}
 					}
 				}
-				if (CAPTURE_STONES_IN_LADDER)
+				if (isCAPTURE_STONES_IN_LADDER())
 				{
 					if (boardValue==_oppositeColor && _liberties[chain]==2)
 					{
@@ -701,7 +732,7 @@ public class MCTacticsAdministration
 				_next[n] = 0;
 		}
 
-		if (EYE_PATTERN)
+		if (isEYE_PATTERN())
 		{
 			for (int n=0; n<8; n++)
 			{
@@ -715,11 +746,11 @@ public class MCTacticsAdministration
 		}
 //		if (_lastRandomNumber<(_boardSize*_boardSize)/2+_boardSize)
 		{
-			if (SEPARATE_PATTERN)
+			if (isSEPARATE_PATTERN())
 				for (int n=0; n<4; n++)
 					if (isCross(_next[n]))
 						return _next[n];
-			if (CUT_PATTERN)
+			if (isCUT_PATTERN())
 			{
 				for (int n=0; n<4; n++)
 					if (isCut(_next[n],_oppositeColor))
@@ -732,7 +763,7 @@ public class MCTacticsAdministration
 			
 //		if (_lastRandomNumber<(_boardSize*_boardSize)/4)
 		{
-			if (TOBI_CUT_PATTERN)
+			if (isTOBI_CUT_PATTERN())
 			{
 				for (int n=0; n<4; n++)
 					if (isTobiCut(_next[n],_oppositeColor))
@@ -742,7 +773,7 @@ public class MCTacticsAdministration
 						return _next[n];
 			}
 	
-			if (KEIMA_CUT_PATTERN)
+			if (isKEIMA_CUT_PATTERN())
 			{
 				for (int n=0; n<8; n++)
 					if (isKeimaPush(_next[n],_oppositeColor))
@@ -752,7 +783,7 @@ public class MCTacticsAdministration
 						return _next[n];
 			}
 			
-			if (TOBI_CONNECT_PATTERN)
+			if (isTOBI_CONNECT_PATTERN())
 			{
 				for (int n=0; n<4; n++)
 					if (isTobiConnect(_next[n],_oppositeColor))
@@ -762,21 +793,21 @@ public class MCTacticsAdministration
 						return _next[n];
 			}
 			
-			if (FIRST_LINE_ATARI_PATTERN)
+			if (isFIRST_LINE_ATARI_PATTERN())
 				for (int n=0; n<4; n++)
 					if (isFirstLineAtari(_next[n]))
 						return _next[n];
 			
-			if (SECOND_LINE_ATARI_PATTERN)
+			if (isSECOND_LINE_ATARI_PATTERN())
 				for (int n=0; n<4; n++)
 					if (isSecondLineAtari(_next[n]))
 						return _next[n];
 		
-			if (FIRST_LINE_BLOCK_PATTERN)
+			if (isFIRST_LINE_BLOCK_PATTERN())
 				for (int n=0; n<4; n++)
 					if (isFirstLineBlock(_next[n]))
 						return _next[n];
-			if (SECOND_LINE_BLOCK_PATTERN)
+			if (isSECOND_LINE_BLOCK_PATTERN())
 				for (int n=0; n<4; n++)
 					if (isSecondLineBlock(_next[n]))
 						return _next[n];
@@ -796,11 +827,11 @@ public class MCTacticsAdministration
 		{
 			int xy = _emptyPoints.get(i);
 			
-			if (SEPARATE_PATTERN)
+			if (isSEPARATE_PATTERN())
 				if (isCross(xy))
 					if (isOK(xy))
 						return xy;
-			if (CUT_PATTERN)
+			if (isCUT_PATTERN())
 			{
 				if (isCut(xy,_oppositeColor))
 					if (isOK(xy))
@@ -809,7 +840,7 @@ public class MCTacticsAdministration
 					if (isOK(xy))
 						return xy;
 			}
-			if (KEIMA_CUT_PATTERN)
+			if (isKEIMA_CUT_PATTERN())
 			{
 				if (isKeimaPush(xy,_oppositeColor))
 					if (isOK(xy))
@@ -819,7 +850,7 @@ public class MCTacticsAdministration
 						return xy;
 			}
 			
-			if (TOBI_CUT_PATTERN)
+			if (isTOBI_CUT_PATTERN())
 			{
 				if (isTobiCut(xy,_oppositeColor))
 					if (isOK(xy))
@@ -829,7 +860,7 @@ public class MCTacticsAdministration
 						return xy;
 			}
 			
-			if (TOBI_CONNECT_PATTERN)
+			if (isTOBI_CONNECT_PATTERN())
 			{
 				if (isTobiConnect(xy,_oppositeColor))
 					if (isOK(xy))
@@ -839,27 +870,27 @@ public class MCTacticsAdministration
 						return xy;
 			}
 			
-			if (FIRST_LINE_ATARI_PATTERN)
+			if (isFIRST_LINE_ATARI_PATTERN())
 			{
 				if (isFirstLineAtari(xy))
 					if (isOK(xy))
 						return xy;
 			}
 			
-			if (SECOND_LINE_ATARI_PATTERN)
+			if (isSECOND_LINE_ATARI_PATTERN())
 			{
 				if (isSecondLineAtari(xy))
 					if (isOK(xy))
 						return xy;
 			}
 		
-			if (FIRST_LINE_BLOCK_PATTERN)
+			if (isFIRST_LINE_BLOCK_PATTERN())
 			{
 				if (isFirstLineBlock(xy))
 					if (isOK(xy))
 						return xy;
 			}
-			if (SECOND_LINE_BLOCK_PATTERN)
+			if (isSECOND_LINE_BLOCK_PATTERN())
 			{
 				if (isSecondLineBlock(xy))
 					if (isOK(xy))
@@ -1169,6 +1200,306 @@ public class MCTacticsAdministration
     
     private boolean isPrehistoric(int chain)
     {
-    	return (!USE_STONE_AGE || _stoneAge[chain]<=_playoutStart);
+    	return (!isUSE_STONE_AGE() || _stoneAge[chain]<=_playoutStart);
+    }
+
+	public boolean isUSE_STONE_AGE()
+    {
+		return _properties.getBooleanProperty("USE_STONE_AGE");
+    	//return USE_STONE_AGE;
+    }
+
+	public void setUSE_STONE_AGE(boolean uSE_STONE_AGE)
+    {
+		_properties.setBooleanProperty("USE_STONE_AGE",uSE_STONE_AGE);
+    	//USE_STONE_AGE = uSE_STONE_AGE;
+    }
+
+	public boolean isFOG_OF_WAR()
+    {
+		return _properties.getBooleanProperty("FOG_OF_WAR");
+    	//return FOG_OF_WAR;
+    }
+
+	public void setFOG_OF_WAR(boolean fOG_OF_WAR)
+    {
+		_properties.setBooleanProperty("FOG_OF_WAR",fOG_OF_WAR);
+    	//FOG_OF_WAR = fOG_OF_WAR;
+    }
+
+	public boolean isNO_FIRST_LINE()
+    {
+		return _properties.getBooleanProperty("NO_FIRST_LINE");
+    	//return NO_FIRST_LINE;
+    }
+
+	public void setNO_FIRST_LINE(boolean nO_FIRST_LINE)
+    {
+		_properties.setBooleanProperty("NO_FIRST_LINE",nO_FIRST_LINE);
+    	//NO_FIRST_LINE = nO_FIRST_LINE;
+    }
+
+	public boolean isNO_EMPTY_TRIANGLE()
+    {
+		return _properties.getBooleanProperty("NO_EMPTY_TRIANGLE");
+    	//return NO_EMPTY_TRIANGLE;
+    }
+
+	public void setNO_EMPTY_TRIANGLE(boolean nO_EMPTY_TRIANGLE)
+    {
+		_properties.setBooleanProperty("NO_EMPTY_TRIANGLE",nO_EMPTY_TRIANGLE);
+    	//NO_EMPTY_TRIANGLE = nO_EMPTY_TRIANGLE;
+    }
+
+	public boolean isNO_AUTO_ATARI()
+    {
+		return _properties.getBooleanProperty("NO_AUTO_ATARI");
+    	//return NO_AUTO_ATARI;
+    }
+
+	public void setNO_AUTO_ATARI(boolean nO_AUTO_ATARI)
+    {
+		_properties.setBooleanProperty("NO_AUTO_ATARI",nO_AUTO_ATARI);
+    	//NO_AUTO_ATARI = nO_AUTO_ATARI;
+    }
+
+	public boolean isUSE_TACTICS_IN_SIMULATION()
+    {
+		return _properties.getBooleanProperty("USE_TACTICS_IN_SIMULATION");
+    	//return USE_TACTICS_IN_SIMULATION;
+    }
+
+	public void setUSE_TACTICS_IN_SIMULATION(boolean uSE_TACTICS_IN_SIMULATION)
+    {
+		_properties.setBooleanProperty("USE_TACTICS_IN_SIMULATION",uSE_TACTICS_IN_SIMULATION);
+    	//USE_TACTICS_IN_SIMULATION = uSE_TACTICS_IN_SIMULATION;
+    }
+
+	public boolean isUSE_TACTICS_IN_EXPLORATION()
+    {
+		return _properties.getBooleanProperty("USE_TACTICS_IN_EXPLORATION");
+    	//return USE_TACTICS_IN_EXPLORATION;
+    }
+
+	public void setUSE_TACTICS_IN_EXPLORATION(boolean uSE_TACTICS_IN_EXPLORATION)
+    {
+		_properties.setBooleanProperty("USE_TACTICS_IN_EXPLORATION",uSE_TACTICS_IN_EXPLORATION);
+    	//USE_TACTICS_IN_EXPLORATION = uSE_TACTICS_IN_EXPLORATION;
+    }
+
+	public boolean isIMMEDIATE_ESCAPE_ATARI()
+    {
+		return _properties.getBooleanProperty("IMMEDIATE_ESCAPE_ATARI");
+    	//return IMMEDIATE_ESCAPE_ATARI;
+    }
+
+	public void setIMMEDIATE_ESCAPE_ATARI(boolean iMMEDIATE_ESCAPE_ATARI)
+    {
+		_properties.setBooleanProperty("IMMEDIATE_ESCAPE_ATARI",iMMEDIATE_ESCAPE_ATARI);
+    	//IMMEDIATE_ESCAPE_ATARI = iMMEDIATE_ESCAPE_ATARI;
+    }
+
+	public boolean isCAPTURE_LAST_MOVE_IN_ATARI()
+    {
+		return _properties.getBooleanProperty("CAPTURE_LAST_MOVE_IN_ATARI");
+    	//return CAPTURE_LAST_MOVE_IN_ATARI;
+    }
+
+	public void setCAPTURE_LAST_MOVE_IN_ATARI(boolean cAPTURE_LAST_MOVE_IN_ATARI)
+    {
+		_properties.setBooleanProperty("CAPTURE_LAST_MOVE_IN_ATARI",cAPTURE_LAST_MOVE_IN_ATARI);
+    	//CAPTURE_LAST_MOVE_IN_ATARI = cAPTURE_LAST_MOVE_IN_ATARI;
+    }
+
+	public boolean isCAPTURE_LAST_MOVE_IN_LADDER()
+    {
+		return _properties.getBooleanProperty("CAPTURE_LAST_MOVE_IN_LADDER");
+    	//return CAPTURE_LAST_MOVE_IN_LADDER;
+    }
+
+	public void setCAPTURE_LAST_MOVE_IN_LADDER(boolean cAPTURE_LAST_MOVE_IN_LADDER)
+    {
+		_properties.setBooleanProperty("CAPTURE_LAST_MOVE_IN_LADDER",cAPTURE_LAST_MOVE_IN_LADDER);
+    	//CAPTURE_LAST_MOVE_IN_LADDER = cAPTURE_LAST_MOVE_IN_LADDER;
+    }
+
+	public boolean isESCAPE_ATARI()
+    {
+		return _properties.getBooleanProperty("ESCAPE_ATARI");
+    	//return ESCAPE_ATARI;
+    }
+
+	public void setESCAPE_ATARI(boolean eSCAPE_ATARI)
+    {
+		_properties.setBooleanProperty("ESCAPE_ATARI",eSCAPE_ATARI);
+    	//ESCAPE_ATARI = eSCAPE_ATARI;
+    }
+
+	public boolean isCAPTURE_STONES_IN_ATARI()
+    {
+		return _properties.getBooleanProperty("CAPTURE_STONES_IN_ATARI");
+    	//return CAPTURE_STONES_IN_ATARI;
+    }
+
+	public void setCAPTURE_STONES_IN_ATARI(boolean cAPTURE_STONES_IN_ATARI)
+    {
+		_properties.setBooleanProperty("CAPTURE_STONES_IN_ATARI",cAPTURE_STONES_IN_ATARI);
+    	//CAPTURE_STONES_IN_ATARI = cAPTURE_STONES_IN_ATARI;
+    }
+
+	public boolean isCAPTURE_STONES_IN_LADDER()
+    {
+		return _properties.getBooleanProperty("CAPTURE_STONES_IN_LADDER");
+    	//return CAPTURE_STONES_IN_LADDER;
+    }
+
+	public void setCAPTURE_STONES_IN_LADDER(boolean cAPTURE_STONES_IN_LADDER)
+    {
+		_properties.setBooleanProperty("CAPTURE_STONES_IN_LADDER",cAPTURE_STONES_IN_LADDER);
+    	//CAPTURE_STONES_IN_LADDER = cAPTURE_STONES_IN_LADDER;
+    }
+
+	public boolean isCAPTURE_STONES()
+    {
+		return _properties.getBooleanProperty("CAPTURE_STONES");
+    	//return CAPTURE_STONES;
+    }
+
+	public void setCAPTURE_STONES(boolean cAPTURE_STONES)
+    {
+		_properties.setBooleanProperty("CAPTURE_STONES",cAPTURE_STONES);
+    	//CAPTURE_STONES = cAPTURE_STONES;
+    }
+
+	public boolean isUSE_HARD_PATTERNS()
+    {
+		return _properties.getBooleanProperty("USE_HARD_PATTERNS");
+    	//return USE_HARD_PATTERNS;
+    }
+
+	public void setUSE_HARD_PATTERNS(boolean uSE_HARD_PATTERNS)
+    {
+		_properties.setBooleanProperty("USE_HARD_PATTERNS",uSE_HARD_PATTERNS);
+    	//USE_HARD_PATTERNS = uSE_HARD_PATTERNS;
+    }
+
+	public boolean isSEPARATE_PATTERN()
+    {
+		return _properties.getBooleanProperty("SEPARATE_PATTERN");
+    	//return SEPARATE_PATTERN;
+    }
+
+	public void setSEPARATE_PATTERN(boolean sEPARATE_PATTERN)
+    {
+		_properties.setBooleanProperty("SEPARATE_PATTERN",sEPARATE_PATTERN);
+    	//SEPARATE_PATTERN = sEPARATE_PATTERN;
+    }
+
+	public boolean isCUT_PATTERN()
+    {
+		return _properties.getBooleanProperty("CUT_PATTERN");
+    	//return CUT_PATTERN;
+    }
+
+	public void setCUT_PATTERN(boolean CUT_PATTERN)
+    {
+		_properties.setBooleanProperty("CUT_PATTERN",CUT_PATTERN);
+    	//CUT_PATTERN = cUT_PATTERN;
+    }
+
+	public boolean isTOBI_CUT_PATTERN()
+    {
+		return _properties.getBooleanProperty("TOBI_CUT_PATTERN");
+    	//return TOBI_CUT_PATTERN;
+    }
+
+	public void setTOBI_CUT_PATTERN(boolean tOBI_CUT_PATTERN)
+    {
+		_properties.setBooleanProperty("TOBI_CUT_PATTERN",tOBI_CUT_PATTERN);
+    	//TOBI_CUT_PATTERN = tOBI_CUT_PATTERN;
+    }
+
+	public boolean isKEIMA_CUT_PATTERN()
+    {
+		return _properties.getBooleanProperty("KEIMA_CUT_PATTERN");
+    	//return KEIMA_CUT_PATTERN;
+    }
+
+	public void setKEIMA_CUT_PATTERN(boolean KEIMA_CUT_PATTERN)
+    {
+		_properties.setBooleanProperty("KEIMA_CUT_PATTERN",KEIMA_CUT_PATTERN);
+    	//KEIMA_CUT_PATTERN = kEIMA_CUT_PATTERN;
+    }
+
+	public boolean isTOBI_CONNECT_PATTERN()
+    {
+		return _properties.getBooleanProperty("TOBI_CONNECT_PATTERN");
+    	//return TOBI_CONNECT_PATTERN;
+    }
+
+	public void setTOBI_CONNECT_PATTERN(boolean tOBI_CONNECT_PATTERN)
+    {
+		_properties.setBooleanProperty("TOBI_CONNECT_PATTERN",tOBI_CONNECT_PATTERN);
+    	//TOBI_CONNECT_PATTERN = tOBI_CONNECT_PATTERN;
+    }
+
+	public boolean isFIRST_LINE_ATARI_PATTERN()
+    {
+		return _properties.getBooleanProperty("FIRST_LINE_ATARI_PATTERN");
+    	//return FIRST_LINE_ATARI_PATTERN;
+    }
+
+	public void setFIRST_LINE_ATARI_PATTERN(boolean FIRST_LINE_ATARI_PATTERN)
+    {
+		_properties.setBooleanProperty("FIRST_LINE_ATARI_PATTERN",FIRST_LINE_ATARI_PATTERN);
+    	//FIRST_LINE_ATARI_PATTERN = fIRST_LINE_ATARI_PATTERN;
+    }
+
+	public boolean isSECOND_LINE_ATARI_PATTERN()
+    {
+		return _properties.getBooleanProperty("SECOND_LINE_ATARI_PATTERN");
+    	//return SECOND_LINE_ATARI_PATTERN;
+    }
+
+	public void setSECOND_LINE_ATARI_PATTERN(boolean sECOND_LINE_ATARI_PATTERN)
+    {
+		_properties.setBooleanProperty("SECOND_LINE_ATARI_PATTERN",sECOND_LINE_ATARI_PATTERN);
+    	//SECOND_LINE_ATARI_PATTERN = sECOND_LINE_ATARI_PATTERN;
+    }
+
+	public boolean isFIRST_LINE_BLOCK_PATTERN()
+    {
+		return _properties.getBooleanProperty("FIRST_LINE_BLOCK_PATTERN");
+    	//return FIRST_LINE_BLOCK_PATTERN;
+    }
+
+	public void setFIRST_LINE_BLOCK_PATTERN(boolean FIRST_LINE_BLOCK_PATTERN)
+    {
+		_properties.setBooleanProperty("FIRST_LINE_BLOCK_PATTERN",FIRST_LINE_BLOCK_PATTERN);
+    	//FIRST_LINE_BLOCK_PATTERN = fIRST_LINE_BLOCK_PATTERN;
+    }
+
+	public boolean isSECOND_LINE_BLOCK_PATTERN()
+    {
+		return _properties.getBooleanProperty("SECOND_LINE_BLOCK_PATTERN");
+    	//return SECOND_LINE_BLOCK_PATTERN;
+    }
+
+	public void setSECOND_LINE_BLOCK_PATTERN(boolean sECOND_LINE_BLOCK_PATTERN)
+    {
+		_properties.setBooleanProperty("SECOND_LINE_BLOCK_PATTERN",sECOND_LINE_BLOCK_PATTERN);
+    	//SECOND_LINE_BLOCK_PATTERN = sECOND_LINE_BLOCK_PATTERN;
+    }
+
+	public boolean isEYE_PATTERN()
+    {
+		return _properties.getBooleanProperty("EYE_PATTERN");
+    	//return EYE_PATTERN;
+    }
+
+	public void setEYE_PATTERN(boolean eYE_PATTERN)
+    {
+		_properties.setBooleanProperty("EYE_PATTERN",eYE_PATTERN);
+    	//EYE_PATTERN = eYE_PATTERN;
     }
 }

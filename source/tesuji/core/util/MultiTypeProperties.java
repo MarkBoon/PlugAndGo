@@ -55,13 +55,27 @@ public class MultiTypeProperties
 		return Double.parseDouble(getProperty(key));
 	}
 	
+	public boolean getBooleanProperty(String key)
+	{
+		String property = getProperty(key);
+		if (property==null)
+			return false;
+		return Boolean.parseBoolean(property);
+	}
+
 	public void setIntProperty(String key, int value)
 	{
-		setProperty(key, ""+value);
+		setProperty(key, Integer.toString(value));
 	}
 	
 	public void setDoubleProperty(String key, double value)
 	{
-		setProperty(key, ""+value);
+		setProperty(key, Double.toString(value));
 	}
+	
+	public void setBooleanProperty(String key, boolean value)
+	{
+		setProperty(key, Boolean.toString(value));
+	}
+	
 }

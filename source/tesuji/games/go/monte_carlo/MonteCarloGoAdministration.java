@@ -341,6 +341,7 @@ public class MonteCarloGoAdministration
 	public void copyDataFrom(MonteCarloAdministration<GoMove> sourceAdministration)
 	{
 		MonteCarloGoAdministration source = (MonteCarloGoAdministration) sourceAdministration;
+		_spreadTest = source._spreadTest;
 		_copyDataFrom(source);
 	}
 
@@ -780,7 +781,7 @@ public class MonteCarloGoAdministration
 			{
 				xy = selectRandomMoveCoordinate(emptyPoints);
 			}
-			while (xy!=PASS && !accept(xy));
+			while (xy!=PASS && (!accept1(xy) || !accept2(xy)));
 	
 			return xy;			
 		}
@@ -800,7 +801,7 @@ public class MonteCarloGoAdministration
 		return selectRandomMoveCoordinate(emptyPoints);
 	}
 	
-	private  boolean accept(int xy)
+	private  boolean accept1(int xy)
 	{
 		if (!isTestVersion() || _otherNeighbours[xy]!=0 || _otherDiagonalNeighbours[xy]>=_maxDiagonalsOccupied[xy])
 		{
@@ -820,6 +821,26 @@ public class MonteCarloGoAdministration
 		return (points==0 || RANDOM.nextInt(points)==0);
 	}
 	
+	private  boolean accept2(int xy)
+	{
+		if (!isTestVersion() || _ownNeighbours[xy]!=0 || _ownDiagonalNeighbours[xy]>=_maxDiagonalsOccupied[xy])
+		{
+			return true;
+		}
+		int points = _otherNeighbours[xy] + _otherDiagonalNeighbours[xy];
+		byte[] board = _boardModel.getSingleArray();
+		if (board[left(above(xy))]==EMPTY && _otherNeighbours[left(above(xy))]>2)
+			points++;
+		if (board[left(below(xy))]==EMPTY && _otherNeighbours[left(below(xy))]>2)
+			points++;
+		if (board[right(above(xy))]==EMPTY && _otherNeighbours[right(above(xy))]>2)
+			points++;
+		if (board[right(below(xy))]==EMPTY && _otherNeighbours[right(below(xy))]>2)
+			points++;
+		
+		return (points==0 || RANDOM.nextInt(points)==0);
+	}
+
 	/**
 	 * Randomly select an empty point from a set of empty points.
 	 * 
