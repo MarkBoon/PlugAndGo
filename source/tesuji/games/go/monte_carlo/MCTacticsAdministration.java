@@ -1,36 +1,33 @@
 /**
- * Project: Tesuji Go Framework.<br>
- * <br>
- * <font color="#CC6600"><font size=-1> Copyright (c) 1985-2006 Mark Boon<br>
- * All rights reserved.<br>
- * <br>
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, and/or sell copies of the
- * Software, and to permit persons to whom the Software is furnished to do so,
- * provided that the above copyright notice(s) and this permission notice appear
- * in all copies of the Software and that both the above copyright notice(s) and
- * this permission notice appear in supporting documentation.<br>
- * <br>
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
- * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
- * IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.<br>
- * <br>
- * <font color="#00000"><font size=+1>
- * 
- */
+* Project: Tesuji Go Framework.<br>
+* <br>
+* <font color="#CC6600"><font size=-1> Copyright (c) 1985-2006 Mark Boon<br>
+* All rights reserved.<br>
+* <br>
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the "Software"), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, and/or sell copies of the
+* Software, and to permit persons to whom the Software is furnished to do so,
+* provided that the above copyright notice(s) and this permission notice appear
+* in all copies of the Software and that both the above copyright notice(s) and
+* this permission notice appear in supporting documentation.<br>
+* <br>
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+* IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.<br>
+* <br>
+* <font color="#00000"><font size=+1>
+* 
+*/
 
 package tesuji.games.go.monte_carlo;
 
-import java.util.Enumeration;
-
 import org.apache.log4j.Logger;
 
-import tesuji.core.util.MultiTypeProperties;
 import tesuji.games.go.common.GoMove;
 import tesuji.games.go.monte_carlo.MonteCarloAdministration;
 import tesuji.games.go.tactics.LadderReader;
@@ -47,8 +44,8 @@ import static tesuji.games.go.common.GoConstant.*;
 import static tesuji.games.go.util.GoArray.*;
 
 /**
- * 
- */
+* 
+*/
 public class MCTacticsAdministration
 	extends MonteCarloGoAdministration
 {
@@ -66,6 +63,35 @@ public class MCTacticsAdministration
 	public static int getNrPatternsGenerated() { return _nrPatternsGenerated; }
 	public static void reset() { _nrPatternsUsed = _nrPatternsGenerated = 0; }
 	
+	public enum Flag
+	{
+		USE_STONE_AGE,
+		FOG_OF_WAR,
+		NO_FIRST_LINE,
+		NO_EMPTY_TRIANGLE,
+		NO_AUTO_ATARI,
+		USE_TACTICS_IN_SIMULATION,
+		USE_TACTICS_IN_EXPLORATION,
+		IMMEDIATE_ESCAPE_ATARI,
+		CAPTURE_LAST_MOVE_IN_ATARI,
+		CAPTURE_LAST_MOVE_IN_LADDER,
+		ESCAPE_ATARI,
+		CAPTURE_STONES_IN_ATARI,
+		CAPTURE_STONES_IN_LADDER,
+		CAPTURE_STONES,
+		USE_HARD_PATTERNS,
+		SEPARATE_PATTERN,
+		CUT_PATTERN,
+		TOBI_CUT_PATTERN,
+		KEIMA_CUT_PATTERN,
+		TOBI_CONNECT_PATTERN,
+		FIRST_LINE_ATARI_PATTERN,
+		SECOND_LINE_ATARI_PATTERN,
+		FIRST_LINE_BLOCK_PATTERN,
+		SECOND_LINE_BLOCK_PATTERN,
+		EYE_PATTERN,
+		LAST
+	};
 //	public boolean USE_STONE_AGE = 					true;
 //	public boolean FOG_OF_WAR = 					true;		// -RefBot2K=54.2%, MCTS10K=51.8%
 //	public boolean NO_FIRST_LINE = 					true;		// -RefBot2K=58.1%, MCTS10K=50.7%?
@@ -107,8 +133,8 @@ public class MCTacticsAdministration
 //	public boolean FIRST_LINE_BLOCK_PATTERN = 		false;
 //	public boolean SECOND_LINE_BLOCK_PATTERN = 		false;
 //	public boolean EYE_PATTERN = 					false;
-	
-	private MultiTypeProperties _properties;
+
+	private boolean[] _flags;
 	
 	public MCTacticsAdministration()
 	{
@@ -127,20 +153,20 @@ public class MCTacticsAdministration
 	
 	private void initProperties()
 	{
-		_properties = new MultiTypeProperties();
-		_properties.setBooleanProperty("USE_STONE_AGE", true);
-		_properties.setBooleanProperty("FOG_OF_WAR", true);
-		_properties.setBooleanProperty("NO_FIRST_LINE", true);
-		_properties.setBooleanProperty("NO_AUTO_ATARI", true);
-		_properties.setBooleanProperty("USE_TACTICS_IN_SIMULATION", true);
-		_properties.setBooleanProperty("USE_TACTICS_IN_EXPLORATION", true);
-		_properties.setBooleanProperty("IMMEDIATE_ESCAPE_ATARI", true);
-		_properties.setBooleanProperty("CAPTURE_LAST_MOVE_IN_LADDER", true);
-		_properties.setBooleanProperty("ESCAPE_ATARI", true);
-		_properties.setBooleanProperty("CAPTURE_STONES_IN_ATARI", true);
-		_properties.setBooleanProperty("CAPTURE_STONES_IN_LADDER", true);
-		_properties.setBooleanProperty("CAPTURE_STONES", true);
-		_properties.setBooleanProperty("SEPARATE_PATTERN", true);
+		_flags = new boolean[Flag.LAST.ordinal()];
+		_flags[Flag.USE_STONE_AGE.ordinal()] = true;
+		_flags[Flag.FOG_OF_WAR.ordinal()] = true;
+		_flags[Flag.NO_FIRST_LINE.ordinal()] = true;
+		_flags[Flag.NO_AUTO_ATARI.ordinal()] = true;
+		_flags[Flag.USE_TACTICS_IN_SIMULATION.ordinal()] = true;
+		_flags[Flag.USE_TACTICS_IN_EXPLORATION.ordinal()] = true;
+		_flags[Flag.IMMEDIATE_ESCAPE_ATARI.ordinal()] = true;
+		_flags[Flag.CAPTURE_LAST_MOVE_IN_LADDER.ordinal()] = true;
+		_flags[Flag.ESCAPE_ATARI.ordinal()] = true;
+		_flags[Flag.CAPTURE_STONES_IN_ATARI.ordinal()] = true;
+		_flags[Flag.CAPTURE_STONES_IN_LADDER.ordinal()] = true;
+		_flags[Flag.CAPTURE_STONES.ordinal()] = true;
+		_flags[Flag.SEPARATE_PATTERN.ordinal()] = true;
 	}
 
 	@Override
@@ -190,12 +216,7 @@ public class MCTacticsAdministration
 		super.copyDataFrom(sourceAdmin);
 		
 		MCTacticsAdministration source = (MCTacticsAdministration) sourceAdmin;
-		for (Enumeration e = source._properties.propertyNames(); e.hasMoreElements();)
-		{
-			String key = (String)e.nextElement();
-			Object value = source._properties.get(key);
-			_properties.put(key, value);
-		}
+		System.arraycopy(source._flags, 0, _flags, 0, _flags.length);
 		if (useFogOfWar())
 		{
 			copy(source._fogOfWar,_fogOfWar);
@@ -218,8 +239,8 @@ public class MCTacticsAdministration
 		if (useFogOfWar())
 			removeFogOfWar(xy);
 	}
-  
-    @Override
+
+   @Override
 	public boolean isVerboten(int xy)
 	{
 		// Eye check
@@ -417,7 +438,7 @@ public class MCTacticsAdministration
 				if (patternXY!=UNDEFINED_COORDINATE && isLegal(patternXY))
 				{
 					_nrPatternsGenerated++;
-					if (RANDOM.nextInt(2+GoArray.getDistance(_previousMove, patternXY)/2)==0)
+					if (RANDOM.nextInt(1+GoArray.getDistance(_previousMove, patternXY)/2)==0 && _ladderReader.wouldBeLadder(patternXY, _colorToPlay)==TacticsConstant.CANNOT_CATCH)
 					{
 						_nrPatternsUsed++;
 						return patternXY;
@@ -670,7 +691,7 @@ public class MCTacticsAdministration
 			stone = _chainNext[stone];
 		}
 		while (stone!=xy);
-  	
+ 	
 		return 0;
 	}   
 
@@ -684,12 +705,12 @@ public class MCTacticsAdministration
 			stone = _chainNext[stone];
 		}
 		while (stone!=xy);
-  	
+ 	
 		return nrStones;
-  	}    
+ 	}    
 
 	protected boolean isFalsePoint(int xy, byte color)
-    {
+   {
 	    if (_boardModel.get(left(xy))==color
 						&& (_boardModel.get(left(above(xy)))==opposite(color) || _boardModel.get(left(above(xy)))==EDGE)
 						&& (_boardModel.get(left(below(xy)))==opposite(color) || _boardModel.get(left(below(xy)))==EDGE))
@@ -707,7 +728,7 @@ public class MCTacticsAdministration
 						&& (_boardModel.get(below(right(xy)))==opposite(color) || _boardModel.get(below(right(xy)))==EDGE))
 			return true;
 		return false;
-    }
+   }
 
 	private void removeFogOfWar(int xy)
 	{
@@ -1203,314 +1224,264 @@ public class MCTacticsAdministration
 		return 0;
 	}
 	
-    protected boolean isSafeToMove(int moveXY)
-    {
+   protected boolean isSafeToMove(int moveXY)
+   {
 		return (_ladderReader.wouldBeLadder(moveXY,BLACK)==TacticsConstant.CANNOT_CATCH
 			&& _ladderReader.wouldBeLadder(moveXY,WHITE)==TacticsConstant.CANNOT_CATCH);
-    }
-    
-    private boolean isPrehistoric(int chain)
-    {
-    	return (!isUSE_STONE_AGE() || _stoneAge[chain]<=_playoutStart);
-    }
+   }
+
+   private boolean isPrehistoric(int chain)
+   {
+   	return (!isUSE_STONE_AGE() || _stoneAge[chain]<=_playoutStart);
+   }
 
 	public boolean isUSE_STONE_AGE()
-    {
-		return _properties.getBooleanProperty("USE_STONE_AGE");
-    	//return USE_STONE_AGE;
-    }
+   {
+		return _flags[Flag.USE_STONE_AGE.ordinal()];
+   }
 
-	public void setUSE_STONE_AGE(boolean uSE_STONE_AGE)
-    {
-		_properties.setBooleanProperty("USE_STONE_AGE",uSE_STONE_AGE);
-    	//USE_STONE_AGE = uSE_STONE_AGE;
-    }
+	public void setUSE_STONE_AGE(boolean value)
+   {
+		_flags[Flag.USE_STONE_AGE.ordinal()] = value;
+   }
 
 	public boolean isFOG_OF_WAR()
-    {
-		return _properties.getBooleanProperty("FOG_OF_WAR");
-    	//return FOG_OF_WAR;
-    }
+   {
+		return _flags[Flag.USE_STONE_AGE.ordinal()];
+   }
 
-	public void setFOG_OF_WAR(boolean fOG_OF_WAR)
-    {
-		_properties.setBooleanProperty("FOG_OF_WAR",fOG_OF_WAR);
-    	//FOG_OF_WAR = fOG_OF_WAR;
-    }
+	public void setFOG_OF_WAR(boolean value)
+   {
+		_flags[Flag.FOG_OF_WAR.ordinal()] = value;
+   }
 
 	public boolean isNO_FIRST_LINE()
-    {
-		return _properties.getBooleanProperty("NO_FIRST_LINE");
-    	//return NO_FIRST_LINE;
-    }
+   {
+		return _flags[Flag.NO_FIRST_LINE.ordinal()];
+   }
 
-	public void setNO_FIRST_LINE(boolean nO_FIRST_LINE)
-    {
-		_properties.setBooleanProperty("NO_FIRST_LINE",nO_FIRST_LINE);
-    	//NO_FIRST_LINE = nO_FIRST_LINE;
-    }
+	public void setNO_FIRST_LINE(boolean value)
+   {
+		_flags[Flag.NO_FIRST_LINE.ordinal()] = value;
+   }
 
 	public boolean isNO_EMPTY_TRIANGLE()
-    {
-		return _properties.getBooleanProperty("NO_EMPTY_TRIANGLE");
-    	//return NO_EMPTY_TRIANGLE;
-    }
+   {
+		return _flags[Flag.NO_EMPTY_TRIANGLE.ordinal()];
+   }
 
-	public void setNO_EMPTY_TRIANGLE(boolean nO_EMPTY_TRIANGLE)
-    {
-		_properties.setBooleanProperty("NO_EMPTY_TRIANGLE",nO_EMPTY_TRIANGLE);
-    	//NO_EMPTY_TRIANGLE = nO_EMPTY_TRIANGLE;
-    }
+	public void setNO_EMPTY_TRIANGLE(boolean value)
+   {
+		_flags[Flag.NO_EMPTY_TRIANGLE.ordinal()] = value;
+   }
 
 	public boolean isNO_AUTO_ATARI()
-    {
-		return _properties.getBooleanProperty("NO_AUTO_ATARI");
-    	//return NO_AUTO_ATARI;
-    }
+   {
+		return _flags[Flag.NO_AUTO_ATARI.ordinal()];
+   }
 
-	public void setNO_AUTO_ATARI(boolean nO_AUTO_ATARI)
-    {
-		_properties.setBooleanProperty("NO_AUTO_ATARI",nO_AUTO_ATARI);
-    	//NO_AUTO_ATARI = nO_AUTO_ATARI;
-    }
+	public void setNO_AUTO_ATARI(boolean value)
+   {
+		_flags[Flag.NO_AUTO_ATARI.ordinal()] = value;
+   }
 
 	public boolean isUSE_TACTICS_IN_SIMULATION()
-    {
-		return _properties.getBooleanProperty("USE_TACTICS_IN_SIMULATION");
-    	//return USE_TACTICS_IN_SIMULATION;
-    }
+   {
+		return _flags[Flag.USE_TACTICS_IN_SIMULATION.ordinal()];
+   }
 
-	public void setUSE_TACTICS_IN_SIMULATION(boolean uSE_TACTICS_IN_SIMULATION)
-    {
-		_properties.setBooleanProperty("USE_TACTICS_IN_SIMULATION",uSE_TACTICS_IN_SIMULATION);
-    	//USE_TACTICS_IN_SIMULATION = uSE_TACTICS_IN_SIMULATION;
-    }
+	public void setUSE_TACTICS_IN_SIMULATION(boolean value)
+   {
+		_flags[Flag.USE_TACTICS_IN_SIMULATION.ordinal()] = value;
+   }
 
 	public boolean isUSE_TACTICS_IN_EXPLORATION()
-    {
-		return _properties.getBooleanProperty("USE_TACTICS_IN_EXPLORATION");
-    	//return USE_TACTICS_IN_EXPLORATION;
-    }
+   {
+		return _flags[Flag.USE_TACTICS_IN_EXPLORATION.ordinal()];
+   }
 
-	public void setUSE_TACTICS_IN_EXPLORATION(boolean uSE_TACTICS_IN_EXPLORATION)
-    {
-		_properties.setBooleanProperty("USE_TACTICS_IN_EXPLORATION",uSE_TACTICS_IN_EXPLORATION);
-    	//USE_TACTICS_IN_EXPLORATION = uSE_TACTICS_IN_EXPLORATION;
-    }
+	public void setUSE_TACTICS_IN_EXPLORATION(boolean value)
+   {
+		_flags[Flag.USE_TACTICS_IN_EXPLORATION.ordinal()] = value;
+   }
 
 	public boolean isIMMEDIATE_ESCAPE_ATARI()
-    {
-		return _properties.getBooleanProperty("IMMEDIATE_ESCAPE_ATARI");
-    	//return IMMEDIATE_ESCAPE_ATARI;
-    }
+   {
+		return _flags[Flag.IMMEDIATE_ESCAPE_ATARI.ordinal()];
+   }
 
-	public void setIMMEDIATE_ESCAPE_ATARI(boolean iMMEDIATE_ESCAPE_ATARI)
-    {
-		_properties.setBooleanProperty("IMMEDIATE_ESCAPE_ATARI",iMMEDIATE_ESCAPE_ATARI);
-    	//IMMEDIATE_ESCAPE_ATARI = iMMEDIATE_ESCAPE_ATARI;
-    }
+	public void setIMMEDIATE_ESCAPE_ATARI(boolean value)
+   {
+		_flags[Flag.IMMEDIATE_ESCAPE_ATARI.ordinal()] = value;
+   }
 
 	public boolean isCAPTURE_LAST_MOVE_IN_ATARI()
-    {
-		return _properties.getBooleanProperty("CAPTURE_LAST_MOVE_IN_ATARI");
-    	//return CAPTURE_LAST_MOVE_IN_ATARI;
-    }
+   {
+		return _flags[Flag.CAPTURE_LAST_MOVE_IN_ATARI.ordinal()];
+   }
 
-	public void setCAPTURE_LAST_MOVE_IN_ATARI(boolean cAPTURE_LAST_MOVE_IN_ATARI)
-    {
-		_properties.setBooleanProperty("CAPTURE_LAST_MOVE_IN_ATARI",cAPTURE_LAST_MOVE_IN_ATARI);
-    	//CAPTURE_LAST_MOVE_IN_ATARI = cAPTURE_LAST_MOVE_IN_ATARI;
-    }
+	public void setCAPTURE_LAST_MOVE_IN_ATARI(boolean value)
+   {
+		_flags[Flag.CAPTURE_LAST_MOVE_IN_ATARI.ordinal()] = value;
+   }
 
 	public boolean isCAPTURE_LAST_MOVE_IN_LADDER()
-    {
-		return _properties.getBooleanProperty("CAPTURE_LAST_MOVE_IN_LADDER");
-    	//return CAPTURE_LAST_MOVE_IN_LADDER;
-    }
+   {
+		return _flags[Flag.CAPTURE_LAST_MOVE_IN_LADDER.ordinal()];
+   }
 
-	public void setCAPTURE_LAST_MOVE_IN_LADDER(boolean cAPTURE_LAST_MOVE_IN_LADDER)
-    {
-		_properties.setBooleanProperty("CAPTURE_LAST_MOVE_IN_LADDER",cAPTURE_LAST_MOVE_IN_LADDER);
-    	//CAPTURE_LAST_MOVE_IN_LADDER = cAPTURE_LAST_MOVE_IN_LADDER;
-    }
+	public void setCAPTURE_LAST_MOVE_IN_LADDER(boolean value)
+   {
+		_flags[Flag.CAPTURE_LAST_MOVE_IN_LADDER.ordinal()] = value;
+   }
 
 	public boolean isESCAPE_ATARI()
-    {
-		return _properties.getBooleanProperty("ESCAPE_ATARI");
-    	//return ESCAPE_ATARI;
-    }
+   {
+		return _flags[Flag.ESCAPE_ATARI.ordinal()];
+   }
 
-	public void setESCAPE_ATARI(boolean eSCAPE_ATARI)
-    {
-		_properties.setBooleanProperty("ESCAPE_ATARI",eSCAPE_ATARI);
-    	//ESCAPE_ATARI = eSCAPE_ATARI;
-    }
+	public void setESCAPE_ATARI(boolean value)
+   {
+		_flags[Flag.ESCAPE_ATARI.ordinal()] = value;
+   }
 
 	public boolean isCAPTURE_STONES_IN_ATARI()
-    {
-		return _properties.getBooleanProperty("CAPTURE_STONES_IN_ATARI");
-    	//return CAPTURE_STONES_IN_ATARI;
-    }
+   {
+		return _flags[Flag.CAPTURE_STONES_IN_ATARI.ordinal()];
+   }
 
-	public void setCAPTURE_STONES_IN_ATARI(boolean cAPTURE_STONES_IN_ATARI)
-    {
-		_properties.setBooleanProperty("CAPTURE_STONES_IN_ATARI",cAPTURE_STONES_IN_ATARI);
-    	//CAPTURE_STONES_IN_ATARI = cAPTURE_STONES_IN_ATARI;
-    }
+	public void setCAPTURE_STONES_IN_ATARI(boolean value)
+   {
+		_flags[Flag.CAPTURE_STONES_IN_ATARI.ordinal()] = value;
+   }
 
 	public boolean isCAPTURE_STONES_IN_LADDER()
-    {
-		return _properties.getBooleanProperty("CAPTURE_STONES_IN_LADDER");
-    	//return CAPTURE_STONES_IN_LADDER;
-    }
+   {
+		return _flags[Flag.CAPTURE_STONES_IN_LADDER.ordinal()];
+   }
 
-	public void setCAPTURE_STONES_IN_LADDER(boolean cAPTURE_STONES_IN_LADDER)
-    {
-		_properties.setBooleanProperty("CAPTURE_STONES_IN_LADDER",cAPTURE_STONES_IN_LADDER);
-    	//CAPTURE_STONES_IN_LADDER = cAPTURE_STONES_IN_LADDER;
-    }
+	public void setCAPTURE_STONES_IN_LADDER(boolean value)
+   {
+		_flags[Flag.CAPTURE_STONES_IN_LADDER.ordinal()] = value;
+   }
 
 	public boolean isCAPTURE_STONES()
-    {
-		return _properties.getBooleanProperty("CAPTURE_STONES");
-    	//return CAPTURE_STONES;
-    }
+   {
+		return _flags[Flag.CAPTURE_STONES.ordinal()];
+   }
 
-	public void setCAPTURE_STONES(boolean cAPTURE_STONES)
-    {
-		_properties.setBooleanProperty("CAPTURE_STONES",cAPTURE_STONES);
-    	//CAPTURE_STONES = cAPTURE_STONES;
-    }
+	public void setCAPTURE_STONES(boolean value)
+   {
+		_flags[Flag.CAPTURE_STONES.ordinal()] = value;
+   }
 
 	public boolean isUSE_HARD_PATTERNS()
-    {
-		return _properties.getBooleanProperty("USE_HARD_PATTERNS");
-    	//return USE_HARD_PATTERNS;
-    }
+   {
+		return _flags[Flag.USE_HARD_PATTERNS.ordinal()];
+   }
 
-	public void setUSE_HARD_PATTERNS(boolean uSE_HARD_PATTERNS)
-    {
-		_properties.setBooleanProperty("USE_HARD_PATTERNS",uSE_HARD_PATTERNS);
-    	//USE_HARD_PATTERNS = uSE_HARD_PATTERNS;
-    }
+	public void setUSE_HARD_PATTERNS(boolean value)
+   {
+		_flags[Flag.USE_HARD_PATTERNS.ordinal()] = value;
+   }
 
 	public boolean isSEPARATE_PATTERN()
-    {
-		return _properties.getBooleanProperty("SEPARATE_PATTERN");
-    	//return SEPARATE_PATTERN;
-    }
+   {
+		return _flags[Flag.SEPARATE_PATTERN.ordinal()];
+   }
 
-	public void setSEPARATE_PATTERN(boolean sEPARATE_PATTERN)
-    {
-		_properties.setBooleanProperty("SEPARATE_PATTERN",sEPARATE_PATTERN);
-    	//SEPARATE_PATTERN = sEPARATE_PATTERN;
-    }
+	public void setSEPARATE_PATTERN(boolean value)
+   {
+		_flags[Flag.SEPARATE_PATTERN.ordinal()] = value;
+   }
 
 	public boolean isCUT_PATTERN()
-    {
-		return _properties.getBooleanProperty("CUT_PATTERN");
-    	//return CUT_PATTERN;
-    }
+   {
+		return _flags[Flag.CUT_PATTERN.ordinal()];
+   }
 
-	public void setCUT_PATTERN(boolean CUT_PATTERN)
-    {
-		_properties.setBooleanProperty("CUT_PATTERN",CUT_PATTERN);
-    	//CUT_PATTERN = cUT_PATTERN;
-    }
+	public void setCUT_PATTERN(boolean value)
+   {
+		_flags[Flag.CUT_PATTERN.ordinal()] = value;
+   }
 
 	public boolean isTOBI_CUT_PATTERN()
-    {
-		return _properties.getBooleanProperty("TOBI_CUT_PATTERN");
-    	//return TOBI_CUT_PATTERN;
-    }
+   {
+		return _flags[Flag.TOBI_CUT_PATTERN.ordinal()];
+   }
 
-	public void setTOBI_CUT_PATTERN(boolean tOBI_CUT_PATTERN)
-    {
-		_properties.setBooleanProperty("TOBI_CUT_PATTERN",tOBI_CUT_PATTERN);
-    	//TOBI_CUT_PATTERN = tOBI_CUT_PATTERN;
-    }
+	public void setTOBI_CUT_PATTERN(boolean value)
+   {
+		_flags[Flag.TOBI_CUT_PATTERN.ordinal()] = value;
+   }
 
 	public boolean isKEIMA_CUT_PATTERN()
-    {
-		return _properties.getBooleanProperty("KEIMA_CUT_PATTERN");
-    	//return KEIMA_CUT_PATTERN;
-    }
+   {
+		return _flags[Flag.KEIMA_CUT_PATTERN.ordinal()];
+   }
 
-	public void setKEIMA_CUT_PATTERN(boolean KEIMA_CUT_PATTERN)
-    {
-		_properties.setBooleanProperty("KEIMA_CUT_PATTERN",KEIMA_CUT_PATTERN);
-    	//KEIMA_CUT_PATTERN = kEIMA_CUT_PATTERN;
-    }
+	public void setKEIMA_CUT_PATTERN(boolean value)
+   {
+		_flags[Flag.KEIMA_CUT_PATTERN.ordinal()] = value;
+   }
 
 	public boolean isTOBI_CONNECT_PATTERN()
-    {
-		return _properties.getBooleanProperty("TOBI_CONNECT_PATTERN");
-    	//return TOBI_CONNECT_PATTERN;
-    }
+   {
+		return _flags[Flag.TOBI_CONNECT_PATTERN.ordinal()];
+   }
 
-	public void setTOBI_CONNECT_PATTERN(boolean tOBI_CONNECT_PATTERN)
-    {
-		_properties.setBooleanProperty("TOBI_CONNECT_PATTERN",tOBI_CONNECT_PATTERN);
-    	//TOBI_CONNECT_PATTERN = tOBI_CONNECT_PATTERN;
-    }
+	public void setTOBI_CONNECT_PATTERN(boolean value)
+   {
+		_flags[Flag.TOBI_CONNECT_PATTERN.ordinal()] = value;
+   }
 
 	public boolean isFIRST_LINE_ATARI_PATTERN()
-    {
-		return _properties.getBooleanProperty("FIRST_LINE_ATARI_PATTERN");
-    	//return FIRST_LINE_ATARI_PATTERN;
-    }
+   {
+		return _flags[Flag.FIRST_LINE_ATARI_PATTERN.ordinal()];
+   }
 
-	public void setFIRST_LINE_ATARI_PATTERN(boolean FIRST_LINE_ATARI_PATTERN)
-    {
-		_properties.setBooleanProperty("FIRST_LINE_ATARI_PATTERN",FIRST_LINE_ATARI_PATTERN);
-    	//FIRST_LINE_ATARI_PATTERN = fIRST_LINE_ATARI_PATTERN;
-    }
+	public void setFIRST_LINE_ATARI_PATTERN(boolean value)
+   {
+		_flags[Flag.FIRST_LINE_ATARI_PATTERN.ordinal()] = value;
+   }
 
 	public boolean isSECOND_LINE_ATARI_PATTERN()
-    {
-		return _properties.getBooleanProperty("SECOND_LINE_ATARI_PATTERN");
-    	//return SECOND_LINE_ATARI_PATTERN;
-    }
+   {
+		return _flags[Flag.SECOND_LINE_ATARI_PATTERN.ordinal()];
+   }
 
-	public void setSECOND_LINE_ATARI_PATTERN(boolean sECOND_LINE_ATARI_PATTERN)
-    {
-		_properties.setBooleanProperty("SECOND_LINE_ATARI_PATTERN",sECOND_LINE_ATARI_PATTERN);
-    	//SECOND_LINE_ATARI_PATTERN = sECOND_LINE_ATARI_PATTERN;
-    }
+	public void setSECOND_LINE_ATARI_PATTERN(boolean value)
+   {
+		_flags[Flag.SECOND_LINE_ATARI_PATTERN.ordinal()] = value;
+   }
 
 	public boolean isFIRST_LINE_BLOCK_PATTERN()
-    {
-		return _properties.getBooleanProperty("FIRST_LINE_BLOCK_PATTERN");
-    	//return FIRST_LINE_BLOCK_PATTERN;
-    }
+   {
+		return _flags[Flag.FIRST_LINE_BLOCK_PATTERN.ordinal()];
+   }
 
-	public void setFIRST_LINE_BLOCK_PATTERN(boolean FIRST_LINE_BLOCK_PATTERN)
-    {
-		_properties.setBooleanProperty("FIRST_LINE_BLOCK_PATTERN",FIRST_LINE_BLOCK_PATTERN);
-    	//FIRST_LINE_BLOCK_PATTERN = fIRST_LINE_BLOCK_PATTERN;
-    }
+	public void setFIRST_LINE_BLOCK_PATTERN(boolean value)
+   {
+		_flags[Flag.FIRST_LINE_BLOCK_PATTERN.ordinal()] = value;
+   }
 
 	public boolean isSECOND_LINE_BLOCK_PATTERN()
-    {
-		return _properties.getBooleanProperty("SECOND_LINE_BLOCK_PATTERN");
-    	//return SECOND_LINE_BLOCK_PATTERN;
-    }
+   {
+		return _flags[Flag.SECOND_LINE_BLOCK_PATTERN.ordinal()];
+   }
 
-	public void setSECOND_LINE_BLOCK_PATTERN(boolean sECOND_LINE_BLOCK_PATTERN)
-    {
-		_properties.setBooleanProperty("SECOND_LINE_BLOCK_PATTERN",sECOND_LINE_BLOCK_PATTERN);
-    	//SECOND_LINE_BLOCK_PATTERN = sECOND_LINE_BLOCK_PATTERN;
-    }
+	public void setSECOND_LINE_BLOCK_PATTERN(boolean value)
+   {
+		_flags[Flag.SECOND_LINE_BLOCK_PATTERN.ordinal()] = value;
+   }
 
 	public boolean isEYE_PATTERN()
-    {
-		return _properties.getBooleanProperty("EYE_PATTERN");
-    	//return EYE_PATTERN;
-    }
+   {
+		return _flags[Flag.EYE_PATTERN.ordinal()];
+   }
 
-	public void setEYE_PATTERN(boolean eYE_PATTERN)
-    {
-		_properties.setBooleanProperty("EYE_PATTERN",eYE_PATTERN);
-    	//EYE_PATTERN = eYE_PATTERN;
-    }
+	public void setEYE_PATTERN(boolean value)
+   {
+		_flags[Flag.EYE_PATTERN.ordinal()] = value;
+   }
 }
