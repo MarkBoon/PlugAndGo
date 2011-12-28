@@ -9,16 +9,7 @@
 				<property name="monteCarloAdministration">
 					<bean class="tesuji.games.go.monte_carlo.MCTacticsAdministration" singleton="false">
 				  		<property name="USE_HARD_PATTERNS">
-				  			<value>true</value>
-				  		</property>
-				  		<property name="SEPARATE_PATTERN">
-				  			<value>true</value>
-				  		</property>
-				  		<property name="CUT_PATTERN">
-				  			<value>true</value>
-				  		</property>
-				  		<property name="KEIMA_CUT_PATTERN">
-				  			<value>true</value>
+				  			<value>false</value>
 				  		</property>
 				  	</bean>
 				</property>

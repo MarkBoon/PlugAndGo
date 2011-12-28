@@ -92,27 +92,7 @@ public class MCTacticsAdministration
 		EYE_PATTERN,
 		LAST
 	};
-//	public boolean USE_STONE_AGE = 					true;
-//	public boolean FOG_OF_WAR = 					true;		// -RefBot2K=54.2%, MCTS10K=51.8%
-//	public boolean NO_FIRST_LINE = 					true;		// -RefBot2K=58.1%, MCTS10K=50.7%?
-//	public boolean NO_EMPTY_TRIANGLE = 				false;		// -RefBot2K=51.4%, MCTS10K=?
-//	public boolean NO_AUTO_ATARI = 					true;		// -RefBot2K=56.1%, MCTS10K=?
-//	public boolean USE_TACTICS_IN_SIMULATION = 		true;		// MCTS50K=88.6%
-//	public boolean USE_TACTICS_IN_EXPLORATION = 	true;
-//	public boolean IMMEDIATE_ESCAPE_ATARI = 		true;		// RefBot2K=86.6%, MCTS10K=82.2%, MCTS50K=83.8%
-//																// RefBot2K=53.3%, MCTS10K=?
-//																// 10*1-RefBot2K=59.5%, MCTS10K=?
-//	public boolean CAPTURE_LAST_MOVE_IN_ATARI = 	false;		// RefBot2K=62.7%, MCTS10K=?
-//	
-//	public boolean CAPTURE_LAST_MOVE_IN_LADDER =	true;		// RefBot2K=74.7%, MCTS10K=78.4%, MCTS50K=81.9%
-//
-//	
-//	public boolean ESCAPE_ATARI = 					true;
-//	public boolean CAPTURE_STONES_IN_ATARI = 		true;
-//	public boolean CAPTURE_STONES_IN_LADDER = 		true;
-//	
-//	public boolean CAPTURE_STONES = 				true;
-//	
+	
 	public final int IMMEDIATE_ESCAPE_PRIORITY =	1;
 	public final int IMMEDIATE_CAPTURE_PRIORITY =	3;
 	public final int IMMEDIATE_LADDER_PRIORITY =	2;
@@ -121,18 +101,6 @@ public class MCTacticsAdministration
 	public final int LADDER_PRIORITY =				6;
 	public final int IMMEDIATE_VISITS =				5;
 	public final int IMMEDIATE_WINS =				5;
-//	
-//	public boolean USE_HARD_PATTERNS = 				false;
-//	public boolean SEPARATE_PATTERN = 				true;
-//	public boolean CUT_PATTERN = 					true;
-//	public boolean TOBI_CUT_PATTERN = 				false;
-//	public boolean KEIMA_CUT_PATTERN = 				true; // MCTS-2K=55%
-//	public boolean TOBI_CONNECT_PATTERN = 			false;
-//	public boolean FIRST_LINE_ATARI_PATTERN = 		false;
-//	public boolean SECOND_LINE_ATARI_PATTERN = 		false;
-//	public boolean FIRST_LINE_BLOCK_PATTERN = 		false;
-//	public boolean SECOND_LINE_BLOCK_PATTERN = 		false;
-//	public boolean EYE_PATTERN = 					false;
 
 	private boolean[] _flags;
 	
@@ -166,7 +134,8 @@ public class MCTacticsAdministration
 		_flags[Flag.CAPTURE_STONES_IN_ATARI.ordinal()] = true;
 		_flags[Flag.CAPTURE_STONES_IN_LADDER.ordinal()] = true;
 		_flags[Flag.CAPTURE_STONES.ordinal()] = true;
-		_flags[Flag.SEPARATE_PATTERN.ordinal()] = true;
+		_flags[Flag.SEPARATE_PATTERN.ordinal()] = false;
+		_flags[Flag.USE_HARD_PATTERNS.ordinal()] = false;
 	}
 
 	@Override
@@ -415,6 +384,16 @@ public class MCTacticsAdministration
 			return priorityMove;
 		
 		return super.selectSimulationMove(emptyPoints);
+	}
+	
+	@Override
+	protected int selectExplorationMove(PointSet emptyPoints)
+	{
+		int priorityMove = selectSimulationPriorityMove();
+		if (priorityMove!=PASS && priorityMove!=UNDEFINED_COORDINATE)
+			return priorityMove;
+		
+		return super.selectExplorationMove(emptyPoints);
 	}
 	
 	protected int selectSimulationPriorityMove()
