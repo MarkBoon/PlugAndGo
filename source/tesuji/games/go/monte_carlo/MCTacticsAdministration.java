@@ -386,15 +386,15 @@ public class MCTacticsAdministration
 		return super.selectSimulationMove(emptyPoints);
 	}
 	
-	@Override
-	protected int selectExplorationMove(PointSet emptyPoints)
-	{
-		int priorityMove = selectSimulationPriorityMove();
-		if (priorityMove!=PASS && priorityMove!=UNDEFINED_COORDINATE)
-			return priorityMove;
-		
-		return super.selectExplorationMove(emptyPoints);
-	}
+//	@Override
+//	protected int selectExplorationMove(PointSet emptyPoints)
+//	{
+//		int priorityMove = selectSimulationPriorityMove();
+//		if (priorityMove!=PASS && priorityMove!=UNDEFINED_COORDINATE)
+//			return priorityMove;
+//		
+//		return super.selectSimulationMove(emptyPoints); //?
+//	}
 	
 	protected int selectSimulationPriorityMove()
 	{

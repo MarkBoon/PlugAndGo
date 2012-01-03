@@ -445,6 +445,15 @@ public class MonteCarloGoAdministration
 	
 	/*
 	 * (non-Javadoc)
+	 * @see tesuji.games.go.monte_carlo.MonteCarloAdministration#playExplorationMove(tesuji.games.general.Move)
+	 */
+	public void playExplorationMove(int xy)
+	{
+		playMove(xy);
+	}
+	
+	/*
+	 * (non-Javadoc)
 	 * @see tesuji.games.go.monte_carlo.MonteCarloAdministration#isLegal(tesuji.games.general.Move)
 	 */
 	public boolean isLegalMove(GoMove move)

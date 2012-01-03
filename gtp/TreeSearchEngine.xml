@@ -11,6 +11,9 @@
 				  		<property name="USE_HARD_PATTERNS">
 				  			<value>false</value>
 				  		</property>
+				  		<property name="USE_TACTICS_IN_EXPLORATION">
+				  			<value>true</value>
+				  		</property>
 				  	</bean>
 				</property>
 		  		<property name="secondsPerMove">
@@ -28,6 +31,9 @@
 		  		<property name="nrSimulationsBeforeExpansion">
 		  			<value>1</value>
 		  		</property>
+		  		<property name="isTestVersion">
+		  			<value>true</value>
+		  		</property>
 			</bean>
   		</constructor-arg>
   		<property name="isTestVersion">
@@ -40,7 +46,14 @@
   		<constructor-arg>
 			<bean class="tesuji.games.go.search.MonteCarloTreeSearch" singleton="false">
 				<property name="monteCarloAdministration">
-					<bean class="tesuji.games.go.monte_carlo.MCTacticsAdministration" singleton="false"/>
+					<bean class="tesuji.games.go.monte_carlo.MCTacticsAdministration" singleton="false">
+				  		<property name="USE_HARD_PATTERNS">
+				  			<value>false</value>
+				  		</property>
+				  		<property name="USE_TACTICS_IN_EXPLORATION">
+				  			<value>false</value>
+				  		</property>
+				  	</bean>
 				</property>
 		  		<property name="secondsPerMove">
 		  			<value>0</value>
@@ -56,6 +69,9 @@
 		  		</property>
 		  		<property name="nrSimulationsBeforeExpansion">
 		  			<value>1</value>
+		  		</property>
+		  		<property name="isTestVersion">
+		  			<value>false</value>
 		  		</property>
 			</bean>
   		</constructor-arg>

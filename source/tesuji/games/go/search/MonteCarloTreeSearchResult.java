@@ -263,7 +263,7 @@ public class MonteCarloTreeSearchResult<MoveType extends Move>
 			return (getVirtualWinRatio() + getRAVEValue()) * getOwnershipValue() + getUrgencyValue() + getPatternValue();
 
 		double beta = getBeta();
-		return beta * ((getVirtualWinRatio()+getRAVEValue())*getOwnershipValue()+getPatternValue()) + (1.0-beta) * (getWinRatio()+getUCTValue()) + getUrgencyValue();		
+		return beta * ((getVirtualWinRatio()+getRAVEValue()) * getOwnershipValue() + getPatternValue()) + (1.0-beta) * (getWinRatio()+getUCTValue()) + getUrgencyValue();		
 	}
 	
 	/**
@@ -352,10 +352,10 @@ public class MonteCarloTreeSearchResult<MoveType extends Move>
 	
 	public double getOwnershipValue()
 	{
-		if (!_isTestVersion)
+//		if (!getIsTestVersion())
 			return 1.0;
 
-		if (_parentResult==null)
+/*		if (_parentResult==null)
 			return 1.0;
 
 		if (_parentResult.getNrPlayouts()<OWNERSHIP_MAXIMUM)
@@ -368,7 +368,7 @@ public class MonteCarloTreeSearchResult<MoveType extends Move>
 		else
 			own = _parentResult.getWhiteOwnership()[xy];
 		int index = own/8;
-		return ownershipFactor[index];
+		return ownershipFactor[index];*/
 		
 //		if (_parentResult.getParentResult()==null)
 //		return 1.0;

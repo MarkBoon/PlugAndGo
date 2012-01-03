@@ -135,6 +135,17 @@ public class GoArray
 	}
     
 	/**
+	 * Clear an array of float
+	 * 
+	 * @param array
+	 */
+	public static final void clear(float[] array)
+	{
+		Arrays.fill(array,0);
+//		System.arraycopy(doubleZeros,0,array,0,MAX);
+	}
+    
+	/**
 	 * Clear an array of Object
 	 * 
 	 * @param array
@@ -308,6 +319,14 @@ public class GoArray
 	public static final double[] createDoubles()
 	{
 		return new double[MAX];
+	}
+
+	/**
+	 * @return allocated space for a fixed-size array of double
+	 */
+	public static final float[] createFloats()
+	{
+		return new float[MAX];
 	}
 
 	/**

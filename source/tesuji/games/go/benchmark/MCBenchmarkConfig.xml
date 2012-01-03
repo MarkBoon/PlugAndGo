@@ -23,12 +23,12 @@
 			<list>
 				<ref bean="mcLibertyAdministration"/>
 				<ref bean="mcTacticsAdministration"/>
-				<ref bean="mcPatternsAdministration"/>
+				<!-- <ref bean="mcPatternsAdministration"/> -->
 			</list>
 		</property>
  	</bean>
  	
-	<bean id="mcLibertyAdministration" class="tesuji.games.go.monte_carlo.MCLibertyAdministration" singleton="false">
+	<bean id="mcLibertyAdministration" class="tesuji.games.go.monte_carlo.MonteCarloGoAdministration" singleton="false">
 	</bean>
  	
 	<bean id="mcTacticsAdministration" class="tesuji.games.go.monte_carlo.MCTacticsAdministration" singleton="false">

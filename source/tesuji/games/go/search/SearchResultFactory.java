@@ -55,6 +55,9 @@ public class SearchResultFactory
 	private ArrayStack<MonteCarloTreeSearchResult> mctsResultPool =
 		new ArrayStack<MonteCarloTreeSearchResult>();
 	
+	private ArrayStack<MonteCarloHashMapResult> mchmResultPool =
+		new ArrayStack<MonteCarloHashMapResult>();
+	
 	public static SearchResultFactory getSingleton()
 	{
 		if (_singleton==null)
@@ -100,6 +103,31 @@ public class SearchResultFactory
         else
         	newResult = mctsResultPool.pop();
         
+        return newResult;
+	}
+	
+	public static MonteCarloHashMapResult createMonteCarloHashMapResult()
+	{
+		return getSingleton()._createMonteCarloHashMapResult();
+	}
+	
+	public static void recycle(MonteCarloHashMapResult o)
+	{
+		getSingleton().mchmResultPool.push(o);
+	}
+	
+	private MonteCarloHashMapResult _createMonteCarloHashMapResult()
+	{
+		MonteCarloHashMapResult newResult;
+        if (mctsResultPool.isEmpty())
+        {
+        	newResult = new MonteCarloHashMapResult();
+        	nrResults++;
+        }
+        else
+        	newResult = mchmResultPool.pop();
+        
+        newResult.init();
         return newResult;
 	}
 }
