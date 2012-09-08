@@ -691,20 +691,20 @@ public class MCTacticsAdministration
 	protected boolean isFalsePoint(int xy, byte color)
    {
 	    if (_boardModel.get(left(xy))==color
-						&& (_boardModel.get(left(above(xy)))==opposite(color) || _boardModel.get(left(above(xy)))==EDGE)
-						&& (_boardModel.get(left(below(xy)))==opposite(color) || _boardModel.get(left(below(xy)))==EDGE))
+						&& (_boardModel.get(left_above(xy))==opposite(color) || _boardModel.get(left_above(xy))==EDGE)
+						&& (_boardModel.get(left_below(xy))==opposite(color) || _boardModel.get(left_below(xy))==EDGE))
 			return true;
 		if (_boardModel.get(right(xy))==color
-						&& (_boardModel.get(right(above(xy)))==opposite(color) || _boardModel.get(right(above(xy)))==EDGE)
-						&& (_boardModel.get(right(below(xy)))==opposite(color) || _boardModel.get(right(below(xy)))==EDGE))
+						&& (_boardModel.get(right_above(xy))==opposite(color) || _boardModel.get(right_above(xy))==EDGE)
+						&& (_boardModel.get(right_below(xy))==opposite(color) || _boardModel.get(right_below(xy))==EDGE))
 			return true;
 		if (_boardModel.get(above(xy))==color
-						&& (_boardModel.get(above(left(xy)))==opposite(color) || _boardModel.get(above(left(xy)))==EDGE)
-						&& (_boardModel.get(above(right(xy)))==opposite(color) || _boardModel.get(above(right(xy)))==EDGE))
+						&& (_boardModel.get(left_above(xy))==opposite(color) || _boardModel.get(left_above(xy))==EDGE)
+						&& (_boardModel.get(right_above(xy))==opposite(color) || _boardModel.get(right_above(xy))==EDGE))
 			return true;
 		if (_boardModel.get(below(xy))==color
-						&& (_boardModel.get(below(left(xy)))==opposite(color) || _boardModel.get(below(left(xy)))==EDGE)
-						&& (_boardModel.get(below(right(xy)))==opposite(color) || _boardModel.get(below(right(xy)))==EDGE))
+						&& (_boardModel.get(left_below(xy))==opposite(color) || _boardModel.get(left_below(xy))==EDGE)
+						&& (_boardModel.get(right_below(xy))==opposite(color) || _boardModel.get(right_below(xy))==EDGE))
 			return true;
 		return false;
    }
@@ -1226,7 +1226,7 @@ public class MCTacticsAdministration
 
 	public boolean isFOG_OF_WAR()
    {
-		return _flags[Flag.USE_STONE_AGE.ordinal()];
+		return _flags[Flag.FOG_OF_WAR.ordinal()];
    }
 
 	public void setFOG_OF_WAR(boolean value)

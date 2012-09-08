@@ -146,7 +146,7 @@ public class MCPlayout<MoveType extends Move>
      */
     public int getNrMovesPlayed()
     {
-    	return nrMovesPlayed;
+    	return _currentAdministration.getNrSimulatedMoves();
     }
     
     public boolean isConsistent()

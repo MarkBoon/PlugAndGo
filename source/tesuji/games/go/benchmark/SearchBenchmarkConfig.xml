@@ -94,7 +94,7 @@
 	<bean id="mctsTacticsAdministration" class="tesuji.games.go.monte_carlo.MCTacticsAdministration" singleton="false"/>
 	<bean id="mctsPatternsAdministration" class="tesuji.games.go.monte_carlo.MCPatternsAdministration" singleton="false">
   		<constructor-arg>
-  			<value>Minimal</value>
+  			<value>Test</value>
   		</constructor-arg>
 	</bean>
  	
@@ -103,9 +103,10 @@
 			<ref bean="mctsGoAdministration"/>
 		</property> -->
 		<property name="monteCarloAdministration">
-			<bean class="tesuji.games.go.monte_carlo.MCTacticsAdministration" singleton="false">
+			<ref bean="mctsPatternsAdministration"/>
+			<!--<bean class="tesuji.games.go.monte_carlo.MCTacticsAdministration" singleton="false">
 		  		<property name="USE_HARD_PATTERNS">
-		  			<value>true</value>
+		  			<value>false</value>
 		  		</property>
 		  		<property name="SEPARATE_PATTERN">
 		  			<value>true</value>
@@ -116,7 +117,7 @@
 		  		<property name="KEIMA_CUT_PATTERN">
 		  			<value>true</value>
 		  		</property>
-		  	</bean>
+		  	</bean>-->
 		</property>
   		<property name="isTestVersion">
   			<value>false</value>

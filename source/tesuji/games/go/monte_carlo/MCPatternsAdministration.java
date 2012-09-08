@@ -71,8 +71,8 @@ public class MCPatternsAdministration
 	{
 		super();
 		
-		_patternSet = loadPatternSet(patternGroupName);
 		_patternManager = HibernatePatternManager.getSingleton();
+		_patternSet = loadPatternSet(patternGroupName);
 	}
 	
 	PatternManager getPatternManager()

@@ -622,6 +622,26 @@ public class GoArray
 		return xy+WIDTH;
 	}
 
+	public static final int left_above(int xy)
+	{
+		return xy-WIDTH-1;
+	}
+
+	public static final int left_below(int xy)
+	{
+		return xy+WIDTH-1;
+	}
+
+	public static final int right_above(int xy)
+	{
+		return xy-WIDTH+1;
+	}
+
+	public static final int right_below(int xy)
+	{
+		return xy+WIDTH+1;
+	}
+
 	/**
 	 * Convert a 2-dimensional coordinate to a 1 dimensional coordinate.
 	 * 

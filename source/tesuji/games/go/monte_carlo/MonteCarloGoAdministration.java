@@ -61,7 +61,7 @@ import static tesuji.games.go.common.GoConstant.*;
 public class MonteCarloGoAdministration
 	implements MonteCarloAdministration<GoMove>
 {
-	public static final boolean USE_MERCY_RULE = false;
+	public static final boolean USE_MERCY_RULE = true;
 	
 	protected final MersenneTwisterFast RANDOM = new MersenneTwisterFast();
 	
@@ -186,6 +186,7 @@ public class MonteCarloGoAdministration
 	protected IntStack _urgencyStack;
 	protected IntStack _visitStack;
 	protected IntStack _winStack;
+	protected IntStack _illegalStack;
 	
 	/**
 	 * A list of checksums computed after each move. It's used to check for super-ko.
@@ -217,7 +218,7 @@ public class MonteCarloGoAdministration
 	
 	private ArrayStack<GoMoveIterator> _iteratorPool =	new ArrayStack<GoMoveIterator>();
 
-	private boolean _spreadTest = false;
+	private boolean _spreadTest = true;
 
 	
 	public MonteCarloGoAdministration()
@@ -240,6 +241,7 @@ public class MonteCarloGoAdministration
 
 		_checksum = new Checksum();
 
+		_illegalStack = ArrayFactory.createIntStack();
 		_moveStack = ArrayFactory.createLargeIntStack();
 		_checksumStack = ArrayFactory.createLargeIntStack();
 		_priorityMoveStack = ArrayFactory.createIntStack();
@@ -818,13 +820,13 @@ public class MonteCarloGoAdministration
 		}
 		int points = _ownNeighbours[xy] + _ownDiagonalNeighbours[xy];
 		byte[] board = _boardModel.getSingleArray();
-		if (board[left(above(xy))]==EMPTY && _ownNeighbours[left(above(xy))]>2)
+		if (board[left_above(xy)]==EMPTY && _ownNeighbours[left_above(xy)]>2)
 			points++;
-		if (board[left(below(xy))]==EMPTY && _ownNeighbours[left(below(xy))]>2)
+		if (board[left_below(xy)]==EMPTY && _ownNeighbours[left_below(xy)]>2)
 			points++;
-		if (board[right(above(xy))]==EMPTY && _ownNeighbours[right(above(xy))]>2)
+		if (board[right_above(xy)]==EMPTY && _ownNeighbours[right_above(xy)]>2)
 			points++;
-		if (board[right(below(xy))]==EMPTY && _ownNeighbours[right(below(xy))]>2)
+		if (board[right_below(xy)]==EMPTY && _ownNeighbours[right_below(xy)]>2)
 			points++;
 		
 		return (points==0 || RANDOM.nextInt(points)==0);
@@ -838,13 +840,13 @@ public class MonteCarloGoAdministration
 		}
 		int points = _otherNeighbours[xy] + _otherDiagonalNeighbours[xy];
 		byte[] board = _boardModel.getSingleArray();
-		if (board[left(above(xy))]==EMPTY && _otherNeighbours[left(above(xy))]>2)
+		if (board[left_above(xy)]==EMPTY && _otherNeighbours[left_above(xy)]>2)
 			points++;
-		if (board[left(below(xy))]==EMPTY && _otherNeighbours[left(below(xy))]>2)
+		if (board[left_below(xy)]==EMPTY && _otherNeighbours[left_below(xy)]>2)
 			points++;
-		if (board[right(above(xy))]==EMPTY && _otherNeighbours[right(above(xy))]>2)
+		if (board[right_above(xy)]==EMPTY && _otherNeighbours[right_above(xy)]>2)
 			points++;
-		if (board[right(below(xy))]==EMPTY && _otherNeighbours[right(below(xy))]>2)
+		if (board[right_below(xy)]==EMPTY && _otherNeighbours[right_below(xy)]>2)
 			points++;
 		
 		return (points==0 || RANDOM.nextInt(points)==0);
@@ -858,7 +860,7 @@ public class MonteCarloGoAdministration
 	 * @return coordinate of a move that's legal and not 'verboten',
 	 * i.e. does something terrible like filling an own eye.
 	 */
-	protected int selectRandomMoveCoordinate(PointSet emptyPoints)
+	protected int selectRandomMoveCoordinate_(PointSet emptyPoints)
 	{
 		int start;
 		int index;
@@ -882,6 +884,26 @@ public class MonteCarloGoAdministration
 		return PASS;
 	}
 	
+	protected int selectRandomMoveCoordinate(PointSet emptyPoints)
+	{
+		while (emptyPoints.getSize()!=0)
+		{
+			int xy = emptyPoints.get(RANDOM.nextInt(emptyPoints.getSize()));
+			if (!isVerboten(xy) && isLegal(xy))
+			{
+				while (!_illegalStack.isEmpty())
+					emptyPoints.add(_illegalStack.pop());
+				return xy;
+			}
+			emptyPoints.remove(xy);
+			_illegalStack.push(xy);
+		}
+		while (!_illegalStack.isEmpty())
+			emptyPoints.add(_illegalStack.pop());
+
+		return PASS;
+	}
+
 	/**
 	 * Check if a move is not allowed, not because it's illegal but because it's undesirable.
 	 * This typically will not allow a side to fill its own eyes.

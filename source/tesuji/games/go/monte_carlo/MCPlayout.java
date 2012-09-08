@@ -27,10 +27,6 @@
 package tesuji.games.go.monte_carlo;
 
 import tesuji.games.general.Move;
-import tesuji.games.general.provider.DataProviderAdapter;
-import tesuji.games.general.provider.DataProviderList;
-import tesuji.games.go.util.DefaultIntegerArrayProvider;
-import tesuji.games.go.util.GoArray;
 
 /**
  * 
@@ -91,7 +87,7 @@ public class MCPlayout<MoveType extends Move>
 									wins[1]++;
 							}
 							
-//							nrMovesPlayed += playoutAdministration.getNrMovesPlayed();
+							nrMovesPlayed += playoutAdministration.getNrSimulatedMoves();
 						}
 //						_currentAdministration.addPointOwnership(playoutAdministration);
 	                }

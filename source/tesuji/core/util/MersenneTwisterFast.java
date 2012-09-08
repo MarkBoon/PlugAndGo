@@ -152,7 +152,7 @@ import java.util.*;
 public class MersenneTwisterFast implements Serializable, Cloneable
     {
 
-	private static final long serialVersionUID = 1L; // Added by Peter Drake to avoid compiler warning
+	private static final long serialVersionUID = 1L;
 
 	// Period parameters
     private static final int N = 624;
