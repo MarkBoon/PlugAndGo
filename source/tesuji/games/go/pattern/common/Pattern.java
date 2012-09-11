@@ -1249,6 +1249,7 @@ public class Pattern
 	{
 		StringBuffer stringBuffer = new StringBuffer();
 
+		stringBuffer.append('\n');
 		if (hasTopEdge())
 		{
 			for (int i=0; i<width; i++)

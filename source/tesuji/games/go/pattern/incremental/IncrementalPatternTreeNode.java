@@ -116,6 +116,13 @@ class IncrementalPatternTreeNode
 
 			if (isRestEmpty(pattern, spiral, done, orientation))
 			{
+				if (terminalList.size()!=0)
+				{
+					System.out.println(terminalList.get(0));
+					System.out.println();
+					System.out.println(pattern);
+					System.out.println();
+				}
 				terminalList.add(pattern);
 				continue;
 			}
@@ -319,7 +326,7 @@ class IncrementalPatternTreeNode
 	*/
 	void removeDeadPatterns()
 	{
-		for (int i=leafList.size(); --i>-0;)
+		for (int i=leafList.size(); --i>=0;)
 		{
 			IncrementalPatternTreeLeaf leaf = leafList.get(i);
 			if (leaf.getPattern().isRemoved())

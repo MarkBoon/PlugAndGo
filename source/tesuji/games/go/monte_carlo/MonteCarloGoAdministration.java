@@ -362,6 +362,7 @@ public class MonteCarloGoAdministration
 		
 		_checksum.setValue(source._checksum.getValue());
 		
+		//_boardModel.setBoardSize(source.getBoardModel().getBoardSize());
 		copy(source._boardModel.getSingleArray(),_boardModel.getSingleArray());
 		
 		copy(source._liberties,_liberties);
@@ -949,7 +950,10 @@ public class MonteCarloGoAdministration
 	protected void addStone(int xy)
 	{
 		byte[] board = _boardModel.getSingleArray();
-		board[xy] = _colorToPlay;
+		if (_inPlayout)
+			board[xy] = _colorToPlay;
+		else
+			_boardModel.set(xy, _colorToPlay);
 		_emptyPoints.remove(xy);
 		_checksum.add(xy, _colorToPlay);
 		
@@ -1014,7 +1018,10 @@ public class MonteCarloGoAdministration
 	protected void removeStone(int xy)
 	{
 		byte[] board = _boardModel.getSingleArray();
-		board[xy] = EMPTY;
+		if (_inPlayout)
+			board[xy] = EMPTY;
+		else
+			_boardModel.set(xy, EMPTY);
 		_emptyPoints.add(xy);
 		_checksum.remove(xy, _oppositeColor);
 

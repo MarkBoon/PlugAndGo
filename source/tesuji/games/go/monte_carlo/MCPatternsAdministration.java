@@ -139,7 +139,9 @@ public class MCPatternsAdministration
 	public void playExplorationMove(GoMove move)
 	{
 		super.playExplorationMove(move);
+		
 		_patternSet.updatePatternMatches();
+		Statistics.nrPatternsMatched += _patternSet.getNewMatchList().size();
 	}
 
 	public void play(int xy)

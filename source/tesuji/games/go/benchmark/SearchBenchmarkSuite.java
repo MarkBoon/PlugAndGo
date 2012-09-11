@@ -38,6 +38,7 @@ import tesuji.games.general.search.Search;
 import tesuji.games.general.search.SearchProperties;
 import tesuji.games.go.common.GoMove;
 import tesuji.games.go.util.GoGameProperties;
+import tesuji.games.go.util.Statistics;
 
 public class SearchBenchmarkSuite
 {
@@ -82,6 +83,7 @@ public class SearchBenchmarkSuite
 			search.getSearchProperties().setDoubleProperty(GoGameProperties.KOMI, _komi);
 			search.getSearchProperties().setIntProperty(SearchProperties.NR_NODES, _nrPlayouts);
 			search.getSearchProperties().setIntProperty(SearchProperties.NR_PROCESSORS, _nrProcessors);
+			Statistics.reset();
 			SearchBenchmark.doSearch(search);
 		}		
 		_logger.info("");

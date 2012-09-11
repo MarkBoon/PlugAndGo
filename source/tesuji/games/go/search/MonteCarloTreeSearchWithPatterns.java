@@ -43,7 +43,6 @@ import tesuji.games.general.provider.DataProviderList;
 import tesuji.games.general.search.Search;
 import tesuji.games.general.search.SearchProperties;
 
-import tesuji.games.go.monte_carlo.MCTacticsAdministration;
 import tesuji.games.go.monte_carlo.MonteCarloAdministration;
 import tesuji.games.go.pattern.common.HibernatePatternManager;
 import tesuji.games.go.pattern.common.Pattern;
@@ -103,7 +102,7 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 	private static long _nrGeneratedMoves;
 	private static long _totalNrPlayouts;
 	private static int _averagePlayouts;
-	
+
 	private double[] _ownershipArray;
 	
 	private boolean _isInitialized = false;
@@ -257,6 +256,7 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 		_logger.info("Percentage saved "+saved+"%");
 		_logger.info("Average nr playouts "+_averagePlayouts);
 		_logger.info("Nr pattern moves per playout "+(Statistics.nrPatternsPlayed/_totalNrPlayouts));
+		_logger.info("Nr patterns matched "+Statistics.nrPatternsMatched);
 		
 		TreeNode<MonteCarloTreeSearchResult<MoveType>> bestNode = getBestChildNode(_rootNode);
 		if (bestNode==null)
@@ -536,7 +536,7 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 		adjustPatterns((GoMove)move);
 		_monteCarloAdministration.playMove(move);
 		_patternMatcher.updatePatternMatches();
-
+		
 //		TreeNode<MonteCarloTreeSearchResult<MoveType>> newRoot = getMoveNode(move);
 		
 //		if (newRoot==null)

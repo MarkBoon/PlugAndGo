@@ -38,7 +38,7 @@
  	
 	<bean id="patternMatcher" class="tesuji.games.go.pattern.incremental.IncrementalPatternMatcher" singleton="false">
   		<constructor-arg>
-  			<value>Minimal</value>
+  			<value>GenTest</value>
   		</constructor-arg>
 	</bean>
 
@@ -46,7 +46,7 @@
 		<property name="monteCarloAdministration">
 			<ref bean="mctsLibertyAdministration"/>
 		</property>
-		<property name="patternSet" value="Minimal"/>
+		<property name="patternSet" value="GenTest"/>
   		<property name="secondsPerMove">
   			<value>0</value>
   		</property>
@@ -98,7 +98,7 @@
   		</constructor-arg>
 	</bean>
  	
-	<bean id="MonteCarloTreeSearch" class="tesuji.games.go.search.MonteCarloTreeSearch" singleton="false">
+	<bean id="MonteCarloTreeSearch" class="tesuji.games.go.search.MonteCarloTreeSearchWithPatterns" singleton="false">
 		<!-- <property name="monteCarloAdministration">
 			<ref bean="mctsGoAdministration"/>
 		</property> -->
@@ -119,6 +119,9 @@
 		  		</property>
 		  	</bean>-->
 		</property>
+  		<property name="patternSet">
+  			<value>GenTest</value>
+  		</property>
   		<property name="isTestVersion">
   			<value>false</value>
   		</property>
