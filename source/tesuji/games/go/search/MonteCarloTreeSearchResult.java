@@ -50,10 +50,10 @@ public class MonteCarloTreeSearchResult<MoveType extends Move>
 	
 	public static final int OWNERSHIP_MAXIMUM = 63;
 	
-	private static final double ownershipFactor[] = 
-		{
-			1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00
-		};
+//	private static final double ownershipFactor[] = 
+//		{
+//			1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00
+//		};
 	
 	/**
 	 * The actual number of times a playout lead to a win.
@@ -72,8 +72,8 @@ public class MonteCarloTreeSearchResult<MoveType extends Move>
 	protected float _nrVirtualPlayouts;
 	
 	/**
-	 * The number of 'virtual' wins. This is usually based on the AMAF (All Moves As First)
-	 * principle and may be weighted depending how deep the move was found in the playout.
+	 * The number of 'pattern' wins. This is based on how often the pattern was
+	 * played versus how often it occurred.
 	 */
 	protected int _patternSuccess;
 	protected int _patternOccurrence;
@@ -100,10 +100,10 @@ public class MonteCarloTreeSearchResult<MoveType extends Move>
 	 */
 	private static double _explorationFactor = Math.sqrt(0.2);
 	/**
-	 * The pattern-factor determines how strongly the search will favour exploring
-	 * nodes that have been an urgency-value from a pattern.
+	 * The urgency-factor determines how strongly the search will favour exploring
+	 * nodes that have been an urgency-value from a (hard-coded) pattern.
 	 */
-	private static double _patternFactor = 10.0;
+	private static double _urgencyFactor = 10.0;
 	
 	private MonteCarloTreeSearchResult<MoveType> _parentResult;
 	
@@ -260,10 +260,10 @@ public class MonteCarloTreeSearchResult<MoveType extends Move>
 	private double computeResult()
 	{
 		if (_nrPlayouts==0)
-			return (getVirtualWinRatio() + getRAVEValue()) * getOwnershipValue() + getUrgencyValue() + getPatternValue();
+			return (getVirtualWinRatio() + getRAVEValue()) * getOwnershipValue() + getUrgencyValue();
 
 		double beta = getBeta();
-		return beta * ((getVirtualWinRatio()+getRAVEValue()) * getOwnershipValue() + getPatternValue()) + (1.0-beta) * (getWinRatio()+getUCTValue()) + getUrgencyValue();		
+		return beta * ((getVirtualWinRatio()+getRAVEValue()) * getOwnershipValue()) + (1.0-beta) * (getWinRatio()+getUCTValue()) + getUrgencyValue();		
 	}
 	
 	/**
@@ -275,13 +275,6 @@ public class MonteCarloTreeSearchResult<MoveType extends Move>
 	public double getUCTValue()
 	{
 		return _explorationFactor * Math.sqrt( getLogNrParentPlayouts() / (_nrPlayouts+1) );
-	}
-	
-	/**
-	 */
-	public double getPatternValue()
-	{
-		return _patternFactor * Math.sqrt( getLogNrParentPlayouts() / (_nrPlayouts+1) );
 	}
 	
 	/**
@@ -303,7 +296,7 @@ public class MonteCarloTreeSearchResult<MoveType extends Move>
 		if (getIsTestVersion())
 			return 0.0;
 		
-		return (_patternFactor / ((double)((GoMove)getMove()).getUrgency())) / (_nrPlayouts+1);
+		return (_urgencyFactor / ((double)((GoMove)getMove()).getUrgency())) / (_nrPlayouts+1);
 	}
 	
 	/**
@@ -324,9 +317,9 @@ public class MonteCarloTreeSearchResult<MoveType extends Move>
 	public double getVirtualWinRatio()
 	{
 		if (_nrVirtualPlayouts == 0.0)
-			return 0.0;
+			return getPatternRatio();
 
-		return (double)_nrVirtualWins / (double)_nrVirtualPlayouts;
+		return ((double)_nrVirtualWins / (double)_nrVirtualPlayouts) + getPatternRatio();
 	}
 	
 	/**
@@ -336,7 +329,7 @@ public class MonteCarloTreeSearchResult<MoveType extends Move>
 		if (_patternOccurrence == 0.0)
 			return 0.0;
 
-		return (double)_patternSuccess / (double)_patternOccurrence;
+		return ((double)_patternSuccess / (double)_patternOccurrence) / 10.0;
 	}
 	
 	/**

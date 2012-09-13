@@ -43,6 +43,7 @@ import tesuji.games.general.provider.DataProviderList;
 import tesuji.games.general.search.Search;
 import tesuji.games.general.search.SearchProperties;
 
+import tesuji.games.go.monte_carlo.MCPatternsAdministration;
 import tesuji.games.go.monte_carlo.MonteCarloAdministration;
 import tesuji.games.go.pattern.common.HibernatePatternManager;
 import tesuji.games.go.pattern.common.Pattern;
@@ -127,6 +128,7 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 	public void setMonteCarloAdministration(MonteCarloAdministration<MoveType> administration)
 	{
 		_monteCarloAdministration = administration;
+		_patternMatcher = ((MCPatternsAdministration)administration).getPatternMatcher();
 		initRoot();
 		
 		GoArray.clear(_ownershipArray);
@@ -143,15 +145,15 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 	
 	public void cleanupPatterns()
 	{
-		if (_patternMatcher!=null)
-		{
-			PatternGroup group = _patternMatcher.getPatternGroup();
-			group.purgeMutilations(_patternManager);
-			group.purgeMeaningless(_patternManager);
-			if (group.getPatternList().size()>100000)
-				group.cleanup(_patternManager);
-			System.err.println("MC uses "+ group.getPatternList() + " patterns.");
-		}		
+//		if (_patternMatcher!=null)
+//		{
+//			PatternGroup group = _patternMatcher.getPatternGroup();
+//			group.purgeMutilations(_patternManager);
+//			group.purgeMeaningless(_patternManager);
+//			if (group.getPatternList().size()>100000)
+//				group.cleanup(_patternManager);
+//			System.err.println("MC uses "+ group.getPatternList() + " patterns.");
+//		}		
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -395,7 +397,7 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 				success = match.getPattern().getWhiteNrSuccesses();
 				usage = match.getPattern().getWhiteNrOccurrences();
 			}
-			if (_patternOccurrence[xy]==0 || success/usage > _patternSuccess[xy] / _patternOccurrence[xy])
+			if (_patternOccurrence[xy]==0 || usage==0 || success/usage > _patternSuccess[xy] / _patternOccurrence[xy])
 			{
 				_patternSuccess[xy] = success;
 				_patternOccurrence[xy] = usage;
@@ -580,22 +582,20 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 				match.increasePatternOccurrence(move.getColor());
 			_patternManager.updatePattern(match.getPattern());
 		}
-		if (list.size()!=0)
-		{
-			int index = (int)(Math.random()*list.size());
-			PatternMatch m = list.get(index);
-			BoardModel boardModel = _monteCarloAdministration.getBoardModel();
-			Pattern p = m.getPattern();
-			Pattern newPattern = p.createMutation(boardModel,xy,m.getOrientation(),m.isInverted(),m.getXY()==xy);
-			_patternMatcher.addPattern(newPattern);
-			if (newPattern.isAdded())
-				_patternManager.createPattern(newPattern);
-			newPattern = p.createFromBoard(boardModel,xy,m.getOrientation(),m.isInverted(),m.getXY()==xy);
-			_patternMatcher.addPattern(newPattern);
-			if (newPattern.isAdded())
-				_patternManager.createPattern(newPattern);
-		}
-		// TODO - else create new pattern from position
+//		if (list.size()!=0)
+//		{
+//			int index = (int)(Math.random()*list.size());
+//			PatternMatch m = list.get(index);
+//			// if (m.getXY()==xy) implied
+//			{
+//				BoardModel boardModel = _monteCarloAdministration.getBoardModel();
+//				Pattern p = m.getPattern();
+//				Pattern newPattern = p.createMutation(boardModel,xy,m.getOrientation(),m.isInverted(),true,_monteCarloAdministration.getColorToMove());
+//				_patternMatcher.addNewPattern(newPattern);
+//				newPattern = p.createFromBoard(boardModel,xy,m.getOrientation(),m.isInverted(),true,_monteCarloAdministration.getColorToMove());
+//				_patternMatcher.addNewPattern(newPattern);
+//			}
+//		}
 	}
 	
 	/* (non-Javadoc)
@@ -808,6 +808,8 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
     	
     	public void run()
     	{
+    		try
+    		{
     		running = true;
     		int nrDuplicateRuns = 0;
     		do
@@ -954,6 +956,12 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
     				break;
     		}
     		while (running);
+    		}
+    		catch (Exception exception)
+    		{
+    			System.out.println("Unexpected exception in MC thread: "+exception.getMessage());
+    			exception.printStackTrace();
+    		}
     	}
     	
     	public void stop()

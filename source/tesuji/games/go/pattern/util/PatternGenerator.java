@@ -9,6 +9,8 @@ import static tesuji.games.general.ColorConstant.*;
 
 public class PatternGenerator
 {
+	private static final String GROUP_NAME = "GenTest";
+	
 	public static ArrayList<Pattern> generate3x3Patterns()
 	{
 		ArrayList<Pattern> list = new ArrayList<Pattern>();
@@ -74,9 +76,20 @@ public class PatternGenerator
 //		}
 		
 		HibernatePatternManager patternManager = HibernatePatternManager.getSingleton();
-		PatternGroup group = new PatternGroup();
-		group.setGroupName("GenTest");
-		patternManager.createPatternGroup(group);
+		PatternGroup group = patternManager.getPatternGroup(GROUP_NAME);
+		if (group!=null)
+		{
+			ArrayList<Pattern> patternList = patternManager.getPatterns(group);
+			for (Pattern p : patternList)
+				patternManager.removePattern(p);
+		}
+		else
+		{
+			group = new PatternGroup();
+			group.setGroupName(GROUP_NAME);
+			patternManager.createPatternGroup(group);
+		}
+		
 		for (int i=0; i<truncatedList.size(); i++)
 		{
 			Pattern p = truncatedList.get(i);

@@ -63,6 +63,7 @@ public class IncrementalPatternMatcher
 	private MatchingState[] matchingState;
 	private ArrayList<PatternMatch> _newMatchList = new ArrayList<PatternMatch>();
 	private PatternMatchList _deletedMatchList = new PatternMatchList();
+	private ArrayList<Pattern> _newPatternList = new ArrayList<Pattern>();
 	
 	public static int nrMatches = 0;
 		
@@ -87,6 +88,16 @@ public class IncrementalPatternMatcher
 	
 	public void initialise(BoardModel boardModel)
 	{
+		// Due to the incremental natuer of this pattern-matcher, new patterns can only be added
+		// before a new game starts, not during a game.
+		tree.addPatterns(_newPatternList);
+		for (Pattern p : _newPatternList)
+		{
+			if (p.isAdded())
+				patternManager.createPattern(p);
+		}
+		_newPatternList.clear();
+
 		_moveNr = 1;
 		_matchList.clear();
 		_boardChangeList.clear();
@@ -177,6 +188,9 @@ public class IncrementalPatternMatcher
     		boardChange.recycle();
     	}
     	_boardChangeList.clear();
+//    	System.out.println("Match Board:");
+//    	System.out.println(_boardModel.toString());
+//    	System.out.println("to patterns:\n"+_newMatchList);
 	}
 
 	private void recursiveMatchAndStoreState(IncrementalPatternTreeNode node, int startXY)
@@ -482,6 +496,11 @@ public class IncrementalPatternMatcher
     public BoardModel getBoardModel()
     {
     	return _boardModel;
+    }
+    
+    public void addNewPattern(Pattern pattern)
+    {
+    	_newPatternList.add(pattern);
     }
     
     // For debugging only

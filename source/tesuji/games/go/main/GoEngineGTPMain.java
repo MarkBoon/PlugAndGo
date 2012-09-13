@@ -76,13 +76,20 @@ public class GoEngineGTPMain
 			if (engineNameSet)
 			{
 				engine = engineList.get(engineName);
+				if (engine==null)
+				{
+					System.err.println("Couldn't instantiate an engine with name "+engineName);
+//					System.exit(-1);
+				}
 			}
 			else
 			{
 				engineList.keys();
 				String selectedEngine = GoEngineBeanHelper.selectEngineFromList(engineList);
 				if (selectedEngine==null)
+				{
 					System.exit(0);
+				}
 				engine = engineList.get(selectedEngine);
 			}
 

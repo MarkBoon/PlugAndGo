@@ -94,7 +94,7 @@
 	<bean id="mctsTacticsAdministration" class="tesuji.games.go.monte_carlo.MCTacticsAdministration" singleton="false"/>
 	<bean id="mctsPatternsAdministration" class="tesuji.games.go.monte_carlo.MCPatternsAdministration" singleton="false">
   		<constructor-arg>
-  			<value>Test</value>
+  			<value>GenTest</value>
   		</constructor-arg>
 	</bean>
  	
@@ -119,9 +119,6 @@
 		  		</property>
 		  	</bean>-->
 		</property>
-  		<property name="patternSet">
-  			<value>GenTest</value>
-  		</property>
   		<property name="isTestVersion">
   			<value>false</value>
   		</property>

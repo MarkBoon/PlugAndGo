@@ -71,6 +71,7 @@ public class MCPatternsAdministration
 	{
 		super();
 		
+		System.err.println("Instantiate MCPatternsAdministration with "+patternGroupName);
 		_patternManager = HibernatePatternManager.getSingleton();
 		_patternSet = loadPatternSet(patternGroupName);
 	}
@@ -78,6 +79,11 @@ public class MCPatternsAdministration
 	PatternManager getPatternManager()
 	{
 		return _patternManager;
+	}
+	
+	public IncrementalPatternMatcher getPatternMatcher()
+	{
+		return _patternSet;
 	}
 
 	private IncrementalPatternMatcher loadPatternSet(String patternGroupName)

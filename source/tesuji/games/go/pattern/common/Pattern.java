@@ -699,13 +699,19 @@ public class Pattern
 		groupId = source.groupId;	
 	}
 	
-	public Pattern createMutation(BoardModel boardModel, int offsetXY, int orientation, boolean inverted, boolean wasPlayed)
+	public Pattern createMutation(BoardModel boardModel, int offsetXY, int orientation, boolean inverted, boolean wasPlayed, byte colorToPlay)
 	{
 		Pattern newPattern = (Pattern) clone();
-		newPattern.blackNrSuccesses = wasPlayed? 1 : 0;
-		newPattern.whiteNrSuccesses = wasPlayed? 1 : 0;
-		newPattern.blackNrOccurrences = 1;
-		newPattern.whiteNrOccurrences = 1;
+		if (colorToPlay==BLACK)
+		{
+			newPattern.blackNrSuccesses = wasPlayed? 1 : 0;
+			newPattern.blackNrOccurrences = 1;
+		}
+		else
+		{
+			newPattern.whiteNrSuccesses = wasPlayed? 1 : 0;
+			newPattern.whiteNrOccurrences = 1;
+		}
 		boolean found = false;
 		while (!found)
 		{
@@ -794,7 +800,8 @@ public class Pattern
 					}
 				}
 			}
-			} catch (ArrayIndexOutOfBoundsException exception)
+			}
+			catch (ArrayIndexOutOfBoundsException exception)
 			{
 				// TODO - see why this still happens.
 			}
@@ -802,17 +809,23 @@ public class Pattern
 		return newPattern;
 	}
 	
-	public Pattern createFromBoard(BoardModel boardModel, int offsetXY, int orientation, boolean inverted, boolean wasPlayed)
+	public Pattern createFromBoard(BoardModel boardModel, int offsetXY, int orientation, boolean inverted, boolean wasPlayed, byte colorToMove)
 	{
 		Pattern newPattern = new Pattern();
 		newPattern.startX = 2;
 		newPattern.startY = 2;
 		newPattern.width = 5;
 		newPattern.height = 5;
-		newPattern.blackNrOccurrences = 1;
-		newPattern.whiteNrOccurrences = 1;
-		newPattern.blackNrSuccesses = 1;
-		newPattern.whiteNrSuccesses = 1;
+		if (colorToMove==BLACK)
+		{
+			newPattern.blackNrOccurrences = 1;
+			newPattern.blackNrSuccesses = 1;
+		}
+		else
+		{
+			newPattern.whiteNrOccurrences = 1;
+			newPattern.whiteNrSuccesses = 1;
+		}
 		for (int i=-1; i<=1; i++)
 		{
 			for (int j=-1; j<=1; j++)

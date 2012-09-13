@@ -76,6 +76,11 @@ public class GTPToGameEngine<MoveType extends Move>
 		String command = gtpCommand.getCommand();
 		String response = "";
 		
+		if (_engine==null)
+		{
+			System.err.println("No engine set. Aborting.");
+//			System.exit(-1);
+		}
 		try
 		{
 			if (command.equals(NAME))
