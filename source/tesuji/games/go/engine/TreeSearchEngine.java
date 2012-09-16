@@ -32,6 +32,7 @@ import org.apache.log4j.Logger;
 
 import tesuji.core.util.ArrayStack;
 
+import tesuji.games.general.MoveAdministration;
 import tesuji.games.general.MoveStack;
 import tesuji.games.general.provider.DataProviderList;
 import tesuji.games.general.renderer.DataRendererManager;
@@ -280,5 +281,10 @@ public class TreeSearchEngine
 		_isTestVersion = isTestVersion;
 		if (_search!=null)
 			_search.setIsTestVersion(_isTestVersion);
+	}
+	
+	public MoveAdministration<GoMove, GoGameProperties> getMoveAdministration()
+	{
+		return _moveAdministration;
 	}
 }

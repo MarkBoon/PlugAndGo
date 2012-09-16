@@ -69,4 +69,14 @@ public class ArrayStack<Type>
 	{
 		return _array[_index-1];
 	}
+	
+	/**
+	 * Take a peek at what's at the n'th place from the top of the stack without removing the item.
+	 * 
+	 * @return Type
+	 */
+	public final Type peek(int n)
+	{
+		return _array[_index-1-n];
+	}
 }

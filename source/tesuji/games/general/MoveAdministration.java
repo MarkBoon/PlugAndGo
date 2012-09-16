@@ -92,4 +92,6 @@ public interface MoveAdministration<MoveType extends Move,PropertiesType extends
      * @return a Properties sub-type that has the pre-game settings. Like board-size etc.
      */
     public PropertiesType getGameProperties();
+    
+    public boolean isGameFinished();
 }

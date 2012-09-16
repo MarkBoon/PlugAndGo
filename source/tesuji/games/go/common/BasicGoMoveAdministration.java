@@ -375,6 +375,12 @@ public class BasicGoMoveAdministration
     		removeCapturedChain(below(xy), color, move);
     }
 
+    public boolean isGameFinished()
+    {
+    	if (_moveStack.peek().isPass() && _moveStack.peek(1).isPass() && _moveStack.peek(2).isPass())
+    		return true;
+    	return false;
+    }
     /*
      * (non-Javadoc)
      * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)

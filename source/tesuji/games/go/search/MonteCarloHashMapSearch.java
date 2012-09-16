@@ -276,4 +276,10 @@ public class MonteCarloHashMapSearch
     		}
     	}
     }
+
+	@Override
+    public boolean isGameFinished()
+    {
+		return false;
+    }
 }

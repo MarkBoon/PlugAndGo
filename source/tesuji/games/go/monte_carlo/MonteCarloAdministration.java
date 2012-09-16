@@ -116,6 +116,8 @@ public interface MonteCarloAdministration<MoveType extends Move>
 	 */
 	public boolean isGameTooLong();
 	
+	public boolean isGameFinished();
+	
 	/**
 	 *  This is defined as all empty points having 4 occupied neighbours.
 	 *  The idea is to only allow a pass in a search-tree when this condition is met.

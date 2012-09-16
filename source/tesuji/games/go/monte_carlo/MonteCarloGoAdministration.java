@@ -773,6 +773,15 @@ public class MonteCarloGoAdministration
 		return _colorToPlay;
 	}
 	
+	@Override
+    public boolean isGameFinished()
+    {
+		if (_moveStack.peek() == PASS && _moveStack.peek(1) == PASS && _moveStack.peek(2) == PASS)
+			return true;
+
+	    return false;
+    }
+
 	/**
 	 * Select a move during playout as the next move.
 	 * 

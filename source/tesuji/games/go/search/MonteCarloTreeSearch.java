@@ -853,4 +853,10 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 			_ownershipArray[i] = (black / (black+white))*200.0 - 100.0;
 		}
 	}
+
+	@Override
+    public boolean isGameFinished()
+    {
+		return (_monteCarloAdministration.isGameFinished());
+    }
 }

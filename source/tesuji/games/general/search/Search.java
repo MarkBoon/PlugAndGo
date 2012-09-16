@@ -81,6 +81,7 @@ public interface Search<MoveType extends Move>
 	// These methods are used to keep the state of the Search object synchronized with the actual game.
 	public void playMove(MoveType move);
 	public void takeBack();
+	public boolean isGameFinished();
 	public void clear();
 
 	// These methods are used to query the resulting search-tree.

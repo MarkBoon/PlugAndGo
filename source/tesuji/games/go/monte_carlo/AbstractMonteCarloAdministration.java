@@ -1105,7 +1105,16 @@ public abstract class AbstractMonteCarloAdministration
     {
     	return SGFUtil.createSGF(getMoveStack()) +"\n\n"+_boardModel.toString();
     }
-    
+
+	@Override
+    public boolean isGameFinished()
+    {
+		if (_moveStack.peek() == PASS && _moveStack.peek(1) == PASS && _moveStack.peek(2) == PASS)
+			return true;
+
+	    return false;
+    }
+
     /**
      * When the getMoves() method is called it returns an instance of this inner-class.
      */

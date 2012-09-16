@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<bean id="EngineTester" class="tesuji.games.go.engine.EngineTester" singleton="false">
+	
+		<!-- Benchmark parameters -->
+		<property name="boardSize">
+			<value>9</value>
+		</property>
+		<property name="komi">
+			<value>0.5</value>
+		</property>
+		<property name="nrPlayouts">
+			<value>5000</value>
+		</property>
+		<property name="nrProcessors">
+			<value>1</value>
+		</property>		
+		<property name="blackPlayer">
+			<ref bean="MonteCarloTreeSearch"/>
+		</property>		
+		<property name="whitePlayer">
+			<ref bean="MonteCarloTreeSearch"/>
+		</property>		
+ 	</bean>
+ 	
+	<bean id="mctsLibertyAdministration" class="tesuji.games.go.monte_carlo.MCLibertyAdministration" singleton="false"/>
+	<bean id="mctsGoAdministration" class="tesuji.games.go.monte_carlo.MonteCarloGoAdministration" singleton="false"/>
+	<bean id="mctsTacticsAdministration" class="tesuji.games.go.monte_carlo.MCTacticsAdministration" singleton="false"/>
+	<bean id="mctsPatternsAdministration" class="tesuji.games.go.monte_carlo.MCPatternsAdministration" singleton="false">
+  		<constructor-arg>
+  			<value>GenTest</value>
+  		</constructor-arg>
+	</bean>
+ 	
+	<bean id="MonteCarloTreeSearch" class="tesuji.games.go.search.MonteCarloTreeSearchWithPatterns" singleton="false">
+		<!-- <property name="monteCarloAdministration">
+			<ref bean="mctsGoAdministration"/>
+		</property> -->
+		<property name="monteCarloAdministration">
+			<ref bean="mctsPatternsAdministration"/>
+			<!--<bean class="tesuji.games.go.monte_carlo.MCTacticsAdministration" singleton="false">
+		  		<property name="USE_HARD_PATTERNS">
+		  			<value>false</value>
+		  		</property>
+		  		<property name="SEPARATE_PATTERN">
+		  			<value>true</value>
+		  		</property>
+		  		<property name="CUT_PATTERN">
+		  			<value>true</value>
+		  		</property>
+		  		<property name="KEIMA_CUT_PATTERN">
+		  			<value>true</value>
+		  		</property>
+		  	</bean>-->
+		</property>
+  		<property name="isTestVersion">
+  			<value>false</value>
+  		</property>
+  		<property name="secondsPerMove">
+  			<value>0</value>
+  		</property>
+  		<property name="nrSimulationsBeforeExpansion">
+  			<value>1</value>
+  		</property>
+	</bean>
+ 	
+</beans>
