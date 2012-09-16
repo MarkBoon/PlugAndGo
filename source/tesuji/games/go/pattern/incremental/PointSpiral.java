@@ -47,7 +47,7 @@ import static tesuji.games.go.pattern.util.PatternUtil.*;
 	original spiral, but for smaller sets the order can greatly differ to make
 	use of the particular characteristics of the set.
 */
-class PointSpiral
+public class PointSpiral
 {
 	// Maximum number of iterations it tries to optimize the spiral.
 //	private static final int MAX_ITERATION = 2;

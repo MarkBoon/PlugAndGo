@@ -45,6 +45,7 @@ import tesuji.games.general.search.SearchProperties;
 
 import tesuji.games.go.monte_carlo.MCPatternsAdministration;
 import tesuji.games.go.monte_carlo.MonteCarloAdministration;
+import tesuji.games.go.monte_carlo.MonteCarloGoAdministration;
 import tesuji.games.go.pattern.common.HibernatePatternManager;
 import tesuji.games.go.pattern.common.Pattern;
 import tesuji.games.go.pattern.common.PatternGroup;
@@ -582,20 +583,26 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 				match.increasePatternOccurrence(move.getColor());
 			_patternManager.updatePattern(match.getPattern());
 		}
-//		if (list.size()!=0)
-//		{
-//			int index = (int)(Math.random()*list.size());
-//			PatternMatch m = list.get(index);
-//			// if (m.getXY()==xy) implied
-//			{
-//				BoardModel boardModel = _monteCarloAdministration.getBoardModel();
-//				Pattern p = m.getPattern();
-//				Pattern newPattern = p.createMutation(boardModel,xy,m.getOrientation(),m.isInverted(),true,_monteCarloAdministration.getColorToMove());
-//				_patternMatcher.addNewPattern(newPattern);
-//				newPattern = p.createFromBoard(boardModel,xy,m.getOrientation(),m.isInverted(),true,_monteCarloAdministration.getColorToMove());
-//				_patternMatcher.addNewPattern(newPattern);
-//			}
-//		}
+		if (list.size()!=0)
+		{
+			int index = (int)(Math.random()*list.size());
+			PatternMatch m = list.get(index);
+			// if (m.getXY()==xy) implied
+			{
+				//BoardModel boardModel = _monteCarloAdministration.getBoardModel();
+				//Pattern p = m.getPattern();
+				//Pattern newPattern = p.createMutation(boardModel,xy,m.getOrientation(),m.isInverted(),true,_monteCarloAdministration.getColorToMove());
+				//_patternMatcher.addNewPattern(newPattern);
+			}
+		}
+		Pattern newPattern = Pattern.createFromBoard(xy,(MonteCarloGoAdministration)_monteCarloAdministration);
+		if (newPattern.getPointCount()>5)
+		{
+			_logger.info("Create new pattern:\n"+newPattern.toString());
+			//_patternMatcher.addNewPattern(newPattern);
+		}
+		else
+			_logger.info("Pattern too small: \n"+newPattern.toString());
 	}
 	
 	/* (non-Javadoc)

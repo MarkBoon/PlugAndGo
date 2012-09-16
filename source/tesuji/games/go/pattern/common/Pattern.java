@@ -34,6 +34,12 @@ import java.util.StringTokenizer;
 import tesuji.core.util.ArrayList;
 import tesuji.core.util.List;
 
+import tesuji.games.general.Move;
+import tesuji.games.go.common.GoMove;
+import tesuji.games.go.common.GoMoveFactory;
+import tesuji.games.go.monte_carlo.MonteCarloAdministration;
+import tesuji.games.go.monte_carlo.MonteCarloGoAdministration;
+import tesuji.games.go.pattern.incremental.PointSpiral;
 import tesuji.games.go.pattern.util.PatternUtil;
 import tesuji.games.go.util.GoArray;
 import tesuji.games.model.BoardModel;
@@ -809,14 +815,40 @@ public class Pattern
 		return newPattern;
 	}
 	
-	public Pattern createFromBoard(BoardModel boardModel, int offsetXY, int orientation, boolean inverted, boolean wasPlayed, byte colorToMove)
+	public static Pattern createFromBoard(int offsetXY, MonteCarloGoAdministration mcAdministration)
 	{
+		int threshold = 25;
+		int boardSize = mcAdministration.getBoardModel().getBoardSize();
+		int[] blackOwnership = GoArray.createIntegers();
+		int[] whiteOwnership = GoArray.createIntegers();
+		MonteCarloGoAdministration tmpAdministration = (MonteCarloGoAdministration)mcAdministration.createClone();
+		for (int i=0; i<100; i++)
+		{
+			tmpAdministration.copyDataFrom(mcAdministration);
+			tmpAdministration.playout();
+			for (int j=GoArray.FIRST; j<GoArray.LAST; j++)
+			{
+				blackOwnership[j] -= tmpAdministration.getBlackOwnership()[j];
+				whiteOwnership[j] -= tmpAdministration.getWhiteOwnership()[j];
+			}
+		}
+		for (int i=0; i<100; i++)
+		{
+			tmpAdministration.copyDataFrom(mcAdministration);
+			tmpAdministration.playMove(GoMoveFactory.getSingleton().createMove(offsetXY, tmpAdministration.getColorToMove()));
+			tmpAdministration.playout();
+			for (int j=GoArray.FIRST; j<GoArray.LAST; j++)
+			{
+				blackOwnership[j] += tmpAdministration.getBlackOwnership()[j];
+				whiteOwnership[j] += tmpAdministration.getWhiteOwnership()[j];
+			}
+		}
 		Pattern newPattern = new Pattern();
-		newPattern.startX = 2;
-		newPattern.startY = 2;
-		newPattern.width = 5;
-		newPattern.height = 5;
-		if (colorToMove==BLACK)
+		newPattern.startX = GoArray.getX(offsetXY);
+		newPattern.startY = GoArray.getY(offsetXY);
+		newPattern.width = boardSize;
+		newPattern.height = boardSize;
+		if (tmpAdministration.getColorToMove()==BLACK)
 		{
 			newPattern.blackNrOccurrences = 1;
 			newPattern.blackNrSuccesses = 1;
@@ -826,27 +858,28 @@ public class Pattern
 			newPattern.whiteNrOccurrences = 1;
 			newPattern.whiteNrSuccesses = 1;
 		}
-		for (int i=-1; i<=1; i++)
+		PointSpiral spiral = new PointSpiral();
+		int[] pointOrder = spiral.getPointOrder();
+		for (int i=0; i<pointOrder.length; i++)
 		{
-			for (int j=-1; j<=1; j++)
+			int relativeX = GoArray.getX(offsetXY) + GoArray.getX(pointOrder[i]);
+			int relativeY = GoArray.getY(offsetXY) + GoArray.getY(pointOrder[i]);
+			int pointXY = offsetXY + pointOrder[i];
+			if (relativeX>0 && relativeY>0 && relativeX<=boardSize && relativeY<=boardSize)
 			{
-				int xy = offsetXY+GoArray.toXY(i,j);
-				newPattern.setRelativePoint(i, j, boardModel.get(xy));
-				if (boardModel.get(xy)==EMPTY)
+				int pointX = GoArray.getX(pointXY);
+				int pointY = GoArray.getY(pointXY);
+				if (blackOwnership[pointXY]>threshold || blackOwnership[pointXY]<-threshold || whiteOwnership[pointXY]>threshold || whiteOwnership[pointXY]<-threshold)
 				{
-					for (int k=-1; k<=1; k++)
-					{
-						for (int l=-1; l<=1; l++)
-						{
-							xy = offsetXY+GoArray.toXY(k,l);
-							newPattern.setRelativePoint(k, l, boardModel.get(xy));
-						}
-					}
+					newPattern.setPoint(pointX, pointY, mcAdministration.getBoardModel().get(pointXY));
 				}
-			}			
+			}
 		}
+		while (newPattern.removeTopRow());
+		while (newPattern.removeBottomRow());
+		while (newPattern.removeRightColumn());
+		while (newPattern.removeLeftColumn());
 		return newPattern;
-		
 	}
 	
 	private void firePropertyChange(String propertyName, Object oldValue, Object newValue)
