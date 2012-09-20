@@ -61,7 +61,7 @@ import static tesuji.games.go.common.GoConstant.*;
 public class MonteCarloGoAdministration
 	implements MonteCarloAdministration<GoMove>
 {
-	public static final boolean USE_MERCY_RULE = true;
+	public static final boolean USE_MERCY_RULE = false;
 	
 	protected final MersenneTwisterFast RANDOM = new MersenneTwisterFast();
 	
@@ -218,7 +218,7 @@ public class MonteCarloGoAdministration
 	
 	private ArrayStack<GoMoveIterator> _iteratorPool =	new ArrayStack<GoMoveIterator>();
 
-	private boolean _spreadTest = true;
+	private boolean _spreadTest = false;
 
 	
 	public MonteCarloGoAdministration()
@@ -1129,6 +1129,10 @@ public class MonteCarloGoAdministration
     		{
     			score--;
     			_white[xy] = 1;
+    		}
+    		else
+    		{
+    			score = score;
     		}
     	}
     	

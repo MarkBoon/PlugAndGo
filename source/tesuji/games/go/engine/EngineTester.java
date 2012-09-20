@@ -90,7 +90,7 @@ public class EngineTester
 			if (_whitePlayer.isGameFinished())
 				break;
 			
-			SearchResult<GoMove> whiteResult = _whitePlayer.doSearch(ColorConstant.BLACK);
+			SearchResult<GoMove> whiteResult = _whitePlayer.doSearch(ColorConstant.WHITE);
 			GoMove whiteMove = (GoMove)whiteResult.getMove().cloneMove();
 			_blackPlayer.playMove(whiteMove);
 			_whitePlayer.playMove(whiteMove);
