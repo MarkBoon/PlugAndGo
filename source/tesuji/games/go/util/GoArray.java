@@ -744,4 +744,26 @@ public class GoArray
 		System.out.println();
 		
 	}
+	
+	public static void printNumbers(int[] array)
+	{
+		System.out.println();
+		for (int i=FIRST; i<=LAST; i++)
+		{
+			int x = getX(i);
+			if (x==0)
+				System.out.println("\n");
+			else
+			{
+				String number = Integer.toHexString(array[i]);
+				if (number.length()==1)
+					number = "0"+number;
+				else
+					number = number.substring(number.length()-2);
+				System.out.print(number+" ");
+			}
+		}
+		System.out.println();
+		
+	}
 }

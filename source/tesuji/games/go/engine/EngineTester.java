@@ -75,11 +75,15 @@ public class EngineTester
 		_blackPlayer.getSearchProperties().setDoubleProperty(GoGameProperties.KOMI, _komi);
 		_blackPlayer.getSearchProperties().setIntProperty(SearchProperties.NR_NODES, _nrPlayouts);
 		_blackPlayer.getSearchProperties().setIntProperty(SearchProperties.NR_PROCESSORS, _nrProcessors);
+		_whitePlayer.getSearchProperties().setIntProperty(GoGameProperties.BOARDSIZE, _boardSize);
+		_whitePlayer.getSearchProperties().setDoubleProperty(GoGameProperties.KOMI, _komi);
+		_whitePlayer.getSearchProperties().setIntProperty(SearchProperties.NR_NODES, _nrPlayouts);
+		_whitePlayer.getSearchProperties().setIntProperty(SearchProperties.NR_PROCESSORS, _nrProcessors);
 
 		while (!_blackPlayer.isGameFinished())
 		{
 			SearchResult<GoMove> blackResult = _blackPlayer.doSearch(ColorConstant.BLACK);
-			GoMove blackMove = blackResult.getMove();
+			GoMove blackMove = (GoMove)blackResult.getMove().cloneMove();
 			_blackPlayer.playMove(blackMove);
 			_whitePlayer.playMove(blackMove);
 			
@@ -87,7 +91,7 @@ public class EngineTester
 				break;
 			
 			SearchResult<GoMove> whiteResult = _whitePlayer.doSearch(ColorConstant.BLACK);
-			GoMove whiteMove = whiteResult.getMove();
+			GoMove whiteMove = (GoMove)whiteResult.getMove().cloneMove();
 			_blackPlayer.playMove(whiteMove);
 			_whitePlayer.playMove(whiteMove);
 		}

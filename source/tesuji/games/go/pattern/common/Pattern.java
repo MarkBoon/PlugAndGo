@@ -858,6 +858,9 @@ public class Pattern
 			newPattern.whiteNrOccurrences = 1;
 			newPattern.whiteNrSuccesses = 1;
 		}
+		GoArray.printNumbers(blackOwnership);
+		System.out.println("---\n");
+		GoArray.printNumbers(whiteOwnership);
 		PointSpiral spiral = new PointSpiral();
 		int[] pointOrder = spiral.getPointOrder();
 		for (int i=0; i<pointOrder.length; i++)
