@@ -824,19 +824,21 @@ public class Pattern
 		int[] afterOwnership = GoArray.createIntegers();
 		int[] diffOwnership = GoArray.createIntegers();
 		MonteCarloGoAdministration tmpAdministration = (MonteCarloGoAdministration)mcAdministration.createClone();
+		MonteCarloGoAdministration startAdministration = (MonteCarloGoAdministration)mcAdministration.createClone();
+		MonteCarloGoAdministration stepAdministration = (MonteCarloGoAdministration)mcAdministration.createClone();
 		for (int i=0; i<limit; i++)
 		{
-			tmpAdministration.copyDataFrom(mcAdministration);
+			tmpAdministration.copyDataFrom(startAdministration);
 			tmpAdministration.playout();
 			for (int j=GoArray.FIRST; j<GoArray.LAST; j++)
 			{
 				beforeOwnership[j] += tmpAdministration.getBlackOwnership()[j];
 			}
 		}
+		stepAdministration.playMove(GoMoveFactory.getSingleton().createMove(offsetXY, startAdministration.getColorToMove()));
 		for (int i=0; i<limit; i++)
 		{
-			tmpAdministration.copyDataFrom(mcAdministration);
-			tmpAdministration.playMove(GoMoveFactory.getSingleton().createMove(offsetXY, tmpAdministration.getColorToMove()));
+			tmpAdministration.copyDataFrom(stepAdministration);
 			tmpAdministration.playout();
 			for (int j=GoArray.FIRST; j<GoArray.LAST; j++)
 			{
@@ -866,9 +868,11 @@ public class Pattern
 			newPattern.whiteNrOccurrences = 1;
 			newPattern.whiteNrSuccesses = 1;
 		}
-		GoArray.printBoard(mcAdministration.getBoardModel());
+		GoArray.printBoard(startAdministration.getBoardModel());
 		System.out.println("---\n");
 		GoArray.printNumbers(beforeOwnership);
+		System.out.println("---\n");
+		GoArray.printBoard(stepAdministration.getBoardModel());
 		System.out.println("---\n");
 		GoArray.printNumbers(afterOwnership);
 		System.out.println("---\n");
