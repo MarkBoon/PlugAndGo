@@ -48,7 +48,7 @@ public class MCBenchmarkSuite
 	private int _nrPlayouts;
 	private int _nrProcessors;
 
-	private List<MonteCarloAdministration> _mcList;
+	private List<MonteCarloAdministration<?>> _mcList;
 	
 	public static void main(String[] args)
 	{
@@ -75,7 +75,7 @@ public class MCBenchmarkSuite
 		_logger.info("Board size: \t" + _boardSize);
 		_logger.info("Komi: \t\t" + _komi);
 		_logger.info("");
-		for (MonteCarloAdministration mcAdministration : _mcList)
+		for (MonteCarloAdministration<?> mcAdministration : _mcList)
 		{
 			mcAdministration.set(GTPCommand.BOARDSIZE, Integer.toString(_boardSize));
 			mcAdministration.set(GTPCommand.KOMI, Double.toString(_komi));
@@ -86,12 +86,12 @@ public class MCBenchmarkSuite
 		_logger.info("Done.");
 	}
 	
-	public List<MonteCarloAdministration> getList()
+	public List<MonteCarloAdministration<?>> getList()
 	{
 		return _mcList;
 	}
 	
-	public void setList(List<MonteCarloAdministration> list)
+	public void setList(List<MonteCarloAdministration<?>> list)
 	{
 		_mcList = list;
 	}
@@ -136,12 +136,12 @@ public class MCBenchmarkSuite
 		_nrProcessors = processors;
 	}
 
-	public List<MonteCarloAdministration> get_mcList()
+	public List<MonteCarloAdministration<?>> get_mcList()
 	{
 		return _mcList;
 	}
 
-	public void set_mcList(List<MonteCarloAdministration> list) 
+	public void set_mcList(List<MonteCarloAdministration<?>> list) 
 	{
 		_mcList = list;
 	}

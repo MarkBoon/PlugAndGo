@@ -141,7 +141,7 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 		cleanupPatterns();
 		_patternManager.getPatterns(group);
 		_patternMatcher = new IncrementalPatternMatcher(group);
-		System.out.println(group.getPatternList().get(0).toString());
+//		System.out.println(group.getPatternList().get(0).toString());
 	}
 	
 	public void cleanupPatterns()
@@ -190,6 +190,7 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 			_isInitialized = true;
 		}
 
+		_logger.info("Start search with position:\n"+_monteCarloAdministration.getBoardModel());
 		long time0 = System.currentTimeMillis();
 
 		assert _monteCarloAdministration.isConsistent() : "Inconsistent Monte-Carlo administration at the start of the search.";
@@ -274,6 +275,7 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 		
 		assert _monteCarloAdministration.isConsistent() : "Inconsistent Monte-Carlo administration at the end of the search.";
 
+		_logger.info("Ended search with move: "+bestNode.getContent().getMove());
 		return bestNode.getContent();
 	}
 	
@@ -583,18 +585,21 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 				match.increasePatternOccurrence(move.getColor());
 			_patternManager.updatePattern(match.getPattern());
 		}
-		if (list.size()!=0)
+		/*if (list.size()!=0)
 		{
 			int index = (int)(Math.random()*list.size());
 			PatternMatch m = list.get(index);
 			// if (m.getXY()==xy) implied
 			{
-				//BoardModel boardModel = _monteCarloAdministration.getBoardModel();
-				//Pattern p = m.getPattern();
-				//Pattern newPattern = p.createMutation(boardModel,xy,m.getOrientation(),m.isInverted(),true,_monteCarloAdministration.getColorToMove());
-				//_patternMatcher.addNewPattern(newPattern);
+				BoardModel boardModel = _monteCarloAdministration.getBoardModel();
+				Pattern p = m.getPattern();
+				Pattern newPattern = p.createMutation(boardModel,xy,m.getOrientation(),m.isInverted(),true,_monteCarloAdministration.getColorToMove());
+				_logger.info("Pattern before:\n"+p);
+				_logger.info("Pattern after:\n"+newPattern);
+				_patternMatcher.addNewPattern(newPattern);
 			}
-		}
+		}*/
+		/*
 		Pattern newPattern = Pattern.createFromBoard(xy,(MonteCarloGoAdministration)_monteCarloAdministration);
 		if (newPattern.getPointCount()>5)
 		{
@@ -603,6 +608,7 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 		}
 		else
 			_logger.info("Pattern too small: \n"+newPattern.toString());
+		*/
 	}
 	
 	/* (non-Javadoc)
@@ -966,7 +972,7 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
     		}
     		catch (Exception exception)
     		{
-    			System.out.println("Unexpected exception in MC thread: "+exception.getMessage());
+    			_logger.error("Unexpected exception in MC thread: "+exception.getMessage());
     			exception.printStackTrace();
     		}
     	}

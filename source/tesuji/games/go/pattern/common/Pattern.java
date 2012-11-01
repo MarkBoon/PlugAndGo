@@ -34,12 +34,8 @@ import java.util.StringTokenizer;
 import tesuji.core.util.ArrayList;
 import tesuji.core.util.List;
 
-import tesuji.games.general.Move;
-import tesuji.games.go.common.GoMove;
 import tesuji.games.go.common.GoMoveFactory;
-import tesuji.games.go.monte_carlo.MonteCarloAdministration;
 import tesuji.games.go.monte_carlo.MonteCarloGoAdministration;
-import tesuji.games.go.pattern.incremental.PointSpiral;
 import tesuji.games.go.pattern.util.PatternUtil;
 import tesuji.games.go.util.GoArray;
 import tesuji.games.model.BoardModel;
@@ -92,10 +88,10 @@ public class Pattern
 	
 	private static final int NR_BITS_PER_WORD = 64;	// Nr of bits in the basic data-type.
 	private static final int NR_WORDS = 4;			// Nr of words used to store the pattern.
-	private static final int MAX_NR_BITS = 256;		// Maximum nr of bits in the pattern. (4x64)
+	private static final int MAX_NR_BITS = 256;		// Maximum nr of bits in the pattern. (4x64) Largest pattern is 16x16.
 
-	private int width = 3;							// Width of the pattern.
-	private int height = 3;							// Height of the pattern.
+	private int width = 3;							// Width of the pattern. Default=3.
+	private int height = 3;							// Height of the pattern. Default=3.
 	private long[] blackBits = new long[NR_WORDS];	// Bit-pattern of the black stones.
 	private long[] whiteBits = new long[NR_WORDS];	// Bit-pattern of the white stones.
 	private long[] emptyBits = new long[NR_WORDS];	// Bit-pattern of the empty points.
@@ -342,6 +338,8 @@ public class Pattern
 			whiteY++;
 		if (userY!=UNDEFINED_COORDINATE)
 			userY++;
+		if (startY!=UNDEFINED_COORDINATE)
+			startY++;
 	
 		// Adjust the coordinates of the conditions as well.
 //		for (PatternCondition c : conditionList)
@@ -384,6 +382,8 @@ public class Pattern
 			whiteX++;
 		if (userX!=UNDEFINED_COORDINATE)
 			userX++;
+		if (startX!=UNDEFINED_COORDINATE)
+			startX++;
 
 		// Adjust the coordinates of the conditions as well.
 //		for (PatternCondition c : conditionList)
@@ -661,6 +661,11 @@ public class Pattern
 		return newPattern;
 	}
 	
+	public boolean isEmpty()
+	{
+		return (blackBits[0]==0 && blackBits[1]==0 && blackBits[2]==0 && blackBits[3]==0 && whiteBits[0]==0 && whiteBits[1]==0 && whiteBits[2]==0 && whiteBits[3]==0);
+	}
+	
 	/**
 	 * @param o object that is the source from which the copy is made
 	 * 
@@ -718,17 +723,27 @@ public class Pattern
 			newPattern.whiteNrSuccesses = wasPlayed? 1 : 0;
 			newPattern.whiteNrOccurrences = 1;
 		}
+		
+		// Add padding around to allow expansion of the pattern.
+		if (!newPattern.hasEmptyTopRow() && !newPattern.hasTopEdge())
+			newPattern.addTopRow();
+		if (!newPattern.hasEmptyBottomRow() && !newPattern.hasBottomEdge())
+			newPattern.addBottomRow();
+		if (!newPattern.hasEmptyLeftColumn() && !newPattern.hasLeftEdge())
+			newPattern.addLeftColumn();
+		if (!newPattern.hasEmptyRightColumn() && !newPattern.hasRightEdge())
+			newPattern.addRightColumn();
+		
 		boolean found = false;
-		while (!found)
+		int nrTries = 0;
+		while (!found && nrTries<1000)
 		{
-			try
+			int x = (int)(Math.random()*newPattern.getWidth());
+			int y = (int)(Math.random()*newPattern.getHeight());
+			if (newPattern.getPoint(x, y)!=NOCARE)
 			{
-			int x = (int)(Math.random()*getWidth());
-			int y = (int)(Math.random()*getHeight());
-			if (getPoint(x, y)!=NOCARE)
-			{
-				int replace = (int)(Math.random()*4);
-				if (replace==0 && (x!=0 || y!=0))
+				/*int replace = (int)(Math.random()*4);
+				if (replace==0 && (x!=startX || y!=startY))
 				{
 					int choice = (int)(Math.random()*4);
 					byte newValue;
@@ -739,36 +754,39 @@ public class Pattern
 						case 2: newValue = WHITE; break;
 						default: newValue = NOCARE; break;
 					}
-					if (newValue!=NOCARE || !isCentered(x,y))
+					if (newValue!=NOCARE || !newPattern.isCentered(x,y))
 					{
 						newPattern.setPoint(x, y, newValue);
 						found = true;
 					}
 				}
-				else
+				else*/
 				{
 					int dir = (int)(Math.random()*4);
 					switch(dir)
 					{
 					case 0:
-						x--;
+						if (x>0)
+							x--;
 						break;
 					case 1:
-						x++;
+						if (x<newPattern.width-1)
+							x++;
 						break;
 					case 2:
-						y--;
+						if (y>0)
+							y--;
 						break;
 					case 3:
-						y++;
+						if (y<newPattern.height-1)
+							y++;
 						break;
 					}
-					if (getPoint(x, y)==NOCARE)
+					if (newPattern.getPoint(x, y)==NOCARE)
 					{
-						found = true;
 						Point p = new Point();
-						int relativeX = x - startX;
-						int relativeY = y - startY;
+						int relativeX = x - newPattern.startX;
+						int relativeY = y - newPattern.startY;
 						PatternUtil.adjustOrientation(relativeX, relativeY, orientation, p);
 						int newXY = offsetXY+GoArray.toXY(p.x,p.y);
 						byte boardValue = boardModel.get(newXY);
@@ -788,37 +806,30 @@ public class Pattern
 							return newPattern;
 						}
 						
-						if (x<0)
-						{
-							newPattern.addLeftColumn();
-							x = 0;
-						}
-						if (x==width)
-							newPattern.addRightColumn();
-						if (y<0)
-						{
-							newPattern.addTopRow();
-							y = 0;
-						}
-						if (y==height)
-							newPattern.addBottomRow();
 						newPattern.setPoint(x, y, boardValue);
+						found = !newPattern.isEmpty();
+						nrTries++;
 					}
 				}
 			}
-			}
-			catch (ArrayIndexOutOfBoundsException exception)
-			{
-				// TODO - see why this still happens.
-			}
 		}
+		
+		// Remove the padding padding.
+		if (newPattern.hasEmptyTopRow())
+			newPattern.removeTopRow();
+		if (newPattern.hasEmptyBottomRow())
+			newPattern.removeBottomRow();
+		if (newPattern.hasEmptyLeftColumn())
+			newPattern.removeLeftColumn();
+		if (newPattern.hasEmptyRightColumn())
+			newPattern.removeRightColumn();
+
 		return newPattern;
 	}
 	
 	public static Pattern createFromBoard(int offsetXY, MonteCarloGoAdministration mcAdministration)
 	{
-		int limit = 2560;
-		int threshold = 25;
+		int limit = 256;
 		int boardSize = mcAdministration.getBoardModel().getBoardSize();
 		int[] beforeOwnership = GoArray.createIntegers();
 		int[] afterOwnership = GoArray.createIntegers();
@@ -834,6 +845,8 @@ public class Pattern
 			{
 				beforeOwnership[j] += tmpAdministration.getBlackOwnership()[j];
 			}
+			GoArray.printNumbers(beforeOwnership);
+			System.out.println("---\n");
 		}
 		stepAdministration.playMove(GoMoveFactory.getSingleton().createMove(offsetXY, startAdministration.getColorToMove()));
 		for (int i=0; i<limit; i++)
@@ -844,6 +857,8 @@ public class Pattern
 			{
 				afterOwnership[j] += tmpAdministration.getBlackOwnership()[j];
 			}
+			GoArray.printNumbers(afterOwnership);
+			System.out.println("---\n");
 		}
 		for (int j=GoArray.FIRST; j<GoArray.LAST; j++)
 		{
@@ -1027,7 +1042,7 @@ public class Pattern
 	
 	public int getPointCount()
 	{
-		// return pointCount;
+		// return pointCount; - there are some bugs in keeping the point-count when resizing the pattern and when reading from the DB.
 
 		int points = 0;
 

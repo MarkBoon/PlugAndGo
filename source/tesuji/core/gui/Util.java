@@ -98,7 +98,6 @@ public class Util
             else
             {
                 URL fileURL = Util.class.getResource("/"+fileName);
-                System.out.println("Resource URL: "+fileURL);
                 return new BufferedInputStream(fileURL.openStream());
             }
         }
@@ -148,8 +147,6 @@ public class Util
             {
                 String fileName = "/vplay/applets/images/"+theName;
                 URL url = new URL(protocol,host,fileName);
-                System.out.println("URL="+url);
-                System.out.println("file="+fileName);
                 return applet.getImage(url,fileName);
             }
             catch (MalformedURLException ex)

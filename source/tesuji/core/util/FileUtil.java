@@ -11,8 +11,7 @@ import org.springframework.core.io.Resource;
 
 public class FileUtil
 {
-	@SuppressWarnings("unchecked")
-	public static InputStream getInputStream(String fileName, Class handler)
+	public static InputStream getInputStream(String fileName, Class<?> handler)
 	{
 		InputStream inputStream = null;
 		if (handler!=null)
@@ -37,8 +36,7 @@ public class FileUtil
 		return inputStream;
 	}
 	
-	@SuppressWarnings("unchecked")
-	public static URL getResourceURL(String fileName, Class handler)
+	public static URL getResourceURL(String fileName, Class<?> handler)
 	{
 		URL url = null;
 		if (handler!=null)

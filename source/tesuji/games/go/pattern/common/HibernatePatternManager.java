@@ -55,8 +55,11 @@ public class HibernatePatternManager
 	
 	public static HibernatePatternManager getSingleton()
 	{
+		
 		if (_singleton==null)
+		{
 			_singleton = new HibernatePatternManager();
+		}
 		return _singleton;
 	}
 	
@@ -186,7 +189,6 @@ public class HibernatePatternManager
     /**
      * @see tesuji.games.go.pattern.common.PatternManager#getPatterns(tesuji.games.go.pattern.common.PatternGroup)
      */
-    @SuppressWarnings("unchecked")
 	public ArrayList<Pattern> getPatterns(PatternGroup group)
     {
 	    try
@@ -194,7 +196,7 @@ public class HibernatePatternManager
 	    	Session hibernateSession = openSession();        	
 	    	String queryString = "from tesuji.games.go.pattern.common.Pattern as pattern where pattern.groupId="+group.getGroupId()+" order by patternNr asc";
 	    	Query query = hibernateSession.createQuery(queryString);
-	    	java.util.List list = query.list();
+	    	java.util.List<?> list = query.list();
 //	    	java.util.List list = hibernateSession.createQuery(query)(query);
 	    	ArrayList<Pattern> patternList = new ArrayList<Pattern>(list.size());
 	    	for (Object p : list)
@@ -317,13 +319,12 @@ public class HibernatePatternManager
     /**
      * @see tesuji.games.go.pattern.common.PatternManager#getPatternGroups()
      */
-    @SuppressWarnings("unchecked")
 	public List<PatternGroup> getPatternGroups()
     {
 	    try
 	    {
 	    	Session hibernateSession = openSession();        	
-	    	java.util.List list = hibernateSession.createQuery("from tesuji.games.go.pattern.common.PatternGroup").list();
+	    	java.util.List<?> list = hibernateSession.createQuery("from tesuji.games.go.pattern.common.PatternGroup").list();
 	    	List<PatternGroup> groupList = new ArrayList<PatternGroup>(list.size());
 	    	for (Object o : list)
 	    		groupList.add((PatternGroup)o);
@@ -348,14 +349,13 @@ public class HibernatePatternManager
     /**
      * @see tesuji.games.go.pattern.common.PatternManager#getPatternGroup(int)
      */
-    @SuppressWarnings("unchecked")
 	public PatternGroup getPatternGroup(int groupId)
     {
 	    try
 	    {
 	    	Session hibernateSession = openSession();        	
 	    	String query = "from tesuji.games.go.pattern.common.PatternGroup as patternGroup where patternGroup.groupId="+groupId;
-	    	java.util.List list = hibernateSession.createQuery(query).list();
+	    	java.util.List<?> list = hibernateSession.createQuery(query).list();
 	    	if (list.size()!=1)
 	    	{
 	    		logger.error("PatternGroup with id '"+groupId+"' does not exist.");
@@ -377,14 +377,13 @@ public class HibernatePatternManager
     /**
      * @see tesuji.games.go.pattern.common.PatternManager#getPatternGroup(java.lang.String)
      */
-    @SuppressWarnings("unchecked")
     public PatternGroup getPatternGroup(String groupName)
     {
 	    try
 	    {
 	    	Session hibernateSession = openSession();        	
 	    	String query = "from tesuji.games.go.pattern.common.PatternGroup as patternGroup where patternGroup.groupName='"+groupName+"'";
-	    	java.util.List list = hibernateSession.createQuery(query).list();
+	    	java.util.List<?> list = hibernateSession.createQuery(query).list();
 	    	if (list.size()!=1)
 	    	{
 	    		logger.error("PatternGroup '"+groupName+"' does not exist.");

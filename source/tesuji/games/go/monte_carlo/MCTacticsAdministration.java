@@ -1118,7 +1118,6 @@ public class MCTacticsAdministration
 		
 		int edge=0;
 		int own=0;
-		int other=0;
 		int empty=0;
 		int emptyXY = 0;
 		for (int n=0; n<4; n++)
@@ -1141,8 +1140,6 @@ public class MCTacticsAdministration
 				own++;
 			else if (_liberties[_chain[next]]==1)
 				own++;
-			else
-				other++;
 		}
 		if (empty!=1)
 			return 0;

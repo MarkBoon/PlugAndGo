@@ -33,7 +33,6 @@ import tesuji.core.util.MersenneTwisterFast;
 import tesuji.games.general.Checksum;
 import tesuji.games.general.MoveIterator;
 
-import tesuji.games.go.common.GoConstant;
 import tesuji.games.go.common.GoMove;
 import tesuji.games.go.common.GoMoveFactory;
 import tesuji.games.go.common.Util;
@@ -493,7 +492,8 @@ public abstract class AbstractMonteCarloAdministration
 	 * (non-Javadoc)
 	 * @see tesuji.games.go.monte_carlo.MonteCarloAdministration#playout()
 	 */
-	public boolean playout()
+	@SuppressWarnings("unused")
+    public boolean playout()
 	{
 		_inPlayout = true;
 		_playoutStart = _moveStack.getSize();

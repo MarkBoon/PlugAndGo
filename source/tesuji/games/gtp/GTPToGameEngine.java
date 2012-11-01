@@ -152,9 +152,11 @@ public class GTPToGameEngine<MoveType extends Move>
 			else if (command.equals(PLAY))
 			{
 				MoveType move = _engine.getMoveFactory().parseMove(gtpCommand.getArgumentLine().toLowerCase());				
+				_logger.info("handleCommand#engine.play "+move);
 				_engine.playMove(move);
 				_engine.evaluate();
 				move.recycle();
+				_logger.info("handleCommand#play "+move);
 			}
 			else if (command.equals(TAKEBACK))
 			{

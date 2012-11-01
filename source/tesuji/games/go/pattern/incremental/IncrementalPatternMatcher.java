@@ -25,11 +25,14 @@
  */
 package tesuji.games.go.pattern.incremental;
 
+import org.apache.log4j.Logger;
+
 import tesuji.core.util.ArrayList;
 import tesuji.core.util.List;
 import tesuji.games.go.pattern.common.Pattern;
 import tesuji.games.go.pattern.common.PatternGroup;
 import tesuji.games.go.pattern.common.PatternManager;
+import tesuji.games.go.search.MonteCarloTreeSearch;
 import tesuji.games.go.util.DefaultBoardModel;
 import tesuji.games.go.util.GoArray;
 import tesuji.games.model.BoardChange;
@@ -51,6 +54,8 @@ import static tesuji.games.go.util.GoArray.MAX;
 public class IncrementalPatternMatcher
 	implements BoardModelListener
 {
+	private static Logger _logger = Logger.getLogger(IncrementalPatternMatcher.class);
+
 	private PointSpiral spiral;
 	private PatternGroup group;
 	private FullPatternTree tree;
@@ -88,15 +93,20 @@ public class IncrementalPatternMatcher
 	
 	public void initialise(BoardModel boardModel)
 	{
-		// Due to the incremental natuer of this pattern-matcher, new patterns can only be added
+		// Due to the incremental nature of this pattern-matcher, new patterns can only be added
 		// before a new game starts, not during a game.
 		tree.addPatterns(_newPatternList);
 		for (Pattern p : _newPatternList)
 		{
 			if (p.isAdded())
+			{
 				patternManager.createPattern(p);
+				group.getPatternList().add(p);
+				_logger.info("New pattern:\n"+p.toString());
+			}
 		}
 		_newPatternList.clear();
+		recomputeTree();
 
 		_moveNr = 1;
 		_matchList.clear();

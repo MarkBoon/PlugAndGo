@@ -26,7 +26,6 @@ package tesuji.games.go.benchmark;
  */
 
 import tesuji.games.general.Move;
-import tesuji.games.go.common.GoMove;
 import tesuji.games.go.monte_carlo.MonteCarloAdministration;
 import tesuji.games.gtp.GTPCommand;
 
@@ -42,7 +41,7 @@ public class MCPlayout<MoveType extends Move>
 	private MonteCarloAdministration _currentAdministration;
 	private MonteCarloAdministration _playoutAdministration;
 	
-	public MCPlayout(MonteCarloAdministration administration)
+	public MCPlayout(MonteCarloAdministration<?> administration)
 	{
 		_currentAdministration = administration;
 		_playoutAdministration = administration.createClone();

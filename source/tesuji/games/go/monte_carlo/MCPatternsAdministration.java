@@ -71,7 +71,6 @@ public class MCPatternsAdministration
 	{
 		super();
 		
-		System.err.println("Instantiate MCPatternsAdministration with "+patternGroupName);
 		_patternManager = HibernatePatternManager.getSingleton();
 		_patternSet = loadPatternSet(patternGroupName);
 	}

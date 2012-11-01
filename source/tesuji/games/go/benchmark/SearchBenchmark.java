@@ -26,6 +26,9 @@
 package tesuji.games.go.benchmark;
 
 //import tesuji.core.util.FactoryReport;
+import org.apache.log4j.Logger;
+
+import tesuji.core.util.LoggerConfigurator;
 import tesuji.core.util.MemoryUtil;
 import tesuji.games.general.ColorConstant;
 import tesuji.games.general.search.Search;
@@ -34,8 +37,12 @@ import tesuji.games.go.common.GoMove;
 
 public class SearchBenchmark
 {
+	public static Logger _logger = Logger.getLogger(SearchBenchmark.class);
+	
 	public static void doSearch(Search<GoMove> search)
 	{
+		LoggerConfigurator.configure();
+		
 		long beforeTime;
 		long afterTime;
 		long beforeMemory = MemoryUtil.getFreeMemory();
@@ -53,14 +60,14 @@ public class SearchBenchmark
 			afterTime = System.currentTimeMillis();
 			afterMemory = MemoryUtil.getFreeMemory();
 			double total = (afterTime - beforeTime)/1000;
-			System.out.println("Time taken: "+total+ " seconds");
-			System.out.println("Move chosen: "+move);
-			System.out.println("Memory used: "+(afterMemory-beforeMemory));
-//			System.out.println(FactoryReport.getFactoryReport());
+			_logger.info("Time taken: "+total+ " seconds");
+			_logger.info("Move chosen: "+move);
+			_logger.info("Memory used: "+(afterMemory-beforeMemory));
+//			_logger.info(FactoryReport.getFactoryReport());
         }
         catch (Exception e)
         {
-			System.out.println("Unexpected exception "+e.getClass()+": "+e.getMessage());
+        	_logger.error("Unexpected exception "+e.getClass()+": "+e.getMessage());
 	        e.printStackTrace();
         }		
 	}

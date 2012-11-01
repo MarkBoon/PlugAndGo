@@ -1,6 +1,6 @@
 CREATE TABLE pattern_group
 (
-	groupId INTEGER IDENTITY,
+	groupId INTEGER AUTO_INCREMENT PRIMARY KEY,
 	groupName VARCHAR(255),
 	description VARCHAR(1000)
 )

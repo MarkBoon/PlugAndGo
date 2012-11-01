@@ -32,13 +32,8 @@ package tesuji.games.go.pattern.common;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
@@ -235,7 +230,6 @@ public class TextFilePatternManager
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	private void readPatternGroupList()
 	{
 		try
@@ -278,7 +272,7 @@ public class TextFilePatternManager
 			Writer writer = new FileWriter(patternGroupFile);
 			for (int i=0; i<patternGroupList.size(); i++)
 			{
-				PatternGroup group = patternGroupList.get(i);
+//				PatternGroup group = patternGroupList.get(i);
 // TODO				writer.write(group.toFile()+"\n");
 			}
 			writer.flush();
@@ -291,7 +285,6 @@ public class TextFilePatternManager
 	}
 	
 
-	@SuppressWarnings("unchecked")
 	private void readPatternList(PatternGroup patternGroup)
 	{
 		String fileName = "Patterns"+patternGroup.getGroupName()+".txt";
@@ -322,7 +315,7 @@ public class TextFilePatternManager
 			Writer writer = new FileWriter(patternFile);
 			for (int i=0; i<patternList.size(); i++)
 			{
-				Pattern pattern = patternList.get(i);
+//				Pattern pattern = patternList.get(i);
 // TODO				writer.write(pattern.toFile()+"\n");
 			}
 			writer.flush();

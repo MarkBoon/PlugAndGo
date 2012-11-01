@@ -26,13 +26,13 @@
 package tesuji.games.sgf;
 
 import tesuji.core.util.SynchronizedArrayStack;
+import tesuji.games.general.Move;
 
 public class SGFDataFactory
 {
-   @SuppressWarnings("unchecked")
-private static SynchronizedArrayStack<SGFData> pool = new SynchronizedArrayStack<SGFData>();   
+	private static SynchronizedArrayStack<SGFData<? extends Move>> pool = new SynchronizedArrayStack<SGFData<? extends Move>>();   
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
 	public static SGFData createSGFData()
     {
         SGFData newNode;

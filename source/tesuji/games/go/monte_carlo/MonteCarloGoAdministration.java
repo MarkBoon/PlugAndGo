@@ -621,7 +621,8 @@ public class MonteCarloGoAdministration
 	 * (non-Javadoc)
 	 * @see tesuji.games.go.monte_carlo.MonteCarloAdministration#playout()
 	 */
-	public boolean playout()
+	@SuppressWarnings("unused")
+    public boolean playout()
 	{
 		_inPlayout = true;
 		_playoutStart = _moveStack.getSize();
@@ -700,15 +701,12 @@ public class MonteCarloGoAdministration
 	{
 		assert !hasLiberty(xy) : SGFUtil.createSGF(getMoveStack());
 
-		byte[] board = _boardModel.getSingleArray();
-		int nrStones = 0;
 		int captive = xy;
 		do
 		{
 			assert _boardModel.get(captive)==_oppositeColor : SGFUtil.createSGF(getMoveStack());
 			
 			_chain[captive] = 0;
-			nrStones++;
 			
 			removeStone(captive);
 			
@@ -1132,7 +1130,7 @@ public class MonteCarloGoAdministration
     		}
     		else
     		{
-    			score = score;
+//    			score = score;
     		}
     	}
     	

@@ -25,6 +25,8 @@
 */
 package tesuji.games.go.pattern.incremental;
 
+import org.apache.log4j.Logger;
+
 import tesuji.core.util.ArrayList;
 import tesuji.core.util.List;
 import tesuji.games.go.pattern.common.Pattern;
@@ -38,6 +40,8 @@ import tesuji.games.go.pattern.common.PatternGroup;
 */
 class FullPatternTree
 {
+	private static Logger _logger = Logger.getLogger(FullPatternTree.class);
+	
 	private int nrNewPatterns;
 	private int dirtyLimit = 100;
 	
@@ -110,9 +114,10 @@ class FullPatternTree
 		for (int orientation=1; orientation<16; orientation++)
 		{
 			root.addPatterns(addedPatterns,patternSpiral,0,orientation);
-			if (patternList.size()>1000)
-				System.out.println("Added patterns for orientation "+orientation);
+			//if (patternList.size()>1000)
+			//	System.out.println("Added patterns for orientation "+orientation);
 		}
+		_logger.info("Added "+nrNewPatterns+" patterns");
 	}
 	
 	/**

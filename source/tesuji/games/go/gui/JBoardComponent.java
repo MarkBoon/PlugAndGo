@@ -41,7 +41,12 @@ public abstract class JBoardComponent<MoveType extends Move>
 	extends	javax.swing.JComponent
 	implements MoveProducer<MoveType>, BoardModelListener
 {
-    protected BoardModel _boardModel;
+    /**
+	 * 
+	 */
+    private static final long serialVersionUID = 886357874606439480L;
+
+	protected BoardModel _boardModel;
     
 	private DefaultMoveProducer<MoveType> _moveProducer = new DefaultMoveProducer<MoveType>();
     

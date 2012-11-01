@@ -125,7 +125,7 @@ public class TreeSearchEngine
     @Override
 	public String getEngineVersion()
     {
-	    return "1.0a";
+	    return _search.getClass().getSimpleName();
     }
 
 	/* (non-Javadoc)
@@ -146,7 +146,7 @@ public class TreeSearchEngine
        	_search.playMove(move);
     	_moveList.add((GoMove)move.cloneMove());
 		_logger.info("Play at "+move);
-		_logger.info("Search Administration: \n"+_search.toString());
+		_logger.info("Search Administration ("+_search.getClass().getSimpleName()+"): \n"+_search.toString());
     	DataProviderList.getSingleton().fireDataChange();
     }
 

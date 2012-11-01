@@ -137,22 +137,22 @@ public class EngineTester
 		_nrProcessors = nrProcessors;
 	}
 
-	public void setBlackPlayer(Search blackPlayer)
+	public void setBlackPlayer(Search<GoMove> blackPlayer)
     {
 	    _blackPlayer = blackPlayer;
     }
 
-	public Search getBlackPlayer()
+	public Search<GoMove> getBlackPlayer()
     {
 	    return _blackPlayer;
     }
 
-	public void setWhitePlayer(Search whitePlayer)
+	public void setWhitePlayer(Search<GoMove> whitePlayer)
     {
 	    _whitePlayer = whitePlayer;
     }
 
-	public Search getWhitePlayer()
+	public Search<GoMove> getWhitePlayer()
     {
 	    return _whitePlayer;
     }

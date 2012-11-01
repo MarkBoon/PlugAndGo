@@ -284,6 +284,7 @@ public class SGFParser<MoveType extends Move>
             }
             parse(fileContents.toString());
             StringBufferFactory.recycleStringBuffer(fileContents);
+            reader.close();
             return getDocumentNode();
 		}
 		catch (IOException ex)

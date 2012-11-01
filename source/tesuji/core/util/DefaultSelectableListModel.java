@@ -213,14 +213,13 @@ public class DefaultSelectableListModel
 		a reference to the listener, the table-model and all GUI components related to
 		it will not be garbage-collected.
 	*/
-	@SuppressWarnings("unchecked")
     public void removeListModel()
 	{
 		if (_listManager!=null)
 		{
-			for (Enumeration e = _listDataListeners.elements(); e.hasMoreElements();)
+			for (Enumeration<ListDataListener> e = _listDataListeners.elements(); e.hasMoreElements();)
 			{
-				ListDataListener l = (ListDataListener) e.nextElement();
+				ListDataListener l = e.nextElement();
 				_listManager.removeListDataListener(l);
 			}
 		}
@@ -257,7 +256,6 @@ public class DefaultSelectableListModel
 		Occasionally one might want to change the collection behind the model, for example by reusing the same
 		list or table layout for different lists of data.
 	*/
-	@SuppressWarnings("unchecked")
     public void setListModel(ListModel listManager)
 	{
 		// Make sure that the listeners to the previous collection are removed...

@@ -256,6 +256,11 @@ public class PointSpiral
 				pattern.setStartX(pattern.getWidth()/2);
 				pattern.setStartY(pattern.getHeight()/2);
 			}
+			else
+			{
+				pattern.setStartX(pattern.getUserX());
+				pattern.setStartY(pattern.getUserY());
+			}
 		}
 
 // TODO - review the whole 'recompute' procedure. Does it gain speed?	

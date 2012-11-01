@@ -263,14 +263,12 @@ public class MCLibertyAdministration
 		assert !hasLiberty(xy) : SGFUtil.createSGF(getMoveStack());
 
 		byte[] board = _boardModel.getSingleArray();
-		int nrStones = 0;
 		int captive = xy;
 		do
 		{
 			assert _boardModel.get(captive)==_oppositeColor : SGFUtil.createSGF(getMoveStack());
 			
 			_chain[captive] = 0;
-			nrStones++;
 			
 			int left = left(captive);
 			int right = right(captive);

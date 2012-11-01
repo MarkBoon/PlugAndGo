@@ -31,10 +31,8 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import tesuji.core.util.LoggerConfigurator;
-import tesuji.games.general.renderer.DataRendererManager;
 import tesuji.games.go.common.GoEngine;
 import tesuji.games.go.common.GoMove;
-import tesuji.games.go.gui.GoDataPanel;
 import tesuji.games.go.util.GoEngineBeanHelper;
 import tesuji.games.gtp.GTPToGameEngine;
 import tesuji.games.util.Console;

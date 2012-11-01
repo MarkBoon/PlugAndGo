@@ -40,17 +40,6 @@ import tesuji.core.util.ArrayList;
 import tesuji.games.go.pattern.common.Pattern;
 import tesuji.games.go.pattern.common.PatternGroup;
 import tesuji.games.go.pattern.common.PatternManager;
-//import tesuji.games.go.pattern.common.PatternSet;
-import tesuji.games.go.pattern.comparator.SucsessRatioPatternComparator;
-import tesuji.games.go.pattern.incremental.PatternMatch;
-import tesuji.games.go.pattern.incremental.PatternMatchList;
-import tesuji.games.go.pattern.incremental.IncrementalPatternMatcher;
-import tesuji.games.go.util.ArrayFactory;
-import tesuji.games.go.util.GoArray;
-import tesuji.games.go.util.IntStack;
-
-import static tesuji.games.general.ColorConstant.*;
-import static tesuji.games.go.common.GoConstant.*;
 
 /**
  	This is the controller for the PatternListPanel class.
@@ -59,13 +48,11 @@ import static tesuji.games.go.common.GoConstant.*;
 public class PatternListController
 {
 	private PatternGroup patternGroup;
-	private IncrementalPatternMatcher patternSet;
 	private ArrayList<Pattern> patternList;
 	private int firstIndex = 0;		// First pattern in the 'window'
 	private int nrPatterns;			// Number of patterns in the 'window'.
 	private Pattern selectedPattern;
 	private PatternManager patternManager;
-	private Comparator<Pattern> comparator;
 	private PropertyChangeSupport changeSupport;
 	
 	public static final String SELECTED_PATTERN_GROUP_PROPERTY = "selectedPatternGroup";
@@ -77,7 +64,6 @@ public class PatternListController
 	public PatternListController(PatternGroup group, PatternManager manager)
 	{
 		patternManager = manager;
-		comparator = new SucsessRatioPatternComparator();
 		
 		changeSupport = new PropertyChangeSupport(this);
 		setPatternGroup(group);
@@ -157,8 +143,6 @@ public class PatternListController
 			ArrayList<Pattern> newList = patternManager.getPatterns(group);
 			patternGroup.setPatternList(newList);
 			patternList = patternGroup.getPatternList();
-//			sortPatterns(comparator); TODO
-			patternSet = new IncrementalPatternMatcher(patternGroup);
 		}
 		else
 			patternList = new ArrayList<Pattern>();

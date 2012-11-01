@@ -40,7 +40,7 @@ import tesuji.games.general.Move;
 public class SGFData<MoveType extends Move>
 	implements FlyWeight
 {
-	private static final long serialVersionUID = -6112070946683551432L;
+//	private static final long serialVersionUID = -6112070946683551432L;
 		
 	private ArrayList<SGFProperty> _propertyList;
 	private MoveType _move;

@@ -1,9 +1,12 @@
 package tesuji.games.go.pattern.util;
 
+import org.apache.log4j.BasicConfigurator;
+
 import tesuji.core.util.ArrayList;
 import tesuji.games.go.pattern.common.HibernatePatternManager;
 import tesuji.games.go.pattern.common.Pattern;
 import tesuji.games.go.pattern.common.PatternGroup;
+import tesuji.games.go.pattern.incremental.IncrementalPatternMatcher;
 
 import static tesuji.games.general.ColorConstant.*;
 
@@ -16,7 +19,9 @@ public class PatternGenerator
 		ArrayList<Pattern> list = new ArrayList<Pattern>();
 		
 		Pattern pattern = new Pattern();
-
+		pattern.setUserX(1);
+		pattern.setUserY(1);
+		
 		generate3x3Pattern(0, 0, pattern, list);
 
 		return list;
@@ -55,15 +60,85 @@ public class PatternGenerator
 		generate3x3Pattern(newCol,newRow,p,list);
 	}
 	
+	public static void generateSymmetricalPatterns(ArrayList<Pattern> list)
+	{
+		Pattern p = new Pattern();
+		p.setUserX(1);
+		p.setUserY(1);
+		for (int row=0; row<3; row++)
+			for (int col=0; col<3; col++)
+				p.setPoint(col, row, EMPTY);
+		
+		p.addLeftColumn();
+		p.addRightColumn();
+		p.addTopRow();
+		p.addBottomRow();
+		
+		p.setPoint(0, 2, EMPTY);
+		p.setPoint(2, 0, EMPTY);
+		p.setPoint(4, 2, EMPTY);
+		p.setPoint(2, 4, EMPTY);
+		
+		list.add((Pattern)p.clone());
+
+		p.setPoint(0, 1, EMPTY);
+		p.setPoint(0, 3, EMPTY);
+		p.setPoint(1, 0, EMPTY);
+		p.setPoint(3, 0, EMPTY);
+		p.setPoint(4, 1, EMPTY);
+		p.setPoint(4, 3, EMPTY);
+		p.setPoint(1, 4, EMPTY);
+		p.setPoint(3, 4, EMPTY);
+		
+		list.add((Pattern)p.clone());
+
+		p.setPoint(0, 0, EMPTY);
+		p.setPoint(0, 4, EMPTY);
+		p.setPoint(0, 0, EMPTY);
+		p.setPoint(4, 0, EMPTY);
+		p.setPoint(4, 0, EMPTY);
+		p.setPoint(4, 4, EMPTY);
+		p.setPoint(0, 4, EMPTY);
+		p.setPoint(4, 4, EMPTY);
+		
+		list.add((Pattern)p.clone());
+
+		p.addLeftColumn();
+		p.addRightColumn();
+		p.addTopRow();
+		p.addBottomRow();
+
+		p.setPoint(0, 3, EMPTY);
+		p.setPoint(3, 0, EMPTY);
+		p.setPoint(6, 3, EMPTY);
+		p.setPoint(3, 6, EMPTY);
+		
+		list.add((Pattern)p.clone());
+		
+		p.setPoint(0, 2, EMPTY);
+		p.setPoint(0, 4, EMPTY);
+		p.setPoint(2, 0, EMPTY);
+		p.setPoint(4, 0, EMPTY);
+		p.setPoint(6, 2, EMPTY);
+		p.setPoint(6, 4, EMPTY);
+		p.setPoint(2, 6, EMPTY);
+		p.setPoint(4, 6, EMPTY);
+		
+		list.add((Pattern)p.clone());
+	}
+	
 	public static void main(String[] args)
 	{
+		BasicConfigurator.configure();
+	
 		ArrayList<Pattern> list = generate3x3Patterns();
+		//generateSymmetricalPatterns(list);
 		ArrayList<Pattern> truncatedList = new ArrayList<Pattern>();
 		
 		for (int i=0; i<list.size(); i++)
 		{
 			Pattern p = list.get(i);
-			if (p.getPoint(1,1)==EMPTY)
+			if (p.getPoint(p.getUserX(),p.getUserY())==EMPTY)
 				truncatedList.add(p);
 		}
 		
@@ -90,12 +165,18 @@ public class PatternGenerator
 			patternManager.createPatternGroup(group);
 		}
 		
+		group.setPatternList(truncatedList);
+		IncrementalPatternMatcher matcher = new IncrementalPatternMatcher(group);
+		
 		for (int i=0; i<truncatedList.size(); i++)
 		{
 			Pattern p = truncatedList.get(i);
-			p.setGroupId(group.getGroupId());
-			System.out.println("Save Pattern: \n"+p.toString()+"\n");
-			patternManager.createPattern(p);
+			if (p.isAdded())
+			{
+				p.setGroupId(group.getGroupId());
+				System.out.println("Save Pattern: \n"+p.toString()+"\n");
+				patternManager.createPattern(p);
+			}
 		}
 	}
 }

@@ -150,6 +150,12 @@ class IncrementalPatternTreeNode
 				leafList.add(leaf);
 				pattern.setAdded(true);
 			}
+			if (leafList.size()>1)
+			{
+				System.err.println("Duplicate pattern:\n"+leafList.get(0).getPattern());
+				System.err.println("and:\n"+leafList.get(1).getPattern());
+				//throw new ArrayIndexOutOfBoundsException();
+			}
 		}
 		
 		if (noCareList.size()!=0)

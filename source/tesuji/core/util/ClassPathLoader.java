@@ -50,7 +50,7 @@ public class ClassPathLoader
 	public static void addFile(File file)
 		throws IOException
 	{
-		addURL(file.toURL());
+		addURL(file.toURI().toURL());
 	}
 
 	public static void addURL(URL url)

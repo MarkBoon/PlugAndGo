@@ -1,6 +1,6 @@
 CREATE TABLE go_pattern
 (
-	uniqueId INTEGER IDENTITY,
+	uniqueId INTEGER AUTO_INCREMENT PRIMARY KEY,
 	groupId INTEGER,
 	patternNr INTEGER,
 	width INTEGER,
