@@ -29,7 +29,7 @@
 		  			<value>true</value>
 		  		</property>
 		  		<property name="nrSimulationsBeforeExpansion">
-		  			<value>8</value>
+		  			<value>1</value>
 		  		</property>
 		  		<property name="isTestVersion">
 		  			<value>false</value>
@@ -71,7 +71,7 @@
 		  			<value>true</value>
 		  		</property>
 		  		<property name="nrSimulationsBeforeExpansion">
-		  			<value>8</value>
+		  			<value>1</value>
 		  		</property>
 		  		<property name="isTestVersion">
 		  			<value>false</value>
