@@ -117,7 +117,7 @@ public class SGFParser<MoveType extends Move>
 	public void parse(StringBuilder sgf)
 		throws ParseException
 	{
-		_documentNode = TreeNodeFactory.getSingleton().createTreeNode();
+		_documentNode = (TreeNode<SGFData<MoveType>>) TreeNodeFactory.getSingleton().createTreeNode();
 		SGFData<MoveType> sgfData = SGFDataFactory.createSGFData();
 		_documentNode.setContent(sgfData);
 		parse(new SGFBuffer(sgf),_documentNode);
@@ -134,7 +134,7 @@ public class SGFParser<MoveType extends Move>
 	public void parse(String sgf)
         throws ParseException
     {
-		_documentNode = TreeNodeFactory.getSingleton().createTreeNode();
+		_documentNode = (TreeNode<SGFData<MoveType>>) TreeNodeFactory.getSingleton().createTreeNode();
 		SGFData<MoveType> sgfData = SGFDataFactory.createSGFData();
 		_documentNode.setContent(sgfData);
         sgfData.setSGF(sgf);
@@ -189,7 +189,7 @@ public class SGFParser<MoveType extends Move>
                     return;
                 case ';':
                 	@SuppressWarnings("unchecked")
-                	TreeNode<SGFData<MoveType>> newNode = TreeNodeFactory.getSingleton().createTreeNode();
+                	TreeNode<SGFData<MoveType>> newNode = (TreeNode<SGFData<MoveType>>) TreeNodeFactory.getSingleton().createTreeNode();
                 	@SuppressWarnings("unchecked")
                 	SGFData<MoveType> sgfData = SGFDataFactory.createSGFData();
                 	newNode.setContent(sgfData);
@@ -325,7 +325,7 @@ public class SGFParser<MoveType extends Move>
 				if (move.isInitialised())
 				{
 					@SuppressWarnings("unchecked")
-					TreeNode<MoveType> nextMoveNode = TreeNodeFactory.getSingleton().createTreeNode();
+					TreeNode<MoveType> nextMoveNode = (TreeNode<MoveType>) TreeNodeFactory.getSingleton().createTreeNode();
 					nextMoveNode.setContent(move);
 					moveNode.add(nextMoveNode);
 					importSGFNode(nextMoveNode,childNode);
@@ -361,7 +361,7 @@ public class SGFParser<MoveType extends Move>
 			{
 				MoveType move = _moveFactory.cloneMove(childNode.getContent().getMove());
 				@SuppressWarnings("unchecked")
-				TreeNode<MoveType> nextMoveNode = TreeNodeFactory.getSingleton().createTreeNode();
+				TreeNode<MoveType> nextMoveNode = (TreeNode<MoveType>) TreeNodeFactory.getSingleton().createTreeNode();
 				nextMoveNode.setContent(move);
 				treeModel.insertNodeInto(nextMoveNode, moveNode, moveNode.getChildCount());
 //				moveNode.add(nextMoveNode);

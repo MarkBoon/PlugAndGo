@@ -34,12 +34,12 @@ public class TreeNodeFactory
 		return "Number of TreeNode objects:\t\t\t"+nrTreeNodes;
 	}
 	
-	@SuppressWarnings("unchecked") // This is where generics stop...?
-	public TreeNode createTreeNode()
+	@SuppressWarnings("rawtypes")
+    public TreeNode<?> createTreeNode()
 	{
     	synchronized (treeNodePool)
         {
-	        TreeNode newNode;
+	        TreeNode<?> newNode;
 	        if (treeNodePool.isEmpty())
 	        {
 	        	newNode = new TreeNode();

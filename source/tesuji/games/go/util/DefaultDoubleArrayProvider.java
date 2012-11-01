@@ -48,8 +48,7 @@ public class DefaultDoubleArrayProvider
 		return _array[GoArray.toXY(x,y)]; // Rely on autoboxing
 	}
 	
-	@SuppressWarnings("unchecked")
-    public Class getDataClass()
+    public Class<Double> getDataClass()
 	{
 		return Double.class;
 	}

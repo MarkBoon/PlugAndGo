@@ -117,7 +117,7 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 	@SuppressWarnings("unchecked")
 	protected void initRoot()
 	{
-		_rootNode = TreeNodeFactory.getSingleton().createTreeNode();
+		_rootNode = (TreeNode<MonteCarloTreeSearchResult<MoveType>>) TreeNodeFactory.getSingleton().createTreeNode();
 		MonteCarloTreeSearchResult<MoveType> rootResult = 
 			(MonteCarloTreeSearchResult<MoveType>) SearchResultFactory.createMonteCarloTreeSearchResult();
 		rootResult.setExplorationFactor(_explorationFactor);
@@ -137,7 +137,8 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 	/* (non-Javadoc)
 	 * @see tesuji.games.general.search.Search#doSearch()
 	 */
-	public MonteCarloTreeSearchResult<MoveType> doSearch(byte startColor)
+	@SuppressWarnings("unchecked")
+    public MonteCarloTreeSearchResult<MoveType> doSearch(byte startColor)
 		throws Exception
 	{		
 		long time0 = System.currentTimeMillis();
@@ -337,7 +338,7 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 			if (move.isPass() && !searchAdministration.isGameAlmostFinished())
 				continue;
 			@SuppressWarnings("unchecked")
-			TreeNode<MonteCarloTreeSearchResult<MoveType>> nextNode = TreeNodeFactory.getSingleton().createTreeNode();
+			TreeNode<MonteCarloTreeSearchResult<MoveType>> nextNode = (TreeNode<MonteCarloTreeSearchResult<MoveType>>) TreeNodeFactory.getSingleton().createTreeNode();
 			@SuppressWarnings("unchecked")
 			MonteCarloTreeSearchResult<MoveType> result = (MonteCarloTreeSearchResult<MoveType>)
 				SearchResultFactory.createMonteCarloTreeSearchResult();

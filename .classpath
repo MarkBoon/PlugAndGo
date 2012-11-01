@@ -19,6 +19,7 @@
 	<classpathentry kind="lib" path="lib/hibernate/jta.jar"/>
 	<classpathentry kind="lib" path="lib/hsql/hsqldb.jar"/>
 	<classpathentry kind="lib" path="lib/hsql/sqltool.jar"/>
-	<classpathentry kind="lib" path="lib/high-scale-lib.jar"/>
+	<classpathentry kind="lib" path="/Users/mboon/Public/workspace/PlugAndGo/lib/high-scale-lib.jar"/>
+	<classpathentry kind="lib" path="lib/mysql/mysql-connector-java-3.1.12-bin.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

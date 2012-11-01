@@ -28,7 +28,6 @@ package tesuji.games.go.util;
 import tesuji.core.util.Factory;
 import tesuji.core.util.FactoryReport;
 import tesuji.core.util.SynchronizedArrayStack;
-import tesuji.games.go.common.GoConstant;
 import tesuji.games.model.BoardArray;
 
 /**

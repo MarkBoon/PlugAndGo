@@ -65,8 +65,7 @@ public interface DataProvider
 	 * 
 	 * @return Class
 	 */
-	@SuppressWarnings("unchecked")
-    public Class getDataClass();
+    public Class<?> getDataClass();
 	
 	/**
 	 * @return a flag whether this provider always has data available for each x,y coordinate

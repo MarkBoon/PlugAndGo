@@ -45,7 +45,6 @@ import tesuji.games.general.search.SearchProperties;
 
 import tesuji.games.go.monte_carlo.MCPatternsAdministration;
 import tesuji.games.go.monte_carlo.MonteCarloAdministration;
-import tesuji.games.go.monte_carlo.MonteCarloGoAdministration;
 import tesuji.games.go.pattern.common.HibernatePatternManager;
 import tesuji.games.go.pattern.common.Pattern;
 import tesuji.games.go.pattern.common.PatternGroup;
@@ -160,7 +159,7 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 	@SuppressWarnings("unchecked")
 	protected void initRoot()
 	{
-		_rootNode = TreeNodeFactory.getSingleton().createTreeNode();
+		_rootNode = (TreeNode<MonteCarloTreeSearchResult<MoveType>>) TreeNodeFactory.getSingleton().createTreeNode();
 		MonteCarloTreeSearchResult<MoveType> rootResult = 
 			(MonteCarloTreeSearchResult<MoveType>) SearchResultFactory.createMonteCarloTreeSearchResult();
 		rootResult.setExplorationFactor(_explorationFactor);
@@ -180,7 +179,8 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 	/* (non-Javadoc)
 	 * @see tesuji.games.general.search.Search#doSearch()
 	 */
-	public MonteCarloTreeSearchResult<MoveType> doSearch(byte startColor)
+	@SuppressWarnings("unchecked")
+    public MonteCarloTreeSearchResult<MoveType> doSearch(byte startColor)
 		throws Exception
 	{		
 		if (!_isInitialized)
@@ -413,7 +413,7 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 			if (move.isPass() && !searchAdministration.isGameAlmostFinished())
 				continue;
 			@SuppressWarnings("unchecked")
-			TreeNode<MonteCarloTreeSearchResult<MoveType>> nextNode = TreeNodeFactory.getSingleton().createTreeNode();
+			TreeNode<MonteCarloTreeSearchResult<MoveType>> nextNode = (TreeNode<MonteCarloTreeSearchResult<MoveType>>) TreeNodeFactory.getSingleton().createTreeNode();
 			@SuppressWarnings("unchecked")
 			MonteCarloTreeSearchResult<MoveType> result = (MonteCarloTreeSearchResult<MoveType>)
 				SearchResultFactory.createMonteCarloTreeSearchResult();
@@ -585,7 +585,7 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 				match.increasePatternOccurrence(move.getColor());
 			_patternManager.updatePattern(match.getPattern());
 		}
-		/*if (list.size()!=0)
+		if (list.size()!=0)
 		{
 			int index = (int)(Math.random()*list.size());
 			PatternMatch m = list.get(index);
@@ -594,11 +594,14 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 				BoardModel boardModel = _monteCarloAdministration.getBoardModel();
 				Pattern p = m.getPattern();
 				Pattern newPattern = p.createMutation(boardModel,xy,m.getOrientation(),m.isInverted(),true,_monteCarloAdministration.getColorToMove());
-				_logger.info("Pattern before:\n"+p);
-				_logger.info("Pattern after:\n"+newPattern);
-				_patternMatcher.addNewPattern(newPattern);
+				if (!newPattern.isEmpty())
+				{
+					_logger.info("Pattern before:\n"+p);
+					_logger.info("Pattern after:\n"+newPattern);
+					_patternMatcher.addNewPattern(newPattern);
+				}
 			}
-		}*/
+		}
 		/*
 		Pattern newPattern = Pattern.createFromBoard(xy,(MonteCarloGoAdministration)_monteCarloAdministration);
 		if (newPattern.getPointCount()>5)

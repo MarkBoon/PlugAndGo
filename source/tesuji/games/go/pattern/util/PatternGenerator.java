@@ -6,7 +6,6 @@ import tesuji.core.util.ArrayList;
 import tesuji.games.go.pattern.common.HibernatePatternManager;
 import tesuji.games.go.pattern.common.Pattern;
 import tesuji.games.go.pattern.common.PatternGroup;
-import tesuji.games.go.pattern.incremental.IncrementalPatternMatcher;
 
 import static tesuji.games.general.ColorConstant.*;
 
@@ -132,7 +131,7 @@ public class PatternGenerator
 		BasicConfigurator.configure();
 	
 		ArrayList<Pattern> list = generate3x3Patterns();
-		//generateSymmetricalPatterns(list);
+		generateSymmetricalPatterns(list);
 		ArrayList<Pattern> truncatedList = new ArrayList<Pattern>();
 		
 		for (int i=0; i<list.size(); i++)
@@ -165,13 +164,10 @@ public class PatternGenerator
 			patternManager.createPatternGroup(group);
 		}
 		
-		group.setPatternList(truncatedList);
-		IncrementalPatternMatcher matcher = new IncrementalPatternMatcher(group);
-		
 		for (int i=0; i<truncatedList.size(); i++)
 		{
 			Pattern p = truncatedList.get(i);
-			if (p.isAdded())
+//			if (p.isAdded())
 			{
 				p.setGroupId(group.getGroupId());
 				System.out.println("Save Pattern: \n"+p.toString()+"\n");

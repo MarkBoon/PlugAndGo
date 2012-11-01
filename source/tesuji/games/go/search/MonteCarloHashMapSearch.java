@@ -180,8 +180,8 @@ public class MonteCarloHashMapSearch
 	    		if (node != null)
 				{
 					boolean blackWins = _searchAdministration.playout();
-					_nrSimulatedMoves += _searchAdministration.getNrSimulatedMoves();
-					_nrPlayouts++;
+					setNrSimulatedMoves(getNrSimulatedMoves() + _searchAdministration.getNrSimulatedMoves());
+					setNrPlayouts(getNrPlayouts() + 1);
 			    	adjustTreeValue(blackWins);
 
 			    	if (_useAMAF)
@@ -281,5 +281,25 @@ public class MonteCarloHashMapSearch
     public boolean isGameFinished()
     {
 		return false;
+    }
+
+	public int getNrSimulatedMoves()
+    {
+	    return _nrSimulatedMoves;
+    }
+
+	public void setNrSimulatedMoves(int nrSimulatedMoves)
+    {
+	    _nrSimulatedMoves = nrSimulatedMoves;
+    }
+
+	public int getNrPlayouts()
+    {
+	    return _nrPlayouts;
+    }
+
+	public void setNrPlayouts(int nrPlayouts)
+    {
+	    _nrPlayouts = nrPlayouts;
     }
 }

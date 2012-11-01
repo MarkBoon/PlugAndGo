@@ -48,8 +48,7 @@ public class DefaultIntegerArrayProvider
 		return _array[GoArray.toXY(x,y)]; // Rely on autoboxing
 	}
 	
-	@SuppressWarnings("unchecked")
-    public Class getDataClass()
+    public Class<Integer> getDataClass()
 	{
 		return Integer.class;
 	}

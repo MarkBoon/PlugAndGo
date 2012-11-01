@@ -22,7 +22,7 @@ public class MonteCarloHashMapResult
 
 	private GoMove		_move;
 	private int			_playouts;
-	private long		_checksum;
+//	private long		_checksum;
 	private PointSet	_emptyPoints;
 //	private int[]		_checksums;
 	private int[]		_wins;

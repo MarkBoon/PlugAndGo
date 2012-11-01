@@ -26,6 +26,7 @@
 
 package tesuji.games.go.test;
 
+import tesuji.games.go.common.GoMove;
 import tesuji.games.go.monte_carlo.MCPlayout;
 import tesuji.games.go.monte_carlo.MonteCarloGoAdministration;
 
@@ -43,7 +44,7 @@ public class MCGoBenchmark
 		MonteCarloGoAdministration administration = new MonteCarloGoAdministration();
 		administration.setBoardSize(BOARD_SIZE);
 		administration.setKomi(KOMI);
-		MCPlayout playout = new MCPlayout(administration);
+		MCPlayout<GoMove> playout = new MCPlayout<GoMove>(administration);
 		MCBenchmark.doPlayout(playout,BOARD_SIZE, KOMI, NUMBER_OF_PLAYOUTS,NUMBER_OF_THREADS);
 	}
 }

@@ -32,7 +32,6 @@ import tesuji.core.util.List;
 import tesuji.games.go.pattern.common.Pattern;
 import tesuji.games.go.pattern.common.PatternGroup;
 import tesuji.games.go.pattern.common.PatternManager;
-import tesuji.games.go.search.MonteCarloTreeSearch;
 import tesuji.games.go.util.DefaultBoardModel;
 import tesuji.games.go.util.GoArray;
 import tesuji.games.model.BoardChange;

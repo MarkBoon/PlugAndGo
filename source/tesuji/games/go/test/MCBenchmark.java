@@ -26,12 +26,13 @@
 package tesuji.games.go.test;
 //Test
 
+import tesuji.games.go.common.GoMove;
 import tesuji.games.go.monte_carlo.MCPlayout;
 
 /** Simply runs a bunch of playouts to test speed. */
 public class MCBenchmark
 {
-	public static void doPlayout(MCPlayout playout, int boardSize, int komi, int nrPlayouts, int nrThreads)
+	public static void doPlayout(MCPlayout<GoMove> playout, int boardSize, int komi, int nrPlayouts, int nrThreads)
 	{
 		long before;
 		long after;

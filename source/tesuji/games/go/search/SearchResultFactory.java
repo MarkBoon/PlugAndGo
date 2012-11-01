@@ -28,7 +28,8 @@ package tesuji.games.go.search;
 import tesuji.core.util.ArrayStack;
 import tesuji.core.util.Factory;
 import tesuji.core.util.FactoryReport;
-import tesuji.games.general.Move;
+
+import tesuji.games.go.common.GoMove;
 
 public class SearchResultFactory
 	implements Factory
@@ -52,8 +53,8 @@ public class SearchResultFactory
 
 	private static LocalAllocationHelper _singleton;
 
-	private ArrayStack<MonteCarloTreeSearchResult> mctsResultPool =
-		new ArrayStack<MonteCarloTreeSearchResult>();
+	private ArrayStack<MonteCarloTreeSearchResult<GoMove>> mctsResultPool =
+		new ArrayStack<MonteCarloTreeSearchResult<GoMove>>();
 	
 	private ArrayStack<MonteCarloHashMapResult> mchmResultPool =
 		new ArrayStack<MonteCarloHashMapResult>();
@@ -87,17 +88,17 @@ public class SearchResultFactory
 		return "Number of MonteCarloTreeSearchResult objects:\t\t"+nrResults+"\n";
 	}
 
-	public static MonteCarloTreeSearchResult createMonteCarloTreeSearchResult()
+	public static MonteCarloTreeSearchResult<GoMove> createMonteCarloTreeSearchResult()
 	{
 		return getSingleton()._createMonteCarloTreeSearchResult();
 	}
 	
-	private MonteCarloTreeSearchResult _createMonteCarloTreeSearchResult()
+	private MonteCarloTreeSearchResult<GoMove> _createMonteCarloTreeSearchResult()
 	{
-		MonteCarloTreeSearchResult newResult;
+		MonteCarloTreeSearchResult<GoMove> newResult;
         if (mctsResultPool.isEmpty())
         {
-        	newResult = new MonteCarloTreeSearchResult(mctsResultPool);
+        	newResult = new MonteCarloTreeSearchResult<GoMove>(mctsResultPool);
         	nrResults++;
         }
         else

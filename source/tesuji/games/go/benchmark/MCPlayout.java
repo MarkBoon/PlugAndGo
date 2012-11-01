@@ -38,10 +38,10 @@ public class MCPlayout<MoveType extends Move>
 	private int[] wins = {0,0};
 	private int nrMovesPlayed;
 	
-	private MonteCarloAdministration _currentAdministration;
-	private MonteCarloAdministration _playoutAdministration;
+	private MonteCarloAdministration<MoveType> _currentAdministration;
+	private MonteCarloAdministration<MoveType> _playoutAdministration;
 	
-	public MCPlayout(MonteCarloAdministration<?> administration)
+	public MCPlayout(MonteCarloAdministration<MoveType> administration)
 	{
 		_currentAdministration = administration;
 		_playoutAdministration = administration.createClone();
@@ -53,7 +53,7 @@ public class MCPlayout<MoveType extends Move>
 		nrMovesPlayed = 0;
 	}
 	
-	public void copyFrom(MonteCarloAdministration source)
+	public void copyFrom(MonteCarloAdministration<MoveType> source)
 	{
 		_currentAdministration.copyDataFrom(source);
 	}
@@ -73,7 +73,7 @@ public class MCPlayout<MoveType extends Move>
 				{
 					public void run()
 	                {
-						MonteCarloAdministration playoutAdministration = _currentAdministration.createClone();
+						MonteCarloAdministration<MoveType> playoutAdministration = _currentAdministration.createClone();
 						for (int i = 0; i < nrPlayouts/nrThreads; i++)
 						{
 							playoutAdministration.copyDataFrom(_currentAdministration);
@@ -158,7 +158,7 @@ public class MCPlayout<MoveType extends Move>
     	return _currentAdministration.selectSimulationMove();
     }
     
-    public MonteCarloAdministration getAdministration()
+    public MonteCarloAdministration<MoveType> getAdministration()
     {
     	return _currentAdministration;
     }
