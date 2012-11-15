@@ -585,7 +585,7 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 				match.increasePatternOccurrence(move.getColor());
 			_patternManager.updatePattern(match.getPattern());
 		}
-		if (list.size()!=0)
+		/*if (list.size()!=0)
 		{
 			int index = (int)(Math.random()*list.size());
 			PatternMatch m = list.get(index);
@@ -601,7 +601,7 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 					_patternMatcher.addNewPattern(newPattern);
 				}
 			}
-		}
+		}*/
 		/*
 		Pattern newPattern = Pattern.createFromBoard(xy,(MonteCarloGoAdministration)_monteCarloAdministration);
 		if (newPattern.getPointCount()>5)

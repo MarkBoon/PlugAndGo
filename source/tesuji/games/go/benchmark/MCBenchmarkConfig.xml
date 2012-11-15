@@ -23,15 +23,23 @@
 			<list>
 				<ref bean="mcLibertyAdministration"/>
 				<ref bean="mcTacticsAdministration"/>
+				<ref bean="mcPluginAdministration"/>
 				<!-- <ref bean="mcPatternsAdministration"/> -->
 			</list>
 		</property>
  	</bean>
- 	
+
 	<bean id="mcLibertyAdministration" class="tesuji.games.go.monte_carlo.MonteCarloGoAdministration" singleton="false">
 	</bean>
  	
 	<bean id="mcTacticsAdministration" class="tesuji.games.go.monte_carlo.MCTacticsAdministration" singleton="false">
 	</bean>
  	
+	<bean id="mcPluginAdministration" class="tesuji.games.go.monte_carlo.MonteCarloPluginAdministration" singleton="false">
+		<property name="moveFilterList">
+			<list>
+				<bean class="tesuji.games.go.monte_carlo.EyeMoveFilter" singleton="false"/>
+			</list>
+		</property>
+	</bean>
 </beans>

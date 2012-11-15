@@ -23,6 +23,14 @@ public class PatternGenerator
 		
 		generate3x3Pattern(0, 0, pattern, list);
 
+		Pattern sidePattern = new Pattern();
+		sidePattern.setUserX(1);
+		sidePattern.setUserY(1);
+		sidePattern.setPoint(1, 0, EDGE);
+		sidePattern.setTopEdge(true);
+
+		generate3x3Pattern(0, 1, pattern, list);
+		
 		return list;
 	}
 	
@@ -131,7 +139,7 @@ public class PatternGenerator
 		BasicConfigurator.configure();
 	
 		ArrayList<Pattern> list = generate3x3Patterns();
-		generateSymmetricalPatterns(list);
+		//generateSymmetricalPatterns(list);
 		ArrayList<Pattern> truncatedList = new ArrayList<Pattern>();
 		
 		for (int i=0; i<list.size(); i++)
