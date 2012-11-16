@@ -238,7 +238,7 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 		
 		int timeLimit = _secondsPerMove*1000;
 		
-		int boardSize = _monteCarloAdministration.getBoardModel().getBoardSize();
+		int boardSize = _monteCarloAdministration.getBoardSize();
 		int delta = timeLimit / (boardSize*boardSize);
 		timeLimit -= _monteCarloAdministration.getMoveStack().getSize()*delta;
 		if (timeLimit<100)
@@ -493,7 +493,7 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 		_monteCarloAdministration.clear();
 		reset();
 		_lastScore = 0.0;
-		DataProviderList.getSingleton().addDataProvider(new DefaultDoubleArrayProvider("Ownership", _ownershipArray, _monteCarloAdministration.getBoardModel().getBoardSize()));
+		DataProviderList.getSingleton().addDataProvider(new DefaultDoubleArrayProvider("Ownership", _ownershipArray, _monteCarloAdministration.getBoardSize()));
     }
     
     protected void reset()
@@ -664,7 +664,7 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 	@Override
 	public String toString()
 	{
-		return _monteCarloAdministration.getBoardModel().toString();
+		return _monteCarloAdministration.toString();
 	}
 
 	/**

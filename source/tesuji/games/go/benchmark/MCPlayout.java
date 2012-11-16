@@ -25,7 +25,10 @@ package tesuji.games.go.benchmark;
  * 
  */
 
+import tesuji.games.general.ColorConstant;
 import tesuji.games.general.Move;
+import tesuji.games.go.common.GoConstant;
+import tesuji.games.go.common.GoMove;
 import tesuji.games.go.monte_carlo.MonteCarloAdministration;
 import tesuji.games.gtp.GTPCommand;
 
@@ -74,19 +77,27 @@ public class MCPlayout<MoveType extends Move>
 					public void run()
 	                {
 						MonteCarloAdministration<MoveType> playoutAdministration = _currentAdministration.createClone();
-						for (int i = 0; i < nrPlayouts/nrThreads; i++)
+						MonteCarloAdministration<MoveType> playingAdministration = _currentAdministration.createClone();
+						for (int i = 0; i < nrPlayouts/nrThreads;)
 						{
-							playoutAdministration.copyDataFrom(_currentAdministration);
-							boolean blackWins = playoutAdministration.playout();
-							synchronized (wins)
+							playingAdministration.copyDataFrom(_currentAdministration);
+							do
 							{
-								if (blackWins)
-									wins[0]++;
-								else
-									wins[1]++;
+								playoutAdministration.copyDataFrom(playingAdministration);
+								boolean blackWins = playoutAdministration.playout();
+								synchronized (wins)
+								{
+									if (blackWins)
+										wins[0]++;
+									else
+										wins[1]++;
+								}
+								
+								nrMovesPlayed += playoutAdministration.getNrSimulatedMoves();
+								playingAdministration.playMove(playingAdministration.selectSimulationMove());
+								i++;
 							}
-							
-							nrMovesPlayed += playoutAdministration.getNrSimulatedMoves();
+							while (i < nrPlayouts/nrThreads && !playingAdministration.isGameFinished());
 						}
 	                }
 				});

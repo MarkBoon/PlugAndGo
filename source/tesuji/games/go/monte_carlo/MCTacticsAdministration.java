@@ -123,8 +123,8 @@ public class MCTacticsAdministration
 	{
 		_flags = new boolean[Flag.LAST.ordinal()];
 		_flags[Flag.USE_STONE_AGE.ordinal()] = true;
-		_flags[Flag.FOG_OF_WAR.ordinal()] = true;
-		_flags[Flag.NO_FIRST_LINE.ordinal()] = true;
+		_flags[Flag.FOG_OF_WAR.ordinal()] = false;
+		_flags[Flag.NO_FIRST_LINE.ordinal()] = false;
 		_flags[Flag.NO_AUTO_ATARI.ordinal()] = false; // -- TODO - temporarily disabled to fix ownership.
 		_flags[Flag.USE_TACTICS_IN_SIMULATION.ordinal()] = true;
 		_flags[Flag.USE_TACTICS_IN_EXPLORATION.ordinal()] = true;

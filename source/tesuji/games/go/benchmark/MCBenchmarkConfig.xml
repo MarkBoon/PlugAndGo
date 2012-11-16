@@ -21,13 +21,16 @@
 		<!-- List with Monte-Carlo playout strategies to benchmark -->
 		<property name="list">
 			<list>
-				<ref bean="mcLibertyAdministration"/>
-				<ref bean="mcTacticsAdministration"/>
+				<!--<ref bean="mcLibertyAdministration"/>
+				<ref bean="mcTacticsAdministration"/>-->
+				<ref bean="mcPluginAdministrationLean"/>
 				<ref bean="mcPluginAdministration"/>
 				<!-- <ref bean="mcPatternsAdministration"/> -->
 			</list>
 		</property>
  	</bean>
+
+	<bean id="eyeMoveFilter" class="tesuji.games.go.monte_carlo.EyeMoveFilter" singleton="false"/>
 
 	<bean id="mcLibertyAdministration" class="tesuji.games.go.monte_carlo.MonteCarloGoAdministration" singleton="false">
 	</bean>
@@ -36,9 +39,39 @@
 	</bean>
  	
 	<bean id="mcPluginAdministration" class="tesuji.games.go.monte_carlo.MonteCarloPluginAdministration" singleton="false">
-		<property name="moveFilterList">
+		<property name="simulationMoveFilterList">
 			<list>
-				<bean class="tesuji.games.go.monte_carlo.EyeMoveFilter" singleton="false"/>
+				<ref bean="eyeMoveFilter"/>
+			</list>
+		</property>
+		<property name="explorationMoveFilterList">
+			<list>
+				<ref bean="eyeMoveFilter"/>
+				<bean class="tesuji.games.go.monte_carlo.FogOfWarFilter" singleton="false"/>
+			</list>
+		</property>
+		<property name="simulationMoveGeneratorList">
+			<list>
+				<bean class="tesuji.games.go.monte_carlo.ImmediateAtariEscape" singleton="false"/>
+				<bean class="tesuji.games.go.monte_carlo.ImmediateCapture" singleton="false"/>
+				<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"/>
+			</list>
+		</property>
+		<property name="explorationMoveGeneratorList">
+			<list>
+				<bean class="tesuji.games.go.monte_carlo.ImmediateAtariEscape" singleton="false"/>
+			</list>
+		</property>
+	</bean>
+	<bean id="mcPluginAdministrationLean" class="tesuji.games.go.monte_carlo.MonteCarloPluginAdministration" singleton="false">
+		<property name="simulationMoveFilterList">
+			<list>
+				<ref bean="eyeMoveFilter"/>
+			</list>
+		</property>
+		<property name="explorationMoveFilterList">
+			<list>
+				<ref bean="eyeMoveFilter"/>
 			</list>
 		</property>
 	</bean>

@@ -185,12 +185,12 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 	{		
 		if (!_isInitialized)
 		{
-			_patternMatcher.initialise(_monteCarloAdministration.getBoardModel());
-			_monteCarloAdministration.getBoardModel().addBoardModelListener(_patternMatcher);
+//XXX			_patternMatcher.initialise(_monteCarloAdministration.getBoardModel());
+//XXX			_monteCarloAdministration.getBoardModel().addBoardModelListener(_patternMatcher);
 			_isInitialized = true;
 		}
 
-		_logger.info("Start search with position:\n"+_monteCarloAdministration.getBoardModel());
+		_logger.info("Start search with position:\n"+_monteCarloAdministration);
 		long time0 = System.currentTimeMillis();
 
 		assert _monteCarloAdministration.isConsistent() : "Inconsistent Monte-Carlo administration at the start of the search.";
@@ -286,7 +286,7 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 		
 		int timeLimit = _secondsPerMove*1000;
 		
-		int boardSize = _monteCarloAdministration.getBoardModel().getBoardSize();
+		int boardSize = _monteCarloAdministration.getBoardSize();
 		int delta = timeLimit / (boardSize*boardSize);
 		timeLimit -= _monteCarloAdministration.getMoveStack().getSize()*delta;
 		if (timeLimit<100)
@@ -623,7 +623,7 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 		_monteCarloAdministration.clear();
 		reset();
 		_lastScore = 0.0;
-		DataProviderList.getSingleton().addDataProvider(new DefaultDoubleArrayProvider("Ownership", _ownershipArray, _monteCarloAdministration.getBoardModel().getBoardSize()));
+		DataProviderList.getSingleton().addDataProvider(new DefaultDoubleArrayProvider("Ownership", _ownershipArray, _monteCarloAdministration.getBoardSize()));
     }
     
     protected void reset()
@@ -794,7 +794,7 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 	@Override
 	public String toString()
 	{
-		return _monteCarloAdministration.getBoardModel().toString();
+		return _monteCarloAdministration.toString();
 	}
 
 	/**
@@ -817,7 +817,8 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
     		running = false;
     		_searchAdministration = _monteCarloAdministration.createClone();
     		_searchPatternMatcher = _patternMatcher.createClone();
-    		_searchAdministration.getBoardModel().addBoardModelListener(_searchPatternMatcher);
+// XXX    		_searchAdministration.getExplorationListenerSupport().addBoardModelListener(_searchPatternMatcher);
+//    		_searchAdministration.getBoardModel().addBoardModelListener(_searchPatternMatcher);
     		_weightMap = createDoubles();
     		_colorMap = createBytes();
     	}
@@ -904,9 +905,9 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 //	    			}
 //	    			else
 	    			{
-	    			_searchAdministration.getBoardModel().removeBoardModelListener(_searchPatternMatcher);
+//	    			_searchAdministration.getBoardModel().removeBoardModelListener(_searchPatternMatcher);
 					boolean blackWins = _searchAdministration.playout();
-	    			_searchAdministration.getBoardModel().addBoardModelListener(_searchPatternMatcher);
+//	    			_searchAdministration.getBoardModel().addBoardModelListener(_searchPatternMatcher);
 					_nrSimulatedMoves += _searchAdministration.getNrSimulatedMoves();
 					_nrPlayouts++;
 			    	adjustTreeValue(playoutNode, blackWins);

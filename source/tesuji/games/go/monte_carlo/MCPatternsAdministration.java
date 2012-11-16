@@ -296,7 +296,7 @@ public class MCPatternsAdministration
 //		_patternSet.getDeletedMatchList().clear();
 //		_patternSet = ((MCFastPatternAdministration)sourceAdmin)._patternSet.createClone();
 		getBoardModel().addBoardModelListener(_patternSet);
-		assert(_patternSet.getBoardModel().equals(sourceAdmin.getBoardModel()));
+//		assert(_patternSet.getBoardModel().equals(sourceAdmin.getBoardModel()));
 	}
 	
 	public MonteCarloAdministration<GoMove> createClone()

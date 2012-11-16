@@ -43,6 +43,10 @@ public class DefaultBoardModel
 {
 	private BoardChangeSupport _boardchangeSupport = new BoardChangeSupport();
 
+	public DefaultBoardModel()
+    {
+    }
+
     /**
      * @param size
      */

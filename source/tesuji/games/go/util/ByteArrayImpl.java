@@ -36,6 +36,10 @@ public class ByteArrayImpl
 	private int _boardSize;
 	protected byte[] _array;
 
+    protected ByteArrayImpl()
+    {
+    }
+
     /**
      * @param size
      */

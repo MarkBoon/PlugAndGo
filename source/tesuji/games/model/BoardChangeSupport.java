@@ -85,4 +85,11 @@ public class BoardChangeSupport
         for (BoardModelListener listener : _listeners)
             listener.changeBoard(changeEvent);
     }
+    
+    public void sendChange(int xy, byte value, byte oldValue)
+    {
+		BoardChange boardChange = BoardChangeFactory.createBoardChange(xy, value, oldValue);
+		sendBoardChange(boardChange);
+		boardChange.recycle();
+    }
 }
