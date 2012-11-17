@@ -6,4 +6,7 @@ public interface MoveGenerator
 	int generate();
 	MoveGenerator createClone();
 	void copyDataFrom(MoveGenerator source);
+	
+	int getUrgency();
+	void setUrgency(int urgency);
 }

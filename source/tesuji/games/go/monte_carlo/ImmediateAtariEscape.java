@@ -7,7 +7,7 @@ import tesuji.games.go.tactics.TacticsConstant;
 import tesuji.games.go.util.BoardMarker;
 import tesuji.games.go.util.FourCursor;
 
-public class ImmediateAtariEscape implements MoveGenerator
+public class ImmediateAtariEscape extends AbstractMoveGenerator
 {
 	private MonteCarloPluginAdministration administration;
 	private BoardMarker _boardMarker = new BoardMarker();

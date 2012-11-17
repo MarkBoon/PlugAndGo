@@ -896,9 +896,9 @@ public class MonteCarloPluginAdministration
 	 */
 	protected int selectExplorationMove(PointSet emptyPoints)
 	{
-		int priorityMove = selectPriorityMove(_explorationMoveGeneratorList);
-		if (priorityMove!=PASS && priorityMove!=UNDEFINED_COORDINATE)
-			return priorityMove;
+//		int priorityMove = selectPriorityMove(_explorationMoveGeneratorList);
+//		if (priorityMove!=PASS && priorityMove!=UNDEFINED_COORDINATE)
+//			return priorityMove;
 		
 		return selectRandomMoveCoordinate(emptyPoints, _explorationMoveFilterList);
 	}
@@ -1391,6 +1391,13 @@ public class MonteCarloPluginAdministration
      */
     protected void getPriorityMoves()
     {
+		for (int i=_explorationMoveGeneratorList.size(); --i>=0;)
+		{
+			MoveGenerator generator = _explorationMoveGeneratorList.get(i);
+			int xy = generator.generate();
+			if (xy!=UNDEFINED_COORDINATE)
+				addPriorityMove(xy,0,generator.getUrgency(),generator.getUrgency());
+		}
     }
     
     protected void addPriorityMove(int xy, int urgency, int visits, int wins)

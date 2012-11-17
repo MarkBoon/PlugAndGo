@@ -6,7 +6,7 @@ import tesuji.games.go.tactics.LadderReader;
 import tesuji.games.go.tactics.TacticsConstant;
 import tesuji.games.go.util.BoardMarker;
 
-public class ImmediateLadder implements MoveGenerator
+public class ImmediateLadder extends AbstractMoveGenerator
 {
 	private MonteCarloPluginAdministration administration;
 	private BoardMarker _boardMarker = new BoardMarker();
