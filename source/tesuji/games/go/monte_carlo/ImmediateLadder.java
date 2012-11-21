@@ -37,10 +37,8 @@ public class ImmediateLadder extends AbstractMoveGenerator
 		if (previousMove==PASS)
 			return UNDEFINED_COORDINATE;
 		
-		_boardMarker.getNewMarker();
-
 		int currentChain = chain[previousMove];
-		if (liberties[currentChain]==2 && _boardMarker.notSet(currentChain) && administration.isPrehistoric(currentChain)
+		if (liberties[currentChain]==2 && administration.isPrehistoric(currentChain)
 			&& (maxDiagonalsOccupied[previousMove]>1 || ownDiagonalNeighbours[previousMove]>0 || otherDiagonalNeighbours[previousMove]>0))
 		{
 			_boardMarker.set(currentChain);

@@ -34,10 +34,8 @@ public class ImmediateCapture extends AbstractMoveGenerator
 		if (previousMove==PASS)
 			return UNDEFINED_COORDINATE;
 		
-		_boardMarker.getNewMarker();
-
 		int currentChain = chain[previousMove];
-		if (liberties[currentChain]==1  && _boardMarker.notSet(currentChain) && administration.isPrehistoric(currentChain))
+		if (liberties[currentChain]==1  && administration.isPrehistoric(currentChain))
 		{
 			_boardMarker.set(currentChain);
 			_ladderReader.setBoardArray(board);

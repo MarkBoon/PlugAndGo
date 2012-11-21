@@ -128,8 +128,8 @@ public class MCTacticsAdministration
 		_flags[Flag.NO_AUTO_ATARI.ordinal()] = false; // -- TODO - temporarily disabled to fix ownership.
 		_flags[Flag.USE_TACTICS_IN_SIMULATION.ordinal()] = true;
 		_flags[Flag.USE_TACTICS_IN_EXPLORATION.ordinal()] = false;
-		_flags[Flag.IMMEDIATE_ESCAPE_ATARI.ordinal()] = false;
-		_flags[Flag.CAPTURE_LAST_MOVE_IN_ATARI.ordinal()] = true;
+		_flags[Flag.IMMEDIATE_ESCAPE_ATARI.ordinal()] = true;
+		_flags[Flag.CAPTURE_LAST_MOVE_IN_ATARI.ordinal()] = false;
 		_flags[Flag.CAPTURE_LAST_MOVE_IN_LADDER.ordinal()] = false;
 		_flags[Flag.ESCAPE_ATARI.ordinal()] = false;
 		_flags[Flag.CAPTURE_STONES_IN_ATARI.ordinal()] = false;
