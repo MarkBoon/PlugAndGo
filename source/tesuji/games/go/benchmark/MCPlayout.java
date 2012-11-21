@@ -25,10 +25,7 @@ package tesuji.games.go.benchmark;
  * 
  */
 
-import tesuji.games.general.ColorConstant;
 import tesuji.games.general.Move;
-import tesuji.games.go.common.GoConstant;
-import tesuji.games.go.common.GoMove;
 import tesuji.games.go.monte_carlo.MonteCarloAdministration;
 import tesuji.games.gtp.GTPCommand;
 

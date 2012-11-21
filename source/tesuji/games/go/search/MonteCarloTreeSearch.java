@@ -49,7 +49,6 @@ import tesuji.games.go.common.GoMove;
 import tesuji.games.go.util.DefaultDoubleArrayProvider;
 import tesuji.games.go.util.GoArray;
 import tesuji.games.go.util.IntStack;
-import tesuji.games.go.util.Statistics;
 
 import static tesuji.games.general.ColorConstant.*;
 import static tesuji.games.go.util.GoArray.createDoubles;
@@ -78,6 +77,7 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 	protected int _nrThreads;
 	protected int _minimumNrNodes;
 	protected int _nodeLimit;
+	protected boolean _optimizeNodeLimit = false;
 	protected double _explorationFactor = Math.sqrt(0.2);
 	
 	protected int _nrSimulationsBeforeExpansion = 1;
@@ -158,7 +158,10 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 		long time1 = System.currentTimeMillis();
 		long time2;
 		long timeLimit = calculateTimeLimit();
-		_nodeLimit = calculateNodeLimit();
+		if (isOptimizeNodeLimit())
+			_nodeLimit = calculateNodeLimit();
+		else
+			_nodeLimit = _minimumNrNodes;
 		
 		// Create a thread for each available processor and start a search in it.
 		Thread[] threads = new Thread[_nrThreads];
@@ -209,11 +212,14 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 		_logger.info("Nr sets "+_nrSets);
 		_logger.info("Nr root visits "+_rootNode.getContent().getNrPlayouts());
 		_logger.info(""+((double)_nrPlayouts/(double)(time3-time0))+" kpos/sec");
-		_logger.info("Percentage saved "+saved+"%");
-		_logger.info("Average nr playouts "+_averagePlayouts);
-		_logger.info("Nr pattern moves per playout "+(Statistics.nrPatternsPlayed/_totalNrPlayouts));
-		_logger.info("Nr hard-coded patterns generated: "+MCTacticsAdministration.getNrPatternsGenerated());
-		_logger.info("Nr hard-coded patterns played: "+MCTacticsAdministration.getNrPatternsUsed());
+		if (isOptimizeNodeLimit())
+		{
+			_logger.info("Percentage saved "+saved+"%");
+			_logger.info("Average nr playouts "+_averagePlayouts);
+		}
+//		_logger.info("Nr pattern moves per playout "+(Statistics.nrPatternsPlayed/_totalNrPlayouts));
+//		_logger.info("Nr hard-coded patterns generated: "+MCTacticsAdministration.getNrPatternsGenerated());
+//		_logger.info("Nr hard-coded patterns played: "+MCTacticsAdministration.getNrPatternsUsed());
 		
 		TreeNode<MonteCarloTreeSearchResult<MoveType>> bestNode = getBestChildNode(_rootNode);
 		if (bestNode==null)
@@ -664,7 +670,7 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 	@Override
 	public String toString()
 	{
-		return _monteCarloAdministration.toString();
+		return _monteCarloAdministration.getClass().getSimpleName();
 	}
 
 	/**
@@ -860,4 +866,14 @@ public class MonteCarloTreeSearch<MoveType extends Move>
     {
 		return (_monteCarloAdministration.isGameFinished());
     }
+
+	public boolean isOptimizeNodeLimit()
+	{
+		return _optimizeNodeLimit;
+	}
+
+	public void setOptimizeNodeLimit(boolean optimizeNodeLimit)
+	{
+		_optimizeNodeLimit = optimizeNodeLimit;
+	}
 }

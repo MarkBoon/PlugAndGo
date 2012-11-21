@@ -453,6 +453,7 @@ public class MonteCarloPluginAdministration
 			_nrPasses = 0;
 
 		_previousMove = xy;
+		assert _previousMove==_moveStack.peek() : "Inconsistent previous move";
 	}
 	
 	/*
@@ -881,7 +882,7 @@ public class MonteCarloPluginAdministration
 	protected int selectSimulationMove(PointSet emptyPoints)
 	{
 		int priorityMove = selectPriorityMove(_simulationMoveGeneratorList);
-		if (priorityMove!=PASS && priorityMove!=UNDEFINED_COORDINATE)
+		if (priorityMove!=PASS && priorityMove!=UNDEFINED_COORDINATE && isLegal(priorityMove))
 			return priorityMove;
 		
 		return selectRandomMoveCoordinate(emptyPoints, _simulationMoveFilterList);
@@ -944,6 +945,28 @@ public class MonteCarloPluginAdministration
 		return UNDEFINED_COORDINATE;
 	}
 	
+	/**
+	 * Check if a move is not allowed, not because it's illegal but because it's undesirable.
+	 * This typically will not allow a side to fill its own eyes.
+	 * 
+	 * @param xy - coordinate of the move
+	 * @return whether allowed or not
+	 */
+	public boolean isVerboten(GoMove move)
+	{
+		for (int i=_simulationMoveFilterList.size(); --i>=0;)
+		{
+			MoveFilter filter = _simulationMoveFilterList.get(i);
+			if (filter.accept(move.getXY(), getColorToMove()))
+				return true;
+		}
+		
+		return false;
+		
+		// Check for standard 'eye' definition.
+//		return (_ownNeighbours[xy]==4 && _otherDiagonalNeighbours[xy]<_maxDiagonalsOccupied[xy]);
+	}
+
 	/**
 	 * Check if a move is not allowed, not because it's illegal but because it's undesirable.
 	 * This typically will not allow a side to fill its own eyes.
@@ -1396,7 +1419,9 @@ public class MonteCarloPluginAdministration
 			MoveGenerator generator = _explorationMoveGeneratorList.get(i);
 			int xy = generator.generate();
 			if (xy!=UNDEFINED_COORDINATE)
+			{
 				addPriorityMove(xy,0,generator.getUrgency(),generator.getUrgency());
+			}
 		}
     }
     

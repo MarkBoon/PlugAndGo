@@ -127,13 +127,14 @@ public class MCTacticsAdministration
 		_flags[Flag.NO_FIRST_LINE.ordinal()] = false;
 		_flags[Flag.NO_AUTO_ATARI.ordinal()] = false; // -- TODO - temporarily disabled to fix ownership.
 		_flags[Flag.USE_TACTICS_IN_SIMULATION.ordinal()] = true;
-		_flags[Flag.USE_TACTICS_IN_EXPLORATION.ordinal()] = true;
-		_flags[Flag.IMMEDIATE_ESCAPE_ATARI.ordinal()] = true;
-		_flags[Flag.CAPTURE_LAST_MOVE_IN_LADDER.ordinal()] = true;
-		_flags[Flag.ESCAPE_ATARI.ordinal()] = true;
-		_flags[Flag.CAPTURE_STONES_IN_ATARI.ordinal()] = true;
-		_flags[Flag.CAPTURE_STONES_IN_LADDER.ordinal()] = true;
-		_flags[Flag.CAPTURE_STONES.ordinal()] = true;
+		_flags[Flag.USE_TACTICS_IN_EXPLORATION.ordinal()] = false;
+		_flags[Flag.IMMEDIATE_ESCAPE_ATARI.ordinal()] = false;
+		_flags[Flag.CAPTURE_LAST_MOVE_IN_ATARI.ordinal()] = true;
+		_flags[Flag.CAPTURE_LAST_MOVE_IN_LADDER.ordinal()] = false;
+		_flags[Flag.ESCAPE_ATARI.ordinal()] = false;
+		_flags[Flag.CAPTURE_STONES_IN_ATARI.ordinal()] = false;
+		_flags[Flag.CAPTURE_STONES_IN_LADDER.ordinal()] = false;
+		_flags[Flag.CAPTURE_STONES.ordinal()] = false;
 		_flags[Flag.SEPARATE_PATTERN.ordinal()] = false;
 		_flags[Flag.USE_HARD_PATTERNS.ordinal()] = false;
 	}
@@ -148,8 +149,8 @@ public class MCTacticsAdministration
 //		_logger.info("NO_FIRST_LINE = "+NO_FIRST_LINE);
 //		_logger.info("NO_EMPTY_TRIANGLE = "+NO_EMPTY_TRIANGLE);
 //		_logger.info("NO_AUTO_ATARI = "+NO_AUTO_ATARI);
-//		_logger.info("USE_TACTICS_IN_SIMULATION = "+USE_TACTICS_IN_SIMULATION);
-//		_logger.info("USE_TACTICS_IN_EXPLORATION = "+USE_TACTICS_IN_EXPLORATION);
+		_logger.info("USE_TACTICS_IN_SIMULATION = "+_flags[Flag.USE_TACTICS_IN_SIMULATION.ordinal()]);
+		_logger.info("USE_TACTICS_IN_EXPLORATION = "+_flags[Flag.USE_TACTICS_IN_EXPLORATION.ordinal()]);
 		_logger.info("USE_HARD_PATTERNS = "+useHardPatterns());
 
 		createFogOfWar();
@@ -157,10 +158,10 @@ public class MCTacticsAdministration
 	
 	private void createFogOfWar()
 	{
+		_row = createRowArray(getBoardSize());
 		if (useFogOfWar())
 		{
 			_fogOfWar = createBytes();
-			_row = createRowArray(getBoardSize());
 			for (int i=FIRST; i<=LAST; i++)
 			{
 				if (_row[i]<3)
@@ -404,7 +405,6 @@ public class MCTacticsAdministration
 			{
 //				if (!isTestVersion() || _lastRandomNumber<(_boardSize*_boardSize)/2+_boardSize)
 				{
-					_boardMarker.getNewMarker();
 					int tacticalXY = getTacticalMove(_previousMove);
 					if (tacticalXY!=UNDEFINED_COORDINATE && isLegal(tacticalXY))
 						return tacticalXY;
@@ -448,12 +448,11 @@ public class MCTacticsAdministration
 	@Override
 	protected void getPriorityMoves()
 	{
-		if (isUSE_TACTICS_IN_EXPLORATION())
-			getTacticalPriorityMoves();
 	}
 	
 	public int getTacticalMove(int previousMove)
 	{
+		_boardMarker.getNewMarker();
 		if (isIMMEDIATE_ESCAPE_ATARI())
 		{
 			for (int n=0; n<4; n++)

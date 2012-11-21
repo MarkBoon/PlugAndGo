@@ -793,18 +793,18 @@ public class MonteCarloGoAdministration
 	 */
 	protected int selectSimulationMove(PointSet emptyPoints)
 	{
-		if (getIsSpreadTest())
-		{
-			int xy;
-			do
-			{
-				xy = selectRandomMoveCoordinate(emptyPoints);
-			}
-			while (xy!=PASS && (!accept1(xy) || !accept2(xy)));
-	
-			return xy;			
-		}
-		else
+//		if (getIsSpreadTest())
+//		{
+//			int xy;
+//			do
+//			{
+//				xy = selectRandomMoveCoordinate(emptyPoints);
+//			}
+//			while (xy!=PASS && (!accept1(xy) || !accept2(xy)));
+//	
+//			return xy;			
+//		}
+//		else
 			return selectRandomMoveCoordinate(emptyPoints);
 	}
 	

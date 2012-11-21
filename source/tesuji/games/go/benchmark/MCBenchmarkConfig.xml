@@ -21,8 +21,8 @@
 		<!-- List with Monte-Carlo playout strategies to benchmark -->
 		<property name="list">
 			<list>
-				<!--<ref bean="mcLibertyAdministration"/>
-				<ref bean="mcTacticsAdministration"/>-->
+				<!--<ref bean="mcLibertyAdministration"/>-->
+				<ref bean="mcTacticsAdministration"/>
 				<ref bean="mcPluginAdministrationLean"/>
 				<ref bean="mcPluginAdministration"/>
 				<!-- <ref bean="mcPatternsAdministration"/> -->
@@ -60,6 +60,8 @@
 		<property name="explorationMoveGeneratorList">
 			<list>
 				<bean class="tesuji.games.go.monte_carlo.ImmediateAtariEscape" singleton="false"/>
+				<bean class="tesuji.games.go.monte_carlo.ImmediateCapture" singleton="false"/>
+				<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"/>
 			</list>
 		</property>
 	</bean>

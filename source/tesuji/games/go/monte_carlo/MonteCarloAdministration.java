@@ -66,7 +66,7 @@ public interface MonteCarloAdministration<MoveType extends Move>
 	 * Decide whether a move will not be used during the playout sequence.
 	 * This is typically the case for moves that would fill the player's own eye(s).
 	 */
-//	public boolean isVerboten(MoveType move);
+	public boolean isVerboten(MoveType move);
 
 	/**
 	 * Play a move of a certain color and update the administration, whatever information it is keeping.

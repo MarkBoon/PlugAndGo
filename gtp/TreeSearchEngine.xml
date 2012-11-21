@@ -20,7 +20,7 @@
 		  			<value>0</value>
 		  		</property>
 		  		<property name="minimumNrNodes">
-		  			<value>4096</value>
+		  			<value>2000</value>
 		  		</property>
 		  		<property name="nrProcessors">
 		  			<value>1</value>
@@ -65,7 +65,7 @@
 		  			<value>1</value>
 		  		</property>
 		  		<property name="minimumNrNodes">
-		  			<value>4096</value>
+		  			<value>2000</value>
 		  		</property>
 		  		<property name="useAMAF">
 		  			<value>true</value>
@@ -82,5 +82,148 @@
   			<value>false</value>
   		</property>
   	</bean>
+
+	<bean id="eyeMoveFilter" class="tesuji.games.go.monte_carlo.EyeMoveFilter" singleton="false"/>
+
+	<bean id="Bot3" class="tesuji.games.go.engine.TreeSearchEngine" singleton="false">
+  		<property name="jar" value="TreeSearchEngine.jar"/>
+  		<constructor-arg>
+			<bean class="tesuji.games.go.search.MonteCarloTreeSearch" singleton="false">
+				<property name="monteCarloAdministration">
+					<bean class="tesuji.games.go.monte_carlo.MonteCarloPluginAdministration" singleton="false">
+						<property name="simulationMoveFilterList">
+							<list>
+								<ref bean="eyeMoveFilter"/>
+							</list>
+						</property>
+						<property name="explorationMoveFilterList">
+							<list>
+								<ref bean="eyeMoveFilter"/>
+							</list>
+						</property>
+						<property name="simulationMoveGeneratorList">
+							<list>
+								<!--<bean class="tesuji.games.go.monte_carlo.ImmediateAtariEscape" singleton="false"/>-->
+								<bean class="tesuji.games.go.monte_carlo.ImmediateCapture" singleton="false"/>
+								<!--<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"/>-->
+							</list>
+						</property>
+						<!--<property name="explorationMoveGeneratorList">
+							<list>
+								<bean class="tesuji.games.go.monte_carlo.ImmediateAtariEscape" singleton="false"/>
+								<bean class="tesuji.games.go.monte_carlo.ImmediateCapture" singleton="false"/>
+								<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"/>
+							</list>
+						</property>-->
+				  	</bean>
+				</property>
+		  		<property name="secondsPerMove">
+		  			<value>0</value>
+		  		</property>
+		  		<property name="nrProcessors">
+		  			<value>1</value>
+		  		</property>
+		  		<property name="minimumNrNodes">
+		  			<value>2000</value>
+		  		</property>
+		  		<property name="useAMAF">
+		  			<value>true</value>
+		  		</property>
+		  		<property name="nrSimulationsBeforeExpansion">
+		  			<value>1</value>
+		  		</property>
+		  		<property name="isTestVersion">
+		  			<value>false</value>
+		  		</property>
+			</bean>
+  		</constructor-arg>
+  		<property name="isTestVersion">
+  			<value>false</value>
+  		</property>
+  	</bean>
+
+	<bean id="Bot4" class="tesuji.games.go.engine.TreeSearchEngine" singleton="false">
+  		<property name="jar" value="TreeSearchEngine.jar"/>
+  		<constructor-arg>
+			<bean class="tesuji.games.go.search.MonteCarloTreeSearch" singleton="false">
+				<property name="monteCarloAdministration">
+					<bean class="tesuji.games.go.monte_carlo.MCTacticsAdministration" singleton="false">
+				  	</bean>
+				</property>
+		  		<property name="secondsPerMove">
+		  			<value>0</value>
+		  		</property>
+		  		<property name="nrProcessors">
+		  			<value>1</value>
+		  		</property>
+		  		<property name="minimumNrNodes">
+		  			<value>2000</value>
+		  		</property>
+		  		<property name="useAMAF">
+		  			<value>true</value>
+		  		</property>
+		  		<property name="nrSimulationsBeforeExpansion">
+		  			<value>1</value>
+		  		</property>
+		  		<property name="isTestVersion">
+		  			<value>false</value>
+		  		</property>
+			</bean>
+  		</constructor-arg>
+  		<property name="isTestVersion">
+  			<value>false</value>
+  		</property>
+  	</bean>
+
+	<bean id="RefBot1" class="tesuji.games.go.engine.RefBotEngine" singleton="false">
+  		<property name="jar" value="TesujiRefBot.jar"/>
+  		<property name="nrSimulations">
+  			<value>2000</value>
+  		</property>
+		<property name="monteCarloAdministration">
+					<bean class="tesuji.games.go.monte_carlo.MonteCarloPluginAdministration" singleton="false">
+						<property name="simulationMoveFilterList">
+							<list>
+								<ref bean="eyeMoveFilter"/>
+							</list>
+						</property>
+						<property name="explorationMoveFilterList">
+							<list>
+								<ref bean="eyeMoveFilter"/>
+							</list>
+						</property>
+				  	</bean>
+		</property>
+  		<property name="resignEnabled">
+  			<value>true</value>
+  		</property>
+  	</bean> 
+  	
+	<bean id="RefBot2" class="tesuji.games.go.engine.RefBotEngine" singleton="false">
+  		<property name="jar" value="TesujiRefBot.jar"/>
+  		<property name="nrSimulations">
+  			<value>2000</value>
+  		</property>
+		<property name="monteCarloAdministration">
+					<bean class="tesuji.games.go.monte_carlo.MonteCarloGoAdministration" singleton="false">
+				  	</bean>
+		</property>
+  		<property name="resignEnabled">
+  			<value>true</value>
+  		</property>
+  	</bean> 
+  	
+	<bean id="RefBot3" class="tesuji.games.go.reference.engine.RefBotEngine" singleton="false">
+  		<property name="jar" value="TesujiRefBot.jar"/>
+  		<property name="nrSimulations">
+  			<value>2000</value>
+  		</property>
+		<property name="monteCarloAdministration">
+			<bean class="tesuji.games.go.reference.monte_carlo.MCLibertyAdministration" singleton="false"/>
+		</property>
+  		<property name="resignEnabled">
+  			<value>true</value>
+  		</property>
+  	</bean> 
 
 </beans>

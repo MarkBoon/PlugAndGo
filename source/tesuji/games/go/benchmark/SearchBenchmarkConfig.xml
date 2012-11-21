@@ -98,13 +98,13 @@
   		</constructor-arg>
 	</bean>
  	
-	<bean id="MonteCarloTreeSearch" class="tesuji.games.go.search.MonteCarloTreeSearchWithPatterns" singleton="false">
+	<bean id="MonteCarloTreeSearch" class="tesuji.games.go.search.MonteCarloTreeSearch" singleton="false">
 		<!-- <property name="monteCarloAdministration">
 			<ref bean="mctsGoAdministration"/>
 		</property> -->
 		<property name="monteCarloAdministration">
-			<ref bean="mctsPatternsAdministration"/>
-			<!--<bean class="tesuji.games.go.monte_carlo.MCTacticsAdministration" singleton="false">
+			<!--<ref bean="mctsPatternsAdministration"/>-->
+			<bean class="tesuji.games.go.monte_carlo.MCTacticsAdministration" singleton="false">
 		  		<property name="USE_HARD_PATTERNS">
 		  			<value>false</value>
 		  		</property>
@@ -117,7 +117,7 @@
 		  		<property name="KEIMA_CUT_PATTERN">
 		  			<value>true</value>
 		  		</property>
-		  	</bean>-->
+		  	</bean>
 		</property>
   		<property name="isTestVersion">
   			<value>false</value>

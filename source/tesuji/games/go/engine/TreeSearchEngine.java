@@ -125,7 +125,7 @@ public class TreeSearchEngine
     @Override
 	public String getEngineVersion()
     {
-	    return _search.getClass().getSimpleName();
+	    return _search.getClass().getSimpleName() + " / " + _search.toString();
     }
 
 	/* (non-Javadoc)
