@@ -18,6 +18,7 @@ public abstract class LadderMoveGenerator extends AbstractMoveGenerator
 	@Override
 	public void copyDataFrom(MoveGenerator source)
 	{
+		checkHistory = ((LadderMoveGenerator)source).checkHistory;
 	}
 
 	public boolean isCheckHistory()

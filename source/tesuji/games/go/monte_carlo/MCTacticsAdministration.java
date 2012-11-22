@@ -123,7 +123,7 @@ public class MCTacticsAdministration
 	private void initProperties()
 	{
 		_flags = new boolean[Flag.LAST.ordinal()];
-		_flags[Flag.USE_STONE_AGE.ordinal()] = false;
+		_flags[Flag.USE_STONE_AGE.ordinal()] = true;
 		_flags[Flag.FOG_OF_WAR.ordinal()] = false;
 		_flags[Flag.NO_FIRST_LINE.ordinal()] = false;
 		_flags[Flag.NO_AUTO_ATARI.ordinal()] = false; // -- TODO - temporarily disabled to fix ownership.
@@ -486,9 +486,8 @@ public class MCTacticsAdministration
 		{
 			Statistics.increment("-Capture");
 			int chain = _chain[previousMove];
-			if (_liberties[chain]==1  /*&& _boardMarker.notSet(chain) && isPrehistoric(chain)*/)
+			if (_liberties[chain]==1  && isPrehistoric(chain))
 			{
-				//_boardMarker.set(chain);
 				_ladderReader.setBoardArray(_boardModel.getSingleArray());
 				_ladderReader.setKoPoint(_koPoint);
 				Statistics.increment("Capture");
@@ -504,10 +503,9 @@ public class MCTacticsAdministration
 		{
 			Statistics.increment("-Ladder");
 			int chain = _chain[previousMove];
-			if (_liberties[chain]==2 /*&& _boardMarker.notSet(chain) && isPrehistoric(chain)*/
+			if (_liberties[chain]==2 && isPrehistoric(chain)
 				&& (_row[previousMove]>1 || _ownDiagonalNeighbours[previousMove]>0 || _otherDiagonalNeighbours[previousMove]>0))
 			{
-				//_boardMarker.set(chain);
 				_ladderReader.setBoardArray(_boardModel.getSingleArray());
 				_ladderReader.setKoPoint(_koPoint);
 				Statistics.increment("Ladder");

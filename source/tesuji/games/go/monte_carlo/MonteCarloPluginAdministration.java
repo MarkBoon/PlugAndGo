@@ -424,6 +424,15 @@ public class MonteCarloPluginAdministration
 		{
 			_explorationMoveFilterList.get(i).copyDataFrom(source._explorationMoveFilterList.get(i));
 		}
+		
+		for (int i=_simulationMoveGeneratorList.size(); --i>=0;)
+		{
+			_simulationMoveGeneratorList.get(i).copyDataFrom(source._simulationMoveGeneratorList.get(i));
+		}
+		for (int i=_explorationMoveGeneratorList.size(); --i>=0;)
+		{
+			_explorationMoveGeneratorList.get(i).copyDataFrom(source._explorationMoveGeneratorList.get(i));
+		}
 	}
 	
 	/**

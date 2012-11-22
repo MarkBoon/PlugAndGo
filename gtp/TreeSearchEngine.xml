@@ -104,8 +104,8 @@
 						<property name="simulationMoveGeneratorList">
 							<list>
 								<bean class="tesuji.games.go.monte_carlo.ImmediateAtariEscape" singleton="false"/>
-								<!--<bean class="tesuji.games.go.monte_carlo.ImmediateCapture" singleton="false"/>
-								<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"/>-->
+								<bean class="tesuji.games.go.monte_carlo.ImmediateCapture" singleton="false"/>
+								<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"/>
 							</list>
 						</property>
 						<!--<property name="explorationMoveGeneratorList">
