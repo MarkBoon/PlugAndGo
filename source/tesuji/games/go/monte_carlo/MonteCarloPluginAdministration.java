@@ -934,12 +934,16 @@ public class MonteCarloPluginAdministration
 
 	protected int selectPriorityMove(List<MoveGenerator> moveGeneratorList)
 	{
-		for (int i=moveGeneratorList.size(); --i>=0;)
+		if (_previousMove!=PASS)
 		{
-			MoveGenerator generator = moveGeneratorList.get(i);
-			int xy = generator.generate();
-			if (xy!=UNDEFINED_COORDINATE)
-				return xy;
+			int size = moveGeneratorList.size();
+			for (int i=0; i<size; i++)
+			{
+				MoveGenerator generator = moveGeneratorList.get(i);
+				int xy = generator.generate();
+				if (xy!=UNDEFINED_COORDINATE)
+					return xy;
+			}
 		}
 		
 		return UNDEFINED_COORDINATE;
@@ -954,7 +958,8 @@ public class MonteCarloPluginAdministration
 	 */
 	public boolean isVerboten(GoMove move)
 	{
-		for (int i=_simulationMoveFilterList.size(); --i>=0;)
+		int size = _simulationMoveFilterList.size();
+		for (int i=0; i<size; i++)
 		{
 			MoveFilter filter = _simulationMoveFilterList.get(i);
 			if (filter.accept(move.getXY(), getColorToMove()))
@@ -976,7 +981,8 @@ public class MonteCarloPluginAdministration
 	 */
 	public boolean isVerboten(int xy, List<MoveFilter> filterList)
 	{
-		for (int i=filterList.size(); --i>=0;)
+		int size = filterList.size();
+		for (int i=0; i<size; i++)
 		{
 			MoveFilter filter = filterList.get(i);
 			if (filter.accept(xy, getColorToMove()))

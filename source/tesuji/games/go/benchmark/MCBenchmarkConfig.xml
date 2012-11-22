@@ -47,7 +47,7 @@
 		<property name="explorationMoveFilterList">
 			<list>
 				<ref bean="eyeMoveFilter"/>
-				<bean class="tesuji.games.go.monte_carlo.FogOfWarFilter" singleton="false"/>
+				<!--<bean class="tesuji.games.go.monte_carlo.FogOfWarFilter" singleton="false"/>-->
 			</list>
 		</property>
 		<property name="simulationMoveGeneratorList">
@@ -57,13 +57,13 @@
 				<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"/>
 			</list>
 		</property>
-		<property name="explorationMoveGeneratorList">
+		<!--<property name="explorationMoveGeneratorList">
 			<list>
 				<bean class="tesuji.games.go.monte_carlo.ImmediateAtariEscape" singleton="false"/>
 				<bean class="tesuji.games.go.monte_carlo.ImmediateCapture" singleton="false"/>
 				<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"/>
 			</list>
-		</property>
+		</property>-->
 	</bean>
 	<bean id="mcPluginAdministrationLean" class="tesuji.games.go.monte_carlo.MonteCarloPluginAdministration" singleton="false">
 		<property name="simulationMoveFilterList">

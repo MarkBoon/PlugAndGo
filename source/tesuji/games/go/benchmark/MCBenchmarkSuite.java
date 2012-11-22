@@ -36,6 +36,7 @@ import org.springframework.core.io.Resource;
 import tesuji.core.util.LoggerConfigurator;
 import tesuji.games.go.common.GoMove;
 import tesuji.games.go.monte_carlo.MonteCarloAdministration;
+import tesuji.games.go.util.Statistics;
 import tesuji.games.gtp.GTPCommand;
 
 /** Simply runs a bunch of playouts to test speed. */
@@ -84,6 +85,18 @@ public class MCBenchmarkSuite
 		}		
 		_logger.info("");
 		_logger.info("Done.");
+		_logger.info("-Escapes: "+Statistics.get("-Escape"));
+		_logger.info("-Captures: "+Statistics.get("-Capture"));
+		_logger.info("-Ladders: "+Statistics.get("-Ladder"));
+		_logger.info("Escapes: "+Statistics.get("Escape"));
+		_logger.info("Captures: "+Statistics.get("Capture"));
+		_logger.info("Ladders: "+Statistics.get("Ladder"));
+		_logger.info("-Immediate Escapes: "+Statistics.get("-ImmediateEscape"));
+		_logger.info("-Immediate Captures: "+Statistics.get("-ImmediateCapture"));
+		_logger.info("-Immediate Ladders: "+Statistics.get("-ImmediateLadder"));
+		_logger.info("Immediate Escapes: "+Statistics.get("ImmediateEscape"));
+		_logger.info("Immediate Captures: "+Statistics.get("ImmediateCapture"));
+		_logger.info("Immediate Ladders: "+Statistics.get("ImmediateLadder"));
 	}
 	
 	public List<MonteCarloAdministration<GoMove>> getList()

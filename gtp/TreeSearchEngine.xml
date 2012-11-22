@@ -103,16 +103,16 @@
 						</property>
 						<property name="simulationMoveGeneratorList">
 							<list>
-								<!--<bean class="tesuji.games.go.monte_carlo.ImmediateAtariEscape" singleton="false"/>-->
-								<bean class="tesuji.games.go.monte_carlo.ImmediateCapture" singleton="false"/>
-								<!--<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"/>-->
+								<bean class="tesuji.games.go.monte_carlo.ImmediateAtariEscape" singleton="false"/>
+								<!--<bean class="tesuji.games.go.monte_carlo.ImmediateCapture" singleton="false"/>
+								<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"/>-->
 							</list>
 						</property>
 						<!--<property name="explorationMoveGeneratorList">
 							<list>
-								<bean class="tesuji.games.go.monte_carlo.ImmediateAtariEscape" singleton="false"/>
-								<bean class="tesuji.games.go.monte_carlo.ImmediateCapture" singleton="false"/>
-								<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"/>
+								<bean class="tesuji.games.go.monte_carlo.ImmediateAtariEscape" singleton="false"><property name="urgency"><value>10</value></property></bean>
+								<bean class="tesuji.games.go.monte_carlo.ImmediateCapture" singleton="false"><property name="urgency"><value>10</value></property></bean>
+								<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"><property name="urgency"><value>10</value></property></bean>
 							</list>
 						</property>-->
 				  	</bean>
@@ -175,6 +175,36 @@
   		</property>
   	</bean>
 
+	<bean id="RefBot" class="tesuji.games.go.engine.TreeSearchEngine" singleton="false">
+  		<property name="jar" value="TreeSearchEngine.jar"/>
+  		<constructor-arg>
+			<bean class="tesuji.games.go.search.MonteCarloTreeSearch" singleton="false">
+				<property name="monteCarloAdministration">
+					<bean class="tesuji.games.go.monte_carlo.MonteCarloGoAdministration" singleton="false">
+				  	</bean>
+				</property>
+		  		<property name="secondsPerMove">
+		  			<value>0</value>
+		  		</property>
+		  		<property name="nrProcessors">
+		  			<value>1</value>
+		  		</property>
+		  		<property name="minimumNrNodes">
+		  			<value>2000</value>
+		  		</property>
+		  		<property name="useAMAF">
+		  			<value>true</value>
+		  		</property>
+		  		<property name="nrSimulationsBeforeExpansion">
+		  			<value>1</value>
+		  		</property>
+		  		<property name="isTestVersion">
+		  			<value>false</value>
+		  		</property>
+			</bean>
+  		</constructor-arg>
+  	</bean> 
+  	
 	<bean id="RefBot1" class="tesuji.games.go.engine.RefBotEngine" singleton="false">
   		<property name="jar" value="TesujiRefBot.jar"/>
   		<property name="nrSimulations">

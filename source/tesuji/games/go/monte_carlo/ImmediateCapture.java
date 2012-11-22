@@ -2,26 +2,15 @@ package tesuji.games.go.monte_carlo;
 
 import static tesuji.games.go.common.GoConstant.PASS;
 import static tesuji.games.go.common.GoConstant.UNDEFINED_COORDINATE;
-import tesuji.games.go.tactics.LadderReader;
 import tesuji.games.go.tactics.TacticsConstant;
-import tesuji.games.go.util.BoardMarker;
+import tesuji.games.go.util.Statistics;
 
-public class ImmediateCapture extends AbstractMoveGenerator
-{
-	private MonteCarloPluginAdministration administration;
-	private BoardMarker _boardMarker = new BoardMarker();
-	private LadderReader _ladderReader;
-	
-	@Override
-	public void register(MonteCarloPluginAdministration admin)
-	{
-		administration = admin;
-		_ladderReader = new LadderReader(administration.getBoardSize()); // A little space can be saved by sharing this instance.
-	}
-
+public class ImmediateCapture extends LadderMoveGenerator
+{	
 	@Override
 	public int generate()
 	{
+		Statistics.increment("-ImmediateCapture");
 		if (administration.getMoveStack().getSize()==0)
 			return UNDEFINED_COORDINATE;
 
@@ -35,11 +24,11 @@ public class ImmediateCapture extends AbstractMoveGenerator
 			return UNDEFINED_COORDINATE;
 		
 		int currentChain = chain[previousMove];
-		if (liberties[currentChain]==1  && administration.isPrehistoric(currentChain))
+		if (liberties[currentChain]==1  && (!isCheckHistory() || administration.isPrehistoric(currentChain)))
 		{
-			_boardMarker.set(currentChain);
 			_ladderReader.setBoardArray(board);
 			_ladderReader.setKoPoint(koPoint);
+			Statistics.increment("ImmediateCapture");
 			if (_ladderReader.tryEscape(previousMove)==TacticsConstant.CANNOT_CATCH)
 			{
 				int captureXY = administration.getLiberty(previousMove);
@@ -54,11 +43,6 @@ public class ImmediateCapture extends AbstractMoveGenerator
 	@Override
 	public MoveGenerator createClone()
 	{
-		return new ImmediateAtariEscape();
-	}
-
-	@Override
-	public void copyDataFrom(MoveGenerator source)
-	{
+		return new ImmediateCapture();
 	}
 }

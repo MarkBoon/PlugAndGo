@@ -37,6 +37,7 @@ import tesuji.games.go.util.EightCursor;
 import tesuji.games.go.util.FourCursor;
 import tesuji.games.go.util.GoArray;
 import tesuji.games.go.util.PointSet;
+import tesuji.games.go.util.Statistics;
 import tesuji.games.go.util.TwelveCursor;
 
 import static tesuji.games.general.ColorConstant.*;
@@ -122,15 +123,15 @@ public class MCTacticsAdministration
 	private void initProperties()
 	{
 		_flags = new boolean[Flag.LAST.ordinal()];
-		_flags[Flag.USE_STONE_AGE.ordinal()] = true;
+		_flags[Flag.USE_STONE_AGE.ordinal()] = false;
 		_flags[Flag.FOG_OF_WAR.ordinal()] = false;
 		_flags[Flag.NO_FIRST_LINE.ordinal()] = false;
 		_flags[Flag.NO_AUTO_ATARI.ordinal()] = false; // -- TODO - temporarily disabled to fix ownership.
 		_flags[Flag.USE_TACTICS_IN_SIMULATION.ordinal()] = true;
 		_flags[Flag.USE_TACTICS_IN_EXPLORATION.ordinal()] = false;
 		_flags[Flag.IMMEDIATE_ESCAPE_ATARI.ordinal()] = true;
-		_flags[Flag.CAPTURE_LAST_MOVE_IN_ATARI.ordinal()] = false;
-		_flags[Flag.CAPTURE_LAST_MOVE_IN_LADDER.ordinal()] = false;
+		_flags[Flag.CAPTURE_LAST_MOVE_IN_ATARI.ordinal()] = true;
+		_flags[Flag.CAPTURE_LAST_MOVE_IN_LADDER.ordinal()] = true;
 		_flags[Flag.ESCAPE_ATARI.ordinal()] = false;
 		_flags[Flag.CAPTURE_STONES_IN_ATARI.ordinal()] = false;
 		_flags[Flag.CAPTURE_STONES_IN_LADDER.ordinal()] = false;
@@ -455,6 +456,7 @@ public class MCTacticsAdministration
 		_boardMarker.getNewMarker();
 		if (isIMMEDIATE_ESCAPE_ATARI())
 		{
+			Statistics.increment("-Escape");
 			for (int n=0; n<4; n++)
 			{
 				int next = FourCursor.getNeighbour(previousMove, n);
@@ -468,6 +470,7 @@ public class MCTacticsAdministration
 							_boardMarker.set(chainNext);
 							_ladderReader.setBoardArray(_boardModel.getSingleArray());
 							_ladderReader.setKoPoint(_koPoint);
+							Statistics.increment("Escape");
 							if (_ladderReader.tryEscape(next)==TacticsConstant.CANNOT_CATCH)
 							{
 								int escapeXY = _ladderReader.getLastLadderMove();
@@ -481,12 +484,14 @@ public class MCTacticsAdministration
 		}
 		if (isCAPTURE_LAST_MOVE_IN_ATARI())
 		{
+			Statistics.increment("-Capture");
 			int chain = _chain[previousMove];
-			if (_liberties[chain]==1  && _boardMarker.notSet(chain) && isPrehistoric(chain))
+			if (_liberties[chain]==1  /*&& _boardMarker.notSet(chain) && isPrehistoric(chain)*/)
 			{
-				_boardMarker.set(chain);
+				//_boardMarker.set(chain);
 				_ladderReader.setBoardArray(_boardModel.getSingleArray());
 				_ladderReader.setKoPoint(_koPoint);
+				Statistics.increment("Capture");
 				if (_ladderReader.tryEscape(previousMove)==TacticsConstant.CANNOT_CATCH)
 				{
 					int captureXY = getLiberty(previousMove);
@@ -497,13 +502,15 @@ public class MCTacticsAdministration
 		}
 		if (isCAPTURE_LAST_MOVE_IN_LADDER())
 		{
+			Statistics.increment("-Ladder");
 			int chain = _chain[previousMove];
-			if (_liberties[chain]==2 && _boardMarker.notSet(chain) && isPrehistoric(chain)
+			if (_liberties[chain]==2 /*&& _boardMarker.notSet(chain) && isPrehistoric(chain)*/
 				&& (_row[previousMove]>1 || _ownDiagonalNeighbours[previousMove]>0 || _otherDiagonalNeighbours[previousMove]>0))
 			{
-				_boardMarker.set(chain);
+				//_boardMarker.set(chain);
 				_ladderReader.setBoardArray(_boardModel.getSingleArray());
 				_ladderReader.setKoPoint(_koPoint);
+				Statistics.increment("Ladder");
 				if (_ladderReader.tryLadder(previousMove)==TacticsConstant.CAN_CATCH)
 				{
 					int ladderXY = _ladderReader.getLastLadderMove();
