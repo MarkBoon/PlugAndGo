@@ -108,13 +108,13 @@
 								<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"/>
 							</list>
 						</property>
-						<!--<property name="explorationMoveGeneratorList">
+						<property name="explorationMoveGeneratorList">
 							<list>
-								<bean class="tesuji.games.go.monte_carlo.ImmediateAtariEscape" singleton="false"><property name="urgency"><value>10</value></property></bean>
-								<bean class="tesuji.games.go.monte_carlo.ImmediateCapture" singleton="false"><property name="urgency"><value>10</value></property></bean>
-								<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"><property name="urgency"><value>10</value></property></bean>
+								<bean class="tesuji.games.go.monte_carlo.ImmediateAtariEscape" singleton="false"><property name="urgency"><value>5</value></property></bean>
+								<bean class="tesuji.games.go.monte_carlo.ImmediateCapture" singleton="false"><property name="urgency"><value>5</value></property></bean>
+								<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"><property name="urgency"><value>5</value></property></bean>
 							</list>
-						</property>-->
+						</property>
 				  	</bean>
 				</property>
 		  		<property name="secondsPerMove">
@@ -148,6 +148,9 @@
 			<bean class="tesuji.games.go.search.MonteCarloTreeSearch" singleton="false">
 				<property name="monteCarloAdministration">
 					<bean class="tesuji.games.go.monte_carlo.MCTacticsAdministration" singleton="false">
+				  		<property name="USE_TACTICS_IN_EXPLORATION">
+				  			<value>false</value>
+				  		</property>
 				  	</bean>
 				</property>
 		  		<property name="secondsPerMove">

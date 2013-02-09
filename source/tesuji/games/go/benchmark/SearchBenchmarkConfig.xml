@@ -21,82 +21,19 @@
 		<!-- List with Monte-Carlo playout strategies to benchmark -->
 		<property name="list">
 			<list>
-			<!--  <ref bean="UCTSearch"/> -->
-			<!--  <ref bean="UCTRaveSearch"/> -->
-			 <!-- <ref bean="ReferenceMonteCarloTreeSearch"/> -->
 				<ref bean="MonteCarloTreeSearch"/>
-			<!-- 	<ref bean="PatternSearch"/> -->
+				<ref bean="PluginMonteCarloTreeSearch"/>
 			</list>
 		</property>
  	</bean>
  	
-	<bean id="mcGoAdministration" class="tesuji.games.go.monte_carlo.MonteCarloGoAdministration" singleton="false"/>
- 	
- 	<bean id="referencePseudoLibertyAdministration" class="tesuji.games.go.reference.monte_carlo.MCPseudoLibertyAdministration" singleton="false"/>
-
-	<bean id="referenceLibertyAdministration" class="tesuji.games.go.reference.monte_carlo.MCLibertyAdministration" singleton="false"/>
- 	
-	<bean id="patternMatcher" class="tesuji.games.go.pattern.incremental.IncrementalPatternMatcher" singleton="false">
-  		<constructor-arg>
-  			<value>GenTest</value>
-  		</constructor-arg>
-	</bean>
-
-	<bean id="PatternSearch" class="tesuji.games.go.search.MonteCarloTreeSearchWithPatterns" singleton="false">
-		<property name="monteCarloAdministration">
-			<ref bean="mctsLibertyAdministration"/>
-		</property>
-		<property name="patternSet" value="GenTest"/>
-  		<property name="secondsPerMove">
-  			<value>0</value>
-  		</property>
-  		<property name="useAMAF">
-  			<value>true</value>
-  		</property>
-	</bean>
- 	
-	<bean id="UCTSearch" class="tesuji.games.go.search.uct.UCTSearch" singleton="false">
-		<property name="monteCarloAdministration">
-			<ref bean="mcGoAdministration"/>
-		</property>
-  		<property name="secondsPerMove">
-  			<value>0</value>
-  		</property>
-	</bean>
- 	
-	<bean id="UCTRaveSearch" class="tesuji.games.go.search.uct.UctRaveSearch" singleton="false">
-		<property name="monteCarloAdministration">
-			<ref bean="mcGoAdministration"/>
-		</property>
-  		<property name="secondsPerMove">
-  			<value>0</value>
-  		</property>
-  		<property name="useAMAF">
-  			<value>true</value>
-  		</property>
-	</bean>
- 	
-	<bean id="ReferenceMonteCarloTreeSearch" class="tesuji.games.go.reference.search.MonteCarloTreeSearch" singleton="false">
-		<property name="monteCarloAdministration">
-			<ref bean="referenceLibertyAdministration"/>
-		</property>
-  		<property name="secondsPerMove">
-  			<value>0</value>
-  		</property>
-  		<property name="nrSimulationsBeforeExpansion">
-  			<value>64</value>
-  		</property>
-	</bean>
- 	
-	<bean id="mctsLibertyAdministration" class="tesuji.games.go.monte_carlo.MCLibertyAdministration" singleton="false"/>
 	<bean id="mctsGoAdministration" class="tesuji.games.go.monte_carlo.MonteCarloGoAdministration" singleton="false"/>
-
-	<bean id="mctsTacticsAdministration" class="tesuji.games.go.monte_carlo.MCTacticsAdministration" singleton="false"/>
 	<bean id="mctsPatternsAdministration" class="tesuji.games.go.monte_carlo.MCPatternsAdministration" singleton="false">
   		<constructor-arg>
   			<value>GenTest</value>
   		</constructor-arg>
 	</bean>
+	<bean id="eyeMoveFilter" class="tesuji.games.go.monte_carlo.EyeMoveFilter" singleton="false"/>
  	
 	<bean id="MonteCarloTreeSearch" class="tesuji.games.go.search.MonteCarloTreeSearch" singleton="false">
 		<!-- <property name="monteCarloAdministration">
@@ -105,18 +42,9 @@
 		<property name="monteCarloAdministration">
 			<!--<ref bean="mctsPatternsAdministration"/>-->
 			<bean class="tesuji.games.go.monte_carlo.MCTacticsAdministration" singleton="false">
-		  		<property name="USE_HARD_PATTERNS">
-		  			<value>false</value>
-		  		</property>
-		  		<property name="SEPARATE_PATTERN">
-		  			<value>true</value>
-		  		</property>
-		  		<property name="CUT_PATTERN">
-		  			<value>true</value>
-		  		</property>
-		  		<property name="KEIMA_CUT_PATTERN">
-		  			<value>true</value>
-		  		</property>
+				  		<property name="USE_TACTICS_IN_EXPLORATION">
+				  			<value>false</value>
+				  		</property>
 		  	</bean>
 		</property>
   		<property name="isTestVersion">
@@ -125,9 +53,55 @@
   		<property name="secondsPerMove">
   			<value>0</value>
   		</property>
+		<property name="useAMAF">
+			<value>true</value>
+		</property>
   		<property name="nrSimulationsBeforeExpansion">
-  			<value>8</value>
+  			<value>1</value>
   		</property>
+	</bean>
+ 
+	<bean id="PluginMonteCarloTreeSearch" class="tesuji.games.go.search.MonteCarloTreeSearch" singleton="false">
+		<property name="monteCarloAdministration">
+			<bean class="tesuji.games.go.monte_carlo.MonteCarloPluginAdministration" singleton="false">
+				<property name="simulationMoveFilterList">
+					<list>
+						<ref bean="eyeMoveFilter"/>
+					</list>
+				</property>
+				<property name="explorationMoveFilterList">
+					<list>
+						<ref bean="eyeMoveFilter"/>
+					</list>
+				</property>
+				<property name="simulationMoveGeneratorList">
+					<list>
+						<bean class="tesuji.games.go.monte_carlo.ImmediateAtariEscape" singleton="false"/>
+						<bean class="tesuji.games.go.monte_carlo.ImmediateCapture" singleton="false"/>
+						<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"/>
+					</list>
+				</property>
+				<property name="explorationMoveGeneratorList">
+					<list>
+						<bean class="tesuji.games.go.monte_carlo.ImmediateAtariEscape" singleton="false"><property name="urgency"><value>5</value></property></bean>
+						<bean class="tesuji.games.go.monte_carlo.ImmediateCapture" singleton="false"><property name="urgency"><value>5</value></property></bean>
+						<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"><property name="urgency"><value>5</value></property></bean>
+					</list>
+				</property>
+		  	</bean>
+		</property>
+		<property name="secondsPerMove">
+			<value>0</value>
+		</property>
+		<property name="useAMAF">
+			<value>true</value>
+		</property>
+		<property name="nrSimulationsBeforeExpansion">
+			<value>1</value>
+		</property>
+		<property name="isTestVersion">
+			<value>false</value>
+		</property>
 	</bean>
  	
 </beans>

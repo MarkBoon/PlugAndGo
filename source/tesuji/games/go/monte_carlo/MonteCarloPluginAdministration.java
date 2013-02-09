@@ -1429,13 +1429,12 @@ public class MonteCarloPluginAdministration
      */
     protected void getPriorityMoves()
     {
-		for (int i=_explorationMoveGeneratorList.size(); --i>=0;)
+		for (MoveGenerator generator : _explorationMoveGeneratorList)
 		{
-			MoveGenerator generator = _explorationMoveGeneratorList.get(i);
 			int xy = generator.generate();
 			if (xy!=UNDEFINED_COORDINATE)
 			{
-				addPriorityMove(xy,0,generator.getUrgency(),generator.getUrgency());
+				addPriorityMove(xy,1,generator.getUrgency(),generator.getUrgency());
 			}
 		}
     }

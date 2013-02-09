@@ -293,10 +293,10 @@ public class MonteCarloTreeSearchResult<MoveType extends Move>
 
 	public double getUrgencyValue()
 	{
-		if (getIsTestVersion())
+//		if (getIsTestVersion())
 			return 0.0;
 		
-		return (_urgencyFactor / ((double)((GoMove)getMove()).getUrgency())) / (_nrPlayouts+1);
+//		return (_urgencyFactor / ((double)((GoMove)getMove()).getUrgency())) / (_nrPlayouts+1);
 	}
 	
 	/**

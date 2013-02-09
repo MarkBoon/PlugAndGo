@@ -12,7 +12,7 @@ public abstract class LadderMoveGenerator extends AbstractMoveGenerator
 	public void register(MonteCarloPluginAdministration admin)
 	{
 		administration = admin;
-		_ladderReader = new LadderReader(administration.getBoardSize()); // A little space can be saved by sharing this instance.
+		_ladderReader = new LadderReader(administration.getBoardSize()); // A little space (and time) can be saved by sharing this instance.
 	}
 
 	@Override
