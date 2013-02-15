@@ -4,6 +4,7 @@ public interface MoveGenerator
 {
 	void register(MonteCarloPluginAdministration admin);
 	int generate();
+	void update();
 	MoveGenerator createClone();
 	void copyDataFrom(MoveGenerator source);
 	

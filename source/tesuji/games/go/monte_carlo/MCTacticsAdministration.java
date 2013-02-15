@@ -578,7 +578,7 @@ public class MCTacticsAdministration
 			}
 		}
 		// TODO - instead of looping over the whole board it's probably faster to keep lists with chains with 1 and 2 liberties.
-		/*
+
 		_boardMarker.getNewMarker();
 		for (int i=FIRST; i<=LAST; i++)
 		{
@@ -634,7 +634,6 @@ public class MCTacticsAdministration
 				}
 			}
 		}
-		*/
 	}
 	
 	/*

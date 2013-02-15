@@ -16,4 +16,7 @@ public abstract class AbstractMoveGenerator implements MoveGenerator
 		_urgency = urgency;
 	}
 
+	public void update()
+	{
+	}
 }

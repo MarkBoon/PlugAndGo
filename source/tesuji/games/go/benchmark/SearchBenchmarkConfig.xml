@@ -21,7 +21,7 @@
 		<!-- List with Monte-Carlo playout strategies to benchmark -->
 		<property name="list">
 			<list>
-				<ref bean="MonteCarloTreeSearch"/>
+				<!--<ref bean="MonteCarloTreeSearch"/>-->
 				<ref bean="PluginMonteCarloTreeSearch"/>
 			</list>
 		</property>
@@ -40,12 +40,12 @@
 			<ref bean="mctsGoAdministration"/>
 		</property> -->
 		<property name="monteCarloAdministration">
-			<!--<ref bean="mctsPatternsAdministration"/>-->
-			<bean class="tesuji.games.go.monte_carlo.MCTacticsAdministration" singleton="false">
+			<ref bean="mctsGoAdministration"/>
+			<!--<bean class="tesuji.games.go.monte_carlo.MCTacticsAdministration" singleton="false">
 				  		<property name="USE_TACTICS_IN_EXPLORATION">
 				  			<value>false</value>
 				  		</property>
-		  	</bean>
+		  	</bean>-->
 		</property>
   		<property name="isTestVersion">
   			<value>false</value>
@@ -57,7 +57,7 @@
 			<value>true</value>
 		</property>
   		<property name="nrSimulationsBeforeExpansion">
-  			<value>1</value>
+  			<value>64</value>
   		</property>
 	</bean>
  
@@ -86,6 +86,12 @@
 						<bean class="tesuji.games.go.monte_carlo.ImmediateAtariEscape" singleton="false"><property name="urgency"><value>5</value></property></bean>
 						<bean class="tesuji.games.go.monte_carlo.ImmediateCapture" singleton="false"><property name="urgency"><value>5</value></property></bean>
 						<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"><property name="urgency"><value>5</value></property></bean>
+						<bean class="tesuji.games.go.monte_carlo.MatchPatterns" singleton="false">
+  							<constructor-arg>
+  								<value>GenTest</value>
+  							</constructor-arg>
+							<property name="urgency"><value>5</value></property>
+						</bean>
 					</list>
 				</property>
 		  	</bean>
@@ -97,7 +103,7 @@
 			<value>true</value>
 		</property>
 		<property name="nrSimulationsBeforeExpansion">
-			<value>1</value>
+			<value>64</value>
 		</property>
 		<property name="isTestVersion">
 			<value>false</value>

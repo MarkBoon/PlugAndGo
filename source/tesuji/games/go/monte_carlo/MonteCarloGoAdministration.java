@@ -820,7 +820,7 @@ public class MonteCarloGoAdministration
 		return selectRandomMoveCoordinate(emptyPoints);
 	}
 	
-	private  boolean accept1(int xy)
+/*	private  boolean accept1(int xy)
 	{
 		if (!isTestVersion() || _otherNeighbours[xy]!=0 || _otherDiagonalNeighbours[xy]>=_maxDiagonalsOccupied[xy])
 		{
@@ -858,7 +858,7 @@ public class MonteCarloGoAdministration
 			points++;
 		
 		return (points==0 || RANDOM.nextInt(points)==0);
-	}
+	}*/
 
 	/**
 	 * Randomly select an empty point from a set of empty points.

@@ -473,6 +473,15 @@ public class MonteCarloPluginAdministration
 	{
 		setColorToMove(move.getColor());
 		playMove(move.getXY());
+		update();
+	}
+	
+	private void update()
+	{
+		for (int i=_explorationMoveGeneratorList.size(); --i>=0;)
+		{
+			_explorationMoveGeneratorList.get(i).update();
+		}
 	}
 	
 	/*
@@ -1604,6 +1613,7 @@ public class MonteCarloPluginAdministration
 			_hasNext = true;
 			_color = getColorToMove();
 			_boardMarker.getNewMarker();
+			update();
 		}
 		
 		public boolean hasNext()

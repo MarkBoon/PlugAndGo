@@ -32,7 +32,6 @@ import tesuji.core.util.List;
 import tesuji.games.go.pattern.common.Pattern;
 import tesuji.games.go.pattern.common.PatternGroup;
 import tesuji.games.go.pattern.common.PatternManager;
-import tesuji.games.go.util.DefaultBoardModel;
 import tesuji.games.go.util.GoArray;
 import tesuji.games.model.BoardChange;
 import tesuji.games.model.BoardChangeFactory;
@@ -59,7 +58,7 @@ public class IncrementalPatternMatcher
 	private PatternGroup group;
 	private FullPatternTree tree;
 	private PatternManager patternManager;
-	private DefaultBoardModel _boardModel;
+	private BoardModel _boardModel;
 	private PatternMatchList _matchList = new PatternMatchList();
 	private ArrayList<BoardChange> _boardChangeList = new ArrayList<BoardChange>(32);
 	private int _moveNr;
@@ -110,7 +109,7 @@ public class IncrementalPatternMatcher
 		_moveNr = 1;
 		_matchList.clear();
 		_boardChangeList.clear();
-		_boardModel = new DefaultBoardModel(boardModel.getBoardSize());
+		_boardModel = boardModel;
 		boardModel.addBoardModelListener(this);
 		matchingState = new MatchingState[GoArray.MAX];
 		for (int i=0; i<GoArray.MAX; i++)
@@ -481,7 +480,8 @@ public class IncrementalPatternMatcher
     	clone.tree = tree;
     	clone.patternManager = patternManager;
     	
-    	clone._boardModel = _boardModel.createClone();
+    	clone._boardModel = _boardModel;
+//    	clone._boardModel = _boardModel.createClone();
     	clone._matchList = _matchList.createIndexedClone();
     	clone._moveNr = _moveNr;
 

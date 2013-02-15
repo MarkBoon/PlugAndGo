@@ -113,6 +113,7 @@
 								<bean class="tesuji.games.go.monte_carlo.ImmediateAtariEscape" singleton="false"><property name="urgency"><value>5</value></property></bean>
 								<bean class="tesuji.games.go.monte_carlo.ImmediateCapture" singleton="false"><property name="urgency"><value>5</value></property></bean>
 								<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"><property name="urgency"><value>5</value></property></bean>
+								<bean class="tesuji.games.go.monte_carlo.GlobalTactics" singleton="false"><property name="urgency"><value>5</value></property></bean>
 							</list>
 						</property>
 				  	</bean>
@@ -149,7 +150,7 @@
 				<property name="monteCarloAdministration">
 					<bean class="tesuji.games.go.monte_carlo.MCTacticsAdministration" singleton="false">
 				  		<property name="USE_TACTICS_IN_EXPLORATION">
-				  			<value>false</value>
+				  			<value>true</value>
 				  		</property>
 				  	</bean>
 				</property>
