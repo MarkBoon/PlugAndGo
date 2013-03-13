@@ -201,6 +201,17 @@ public class GoArray
 	} 
 	
 	/**
+	 * Copy an array of long
+	 * 
+	 * @param source array
+	 * @param destination array
+	 */
+	public static final void copy(double[] source, double[] destination)
+	{
+		System.arraycopy(source,0,destination,0,MAX);
+	} 
+	
+	/**
 	 * Copy an array of Object
 	 * 
 	 * @param source array
