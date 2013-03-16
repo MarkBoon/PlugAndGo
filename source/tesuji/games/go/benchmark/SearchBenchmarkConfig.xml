@@ -35,7 +35,7 @@
 	</bean>
 	<bean id="eyeMoveFilter" class="tesuji.games.go.monte_carlo.EyeMoveFilter" singleton="false"/>
 	
-	<bean id="patternMatcher" class="tesuji.games.go.monte_carlo.MatchPatterns" singleton="true">
+	<bean id="patternMatcher" class="tesuji.games.go.monte_carlo.move_generator.MatchPatterns" singleton="true">
 		<constructor-arg>
 			<value>GenTest</value>
 		</constructor-arg>
@@ -83,17 +83,17 @@
 				</property>
 				<property name="simulationMoveGeneratorList">
 					<list>
-						<bean class="tesuji.games.go.monte_carlo.ImmediateAtariEscape" singleton="false"/>
-						<bean class="tesuji.games.go.monte_carlo.ImmediateCapture" singleton="false"/>
-						<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"/>
-						<ref bean="patternMatcher"/>
+						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"/>
+						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"/>
+						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"/>
+						<!--<ref bean="patternMatcher"/>-->
 					</list>
 				</property>
 				<property name="explorationMoveGeneratorList">
 					<list>
-						<bean class="tesuji.games.go.monte_carlo.ImmediateAtariEscape" singleton="false"><property name="urgency"><value>5</value></property></bean>
-						<bean class="tesuji.games.go.monte_carlo.ImmediateCapture" singleton="false"><property name="urgency"><value>5</value></property></bean>
-						<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"><property name="urgency"><value>5</value></property></bean>
+						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"><property name="urgency"><value>5</value></property></bean>
+						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"><property name="urgency"><value>5</value></property></bean>
+						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"><property name="urgency"><value>5</value></property></bean>
 						<ref bean="patternMatcher"/>
 					</list>
 				</property>

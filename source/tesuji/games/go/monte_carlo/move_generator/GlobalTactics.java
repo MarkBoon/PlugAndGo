@@ -1,4 +1,4 @@
-package tesuji.games.go.monte_carlo;
+package tesuji.games.go.monte_carlo.move_generator;
 
 import static tesuji.games.general.ColorConstant.opposite;
 import static tesuji.games.go.common.GoConstant.UNDEFINED_COORDINATE;
@@ -19,13 +19,13 @@ public class GlobalTactics extends LadderMoveGenerator
 		if (administration.getMoveStack().getSize()==0)
 			return UNDEFINED_COORDINATE;
 
-		byte[] board = administration._board;
-		int[] chain = administration._chain;
-		int[] liberties = administration._liberties;
-		int previousMove = administration._previousMove;
+		byte[] board = administration.getBoardArray();
+		int[] chain = administration.getChainArray();
+		int[] liberties = administration.getLibertyArray();
+		int previousMove = administration.getLastMove();
 		byte colorToMove = administration.getColorToMove();
 		byte oppositeColor = opposite(colorToMove);
-		int koPoint = administration._koPoint;
+		int koPoint = administration.getKoPoint();
 
 		_boardMarker.getNewMarker();
 		for (int i=FIRST; i<=LAST; i++)

@@ -40,6 +40,7 @@ import tesuji.games.go.common.GoMove;
 import tesuji.games.go.common.GoMoveFactory;
 import tesuji.games.go.common.Util;
 
+import tesuji.games.go.monte_carlo.move_generator.MoveGenerator;
 import tesuji.games.go.util.ArrayFactory;
 import tesuji.games.go.util.BoardMarker;
 import tesuji.games.go.util.DiagonalCursor;
@@ -48,6 +49,7 @@ import tesuji.games.go.util.GoArray;
 import tesuji.games.go.util.IntStack;
 import tesuji.games.go.util.PointSet;
 import tesuji.games.go.util.PointSetFactory;
+import tesuji.games.go.util.ProbabilityMap;
 import tesuji.games.go.util.SGFUtil;
 import tesuji.games.gtp.GTPCommand;
 import tesuji.games.model.BoardChangeSupport;
@@ -157,7 +159,7 @@ public class MonteCarloPluginAdministration
 	protected PointSet _emptyPoints;
 	
 	protected BoardChangeSupport _simulationMoveSupport;
-	protected BoardChangeSupport _explorationMoveSupport;
+	public BoardChangeSupport _explorationMoveSupport;
 	protected byte[] _board;
 
 	/**
@@ -219,6 +221,8 @@ public class MonteCarloPluginAdministration
 		
 	protected BoardMarker _boardMarker;
 
+	private ProbabilityMap _probabilityMap;
+
 	private boolean _isTestVersion;
 	
 	protected int _lastRandomNumber;
@@ -269,6 +273,8 @@ public class MonteCarloPluginAdministration
 		_stoneAge = GoArray.createIntegers();
 		
 		_boardMarker = new BoardMarker();
+		
+		_probabilityMap = new ProbabilityMap(RANDOM);
 	}
 
 	protected MonteCarloPluginAdministration(int boardSize)
@@ -308,7 +314,7 @@ public class MonteCarloPluginAdministration
 		GoArray.clear(_white);
 
 		GoArray.clear(_stoneAge);
-		
+
 		_ownNeighbours = _blackNeighbours;
 		_otherNeighbours = _whiteNeighbours;
 		_ownDiagonalNeighbours = _blackDiagonalNeighbours;
@@ -316,6 +322,8 @@ public class MonteCarloPluginAdministration
 		
 		_koPoint = UNDEFINED_COORDINATE;
 		
+		_probabilityMap.reset();
+
 		for (int i=FIRST; i<=LAST; i++)
 		{
 			if (_board[i]!=EDGE)
@@ -331,9 +339,11 @@ public class MonteCarloPluginAdministration
 				else
 					_maxDiagonalsOccupied[i] = 2;
 				
-				_emptyPoints.add(i);
-				
+				_emptyPoints.add(i);			
 			}
+			else 
+				_probabilityMap.reset(i);
+			
 			for (int n=0; n<4; n++)
 			{
 				int next = FourCursor.getNeighbour(i, n);
@@ -403,6 +413,7 @@ public class MonteCarloPluginAdministration
 		
 		_moveStack.copyFrom(source._moveStack);
 		_checksumStack.copyFrom(source._checksumStack);
+		_probabilityMap.copyFrom(source._probabilityMap);
 		
 		_ownNeighbours = source._ownNeighbours;
 		_otherNeighbours = source._otherNeighbours;
@@ -712,9 +723,13 @@ public class MonteCarloPluginAdministration
 		_playoutStart = _moveStack.getSize();
 		while (true)
 		{
+			assert(_probabilityMap.isConsistent());
 			selectAndPlay();
-			
-			// Check some of the criteria that end a game.
+
+//    		System.out.println( "\n" + GoArray.toString(_board) + "\n");
+			assert _emptyPoints.isConsistent(_board);
+
+    		// Check some of the criteria that end a game.
 			if (getNrPasses()>1)
 			{
 				_inPlayout = false;
@@ -903,7 +918,7 @@ public class MonteCarloPluginAdministration
 		if (priorityMove!=PASS && priorityMove!=UNDEFINED_COORDINATE && isLegal(priorityMove))
 			return priorityMove;
 		
-		return selectRandomMoveCoordinate(emptyPoints, _simulationMoveFilterList);
+		return selectWeightedMoveCoordinate(emptyPoints, _simulationMoveFilterList);
 	}
 	
 	/**
@@ -930,8 +945,43 @@ public class MonteCarloPluginAdministration
 	 * @return coordinate of a move that's legal and not 'verboten',
 	 * i.e. does something terrible like filling an own eye.
 	 */
+	protected int selectWeightedMoveCoordinate(PointSet emptyPoints, List<MoveFilter> filterList)
+	{
+		while (emptyPoints.getSize()!=0 && _probabilityMap.hasPoints())
+		{
+			int xy = _probabilityMap.getCoordinate();
+			if (!isVerboten(xy,filterList) && isLegal(xy))
+			{
+				while (!_illegalStack.isEmpty())
+				{
+					int illegalXY = _illegalStack.pop();
+					emptyPoints.add(illegalXY);
+					_probabilityMap.add(illegalXY);
+				}
+				assert(_probabilityMap.isConsistent());
+				return xy;
+			}
+			emptyPoints.remove(xy);
+			_illegalStack.push(xy);
+			_probabilityMap.reset(xy);
+		}
+//		if ((emptyPoints.getSize()==0 && _probabilityMap.hasPoints()) || (emptyPoints.getSize()!=0 && !_probabilityMap.hasPoints()))
+//			System.err.println("Inconsistent!");
+		assert((emptyPoints.getSize()!=0)==_probabilityMap.hasPoints());
+		while (!_illegalStack.isEmpty())
+		{
+			int illegalXY = _illegalStack.pop();
+			emptyPoints.add(illegalXY);
+			_probabilityMap.add(illegalXY);
+		}
+
+		assert(_probabilityMap.isConsistent());
+		return PASS;
+	}
+
 	protected int selectRandomMoveCoordinate(PointSet emptyPoints, List<MoveFilter> filterList)
 	{
+		assert(_illegalStack.isEmpty());
 		while (emptyPoints.getSize()!=0)
 		{
 			int xy = emptyPoints.get(RANDOM.nextInt(emptyPoints.getSize()));
@@ -1100,6 +1150,7 @@ public class MonteCarloPluginAdministration
 			_whiteDiagonalNeighbours[right(above)]++;
 			_whiteDiagonalNeighbours[right(below)]++;			
 		}
+		_probabilityMap.reset(xy);
 	}
 
 	/**
@@ -1167,6 +1218,7 @@ public class MonteCarloPluginAdministration
 			_whiteDiagonalNeighbours[right(above)]--;
 			_whiteDiagonalNeighbours[right(below)]--;		
 		}
+		_probabilityMap.add(xy);
 	}
 
 	/*
@@ -1202,7 +1254,7 @@ public class MonteCarloPluginAdministration
     	{
     		int xy = _emptyPoints.get(i);
     		
-    		assert _board[xy]==EMPTY : SGFUtil.createSGF(getMoveStack());
+    		assert _board[xy]==EMPTY : "\n" + GoArray.toString(_board) + "\n" + SGFUtil.createSGF(getMoveStack());
 //    		assert _boardModel.get(xy)==EMPTY : SGFUtil.createSGF(getMoveStack());
     		
     		if (_blackNeighbours[xy]==_neighbours[xy])
@@ -1448,7 +1500,7 @@ public class MonteCarloPluginAdministration
 		}
     }
     
-    protected void addPriorityMove(int xy, int urgency, int visits, int wins)
+    public void addPriorityMove(int xy, int urgency, int visits, int wins)
     {
     	_priorityMoveStack.push(xy);
     	_urgencyStack.push(urgency);
@@ -1526,6 +1578,11 @@ public class MonteCarloPluginAdministration
     public byte[] getWhiteOwnership()
     {
     	return _white;
+    }
+    
+    public ProbabilityMap getProbabilityMap()
+    {
+    	return _probabilityMap;
     }
     
     /**
@@ -1706,6 +1763,31 @@ public class MonteCarloPluginAdministration
     	}
     }
     
+    public int getLastMove()
+    {
+    	return _previousMove;
+    }
+    
+    public int getKoPoint()
+    {
+    	return _koPoint;
+    }
+    
+    public byte[] getBoardArray()
+    {
+    	return _board;
+    }
+    
+    public int[] getChainArray()
+    {
+    	return _chain;
+    }
+    
+    public int[] getLibertyArray()
+    {
+    	return _liberties;
+    }
+    
     public byte[] getBlackNeighbourArray()
     {
     	return _blackNeighbours;
@@ -1729,5 +1811,15 @@ public class MonteCarloPluginAdministration
     public byte[] getMaxDiagonalArray()
     {
     	return _maxDiagonalsOccupied;
+    }
+    
+    public byte[] getOwnDiagonalAray()
+    {
+    	return _ownDiagonalNeighbours;
+    }
+    
+    public byte[] getOtherDiagonalAray()
+    {
+    	return _ownDiagonalNeighbours;
     }
 }

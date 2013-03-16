@@ -6,22 +6,21 @@ import tesuji.core.util.MersenneTwisterFast;
 
 public class ProbabilityMap
 {
-	private static final double DEFAULT = 0.001;
-	private static MersenneTwisterFast _random = new MersenneTwisterFast(System.nanoTime());
+	private static final double ERROR_MARGIN = 0.000000001;
+	private static final double DEFAULT = Math.sqrt(ERROR_MARGIN);
+	private MersenneTwisterFast _random;
 
 	private double[] _weights;
-	private double[] _columnSum;
 	private double[] _rowSum;
 	private double _total;
 	
-	public ProbabilityMap()
+	public ProbabilityMap(MersenneTwisterFast randomNumberGenerator)
 	{
+		_random = randomNumberGenerator;
 		_weights = GoArray.createDoubles();
-		_columnSum = new double[GoArray.WIDTH];
 		_rowSum = new double[GoArray.WIDTH];
 		
-		for (int i=GoArray.FIRST; i<GoArray.LAST; i++)
-			add(i,DEFAULT);
+		reset();
 	}
 	
 	public double getWeight(int xy)
@@ -31,10 +30,8 @@ public class ProbabilityMap
 
 	public void add(int xy, double weight)
 	{
-		int x = GoArray.getX(xy);
-		int y = GoArray.getX(xy);
+		int y = GoArray.getY(xy);
 		_weights[xy] += weight;
-		_columnSum[x] += weight;
 		_rowSum[y] += weight;
 		_total += weight;
 	}
@@ -46,21 +43,17 @@ public class ProbabilityMap
 	
 	public void subtract(int xy, double weight)
 	{
-		int x = GoArray.getX(xy);
-		int y = GoArray.getX(xy);
+		int y = GoArray.getY(xy);
 		_weights[xy] -= weight;
-		_columnSum[x] -= weight;
 		_rowSum[y] -= weight;
 		_total -= weight;
 	}
 
 	public void reset(int xy)
 	{
-		int x = GoArray.getX(xy);
-		int y = GoArray.getX(xy);
+		int y = GoArray.getY(xy);
 		double weight = _weights[xy];
 		_weights[xy] = 0.0;
-		_columnSum[x] -= weight;
 		_rowSum[y] -= weight;
 		_total -= weight;
 	}
@@ -68,32 +61,58 @@ public class ProbabilityMap
 	public void reset()
 	{
 		GoArray.clear(_weights);
-		Arrays.fill(_columnSum,0);
 		Arrays.fill(_rowSum,0);
 		_total = 0.0;
+		
+		for (int i=GoArray.FIRST; i<GoArray.LAST; i++)
+			add(i,DEFAULT);
 	}
 	
 	public int getCoordinate()
 	{
-		double columnValue = _random.nextDouble() * _total;
-		double rowValue = _random.nextDouble() * _total;
-		int x = 0;
+		double randomValue = _random.nextDouble() * _total;
+		assert( randomValue<_total);
 		int y = 0;
-		double tmpColumnSum = 0.0;
-		while (tmpColumnSum<=columnValue)
-			tmpColumnSum += _columnSum[++x];
-		double tmpRowSum = 0.0;
-		while (tmpRowSum<=rowValue)
-			tmpRowSum += _rowSum[++x];
+		double tmpSum = 0.0;
+		while (tmpSum<=randomValue)
+			tmpSum += _rowSum[++y];
 		
-		return GoArray.toXY(x, y);
+		assert(y<GoArray.WIDTH);
+		
+		tmpSum -= _rowSum[y];
+		int xy = y * GoArray.WIDTH;
+		while (tmpSum<=randomValue)
+			tmpSum += _weights[++xy];
+		
+		assert(_weights[xy]!=0.0);
+		return xy;
 	}
 	
 	public void copyFrom(ProbabilityMap source)
 	{
 		System.arraycopy(source._weights,0,_weights,0,GoArray.MAX);
-		System.arraycopy(source._columnSum,0,_columnSum,0,GoArray.WIDTH);
 		System.arraycopy(source._rowSum,0,_rowSum,0,GoArray.WIDTH);
 		_total = source._total;
+	}
+	
+	public boolean hasPoints()
+	{
+		return _total > ERROR_MARGIN;
+	}
+	
+	public boolean isConsistent()
+	{
+		double total = 0.0;
+		double rowTotal = 0.0;
+		
+		for (int i=GoArray.FIRST; i<GoArray.LAST; i++)
+			total += _weights[i];
+		for (int i=0; i<GoArray.WIDTH; i++)
+			rowTotal += _rowSum[i];
+		
+		assert(Math.abs(_total-total)<ERROR_MARGIN);
+		assert(Math.abs(_total-rowTotal)<ERROR_MARGIN);
+		
+		return true;
 	}
 }

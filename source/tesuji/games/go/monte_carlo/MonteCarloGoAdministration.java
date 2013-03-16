@@ -46,7 +46,6 @@ import tesuji.games.go.util.GoArray;
 import tesuji.games.go.util.IntStack;
 import tesuji.games.go.util.PointSet;
 import tesuji.games.go.util.PointSetFactory;
-import tesuji.games.go.util.ProbabilityMap;
 import tesuji.games.go.util.SGFUtil;
 import tesuji.games.gtp.GTPCommand;
 import tesuji.games.model.BoardModel;
@@ -219,8 +218,6 @@ public class MonteCarloGoAdministration
 	
 	private ArrayStack<GoMoveIterator> _iteratorPool =	new ArrayStack<GoMoveIterator>();
 	
-	private ProbabilityMap _probabilityMap;
-
 	private boolean _spreadTest = false;
 
 	
@@ -255,8 +252,6 @@ public class MonteCarloGoAdministration
 		_stoneAge = GoArray.createIntegers();
 		
 		_boardMarker = new BoardMarker();
-		
-		_probabilityMap = new ProbabilityMap();
 	}
 
 	protected MonteCarloGoAdministration(int boardSize)
@@ -321,8 +316,6 @@ public class MonteCarloGoAdministration
 				_emptyPoints.add(i);
 				
 			}
-			else 
-				_probabilityMap.reset(i);
 	
 			for (int n=0; n<4; n++)
 			{
@@ -391,7 +384,6 @@ public class MonteCarloGoAdministration
 		
 		_moveStack.copyFrom(source._moveStack);
 		_checksumStack.copyFrom(source._checksumStack);
-		_probabilityMap.copyFrom(source._probabilityMap);
 		
 		_ownNeighbours = source._ownNeighbours;
 		_otherNeighbours = source._otherNeighbours;
@@ -903,6 +895,7 @@ public class MonteCarloGoAdministration
 	
 	protected int selectRandomMoveCoordinate(PointSet emptyPoints)
 	{
+		assert(_illegalStack.isEmpty());
 		while (emptyPoints.getSize()!=0)
 		{
 			int xy = emptyPoints.get(RANDOM.nextInt(emptyPoints.getSize()));
@@ -916,7 +909,10 @@ public class MonteCarloGoAdministration
 			_illegalStack.push(xy);
 		}
 		while (!_illegalStack.isEmpty())
-			emptyPoints.add(_illegalStack.pop());
+		{
+			int xy = _illegalStack.pop();
+			emptyPoints.add(xy);
+		}
 
 		return PASS;
 	}
@@ -1023,7 +1019,6 @@ public class MonteCarloGoAdministration
 			_whiteDiagonalNeighbours[right(above)]++;
 			_whiteDiagonalNeighbours[right(below)]++;			
 		}
-		_probabilityMap.reset(xy);
 	}
 
 	/**
@@ -1091,7 +1086,6 @@ public class MonteCarloGoAdministration
 			_whiteDiagonalNeighbours[right(above)]--;
 			_whiteDiagonalNeighbours[right(below)]--;		
 		}
-		_probabilityMap.add(xy);
 	}
 
 	/*

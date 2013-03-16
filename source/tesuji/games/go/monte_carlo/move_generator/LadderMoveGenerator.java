@@ -1,5 +1,6 @@
-package tesuji.games.go.monte_carlo;
+package tesuji.games.go.monte_carlo.move_generator;
 
+import tesuji.games.go.monte_carlo.MonteCarloPluginAdministration;
 import tesuji.games.go.tactics.LadderReader;
 
 public abstract class LadderMoveGenerator extends AbstractMoveGenerator
@@ -18,6 +19,7 @@ public abstract class LadderMoveGenerator extends AbstractMoveGenerator
 	@Override
 	public void copyDataFrom(MoveGenerator source)
 	{
+		super.copyDataFrom(source);
 		checkHistory = ((LadderMoveGenerator)source).checkHistory;
 	}
 

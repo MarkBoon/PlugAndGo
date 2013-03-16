@@ -52,16 +52,16 @@
 		</property>
 		<property name="simulationMoveGeneratorList">
 			<list>
-				<bean class="tesuji.games.go.monte_carlo.ImmediateAtariEscape" singleton="false"><property name="checkHistory"><value>true</value></property></bean>
-				<bean class="tesuji.games.go.monte_carlo.ImmediateCapture" singleton="false"><property name="checkHistory"><value>true</value></property></bean>
-				<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"><property name="checkHistory"><value>true</value></property></bean>
+				<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"><property name="checkHistory"><value>true</value></property></bean>
+				<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"><property name="checkHistory"><value>true</value></property></bean>
+				<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"><property name="checkHistory"><value>true</value></property></bean>
 			</list>
 		</property>
 		<!--<property name="explorationMoveGeneratorList">
 			<list>
-				<bean class="tesuji.games.go.monte_carlo.ImmediateAtariEscape" singleton="false"/>
-				<bean class="tesuji.games.go.monte_carlo.ImmediateCapture" singleton="false"/>
-				<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"/>
+				<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"/>
+				<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"/>
+				<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"/>
 			</list>
 		</property>-->
 	</bean>

@@ -1,4 +1,4 @@
-package tesuji.games.go.monte_carlo;
+package tesuji.games.go.monte_carlo.move_generator;
 
 import static tesuji.games.go.common.GoConstant.PASS;
 import static tesuji.games.go.common.GoConstant.UNDEFINED_COORDINATE;
@@ -14,14 +14,14 @@ public class ImmediateLadder extends LadderMoveGenerator
 		if (administration.getMoveStack().getSize()==0)
 			return UNDEFINED_COORDINATE;
 
-		byte[] board = administration._board;
-		int[] chain = administration._chain;
-		int[] liberties = administration._liberties;
-		byte[] ownDiagonalNeighbours = administration._ownDiagonalNeighbours;
-		byte[] otherDiagonalNeighbours = administration._otherDiagonalNeighbours;
-		byte[] maxDiagonalsOccupied = administration._maxDiagonalsOccupied;
+		byte[] board = administration.getBoardArray();
+		int[] chain = administration.getChainArray();
+		int[] liberties = administration.getLibertyArray();
+		byte[] ownDiagonalNeighbours = administration.getOwnDiagonalAray();
+		byte[] otherDiagonalNeighbours = administration.getOtherDiagonalAray();
+		byte[] maxDiagonalsOccupied = administration.getMaxDiagonalArray();
 		int previousMove = administration.getMoveStack().peek();
-		int koPoint = administration._koPoint;
+		int koPoint = administration.getKoPoint();
 		
 		if (previousMove==PASS)
 			return UNDEFINED_COORDINATE;
@@ -37,7 +37,10 @@ public class ImmediateLadder extends LadderMoveGenerator
 			{
 				int ladderXY = _ladderReader.getLastLadderMove();
 				if (administration.isLegal(ladderXY))
-					return ladderXY;
+				{
+					administration.getProbabilityMap().add(ladderXY, 0.3);
+					//return ladderXY;
+				}
 			}
 		}
 

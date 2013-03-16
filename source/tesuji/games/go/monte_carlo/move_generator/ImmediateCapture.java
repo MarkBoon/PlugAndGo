@@ -1,4 +1,4 @@
-package tesuji.games.go.monte_carlo;
+package tesuji.games.go.monte_carlo.move_generator;
 
 import static tesuji.games.go.common.GoConstant.PASS;
 import static tesuji.games.go.common.GoConstant.UNDEFINED_COORDINATE;
@@ -14,11 +14,11 @@ public class ImmediateCapture extends LadderMoveGenerator
 		if (administration.getMoveStack().getSize()==0)
 			return UNDEFINED_COORDINATE;
 
-		byte[] board = administration._board;
-		int[] chain = administration._chain;
-		int[] liberties = administration._liberties;
+		byte[] board = administration.getBoardArray();
+		int[] chain = administration.getChainArray();
+		int[] liberties = administration.getLibertyArray();
 		int previousMove = administration.getMoveStack().peek();
-		int koPoint = administration._koPoint;
+		int koPoint = administration.getKoPoint();
 		
 		if (previousMove==PASS)
 			return UNDEFINED_COORDINATE;
@@ -33,7 +33,10 @@ public class ImmediateCapture extends LadderMoveGenerator
 			{
 				int captureXY = administration.getLiberty(previousMove);
 				if (administration.isLegal(captureXY))
-					return captureXY;
+				{
+					administration.getProbabilityMap().add(captureXY, 0.4);
+//					return captureXY;
+				}
 			}
 		}
 

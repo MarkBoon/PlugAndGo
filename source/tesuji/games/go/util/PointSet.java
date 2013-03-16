@@ -26,6 +26,7 @@
 
 package tesuji.games.go.util;
 
+import static tesuji.games.general.ColorConstant.EMPTY;
 import static tesuji.games.go.util.GoArray.copy;
 import static tesuji.games.go.util.GoArray.createShorts;
 import tesuji.core.util.FlyWeight;
@@ -102,5 +103,13 @@ public class PointSet
 	{
 		_nrPoints = 0;
 		_owner.push(this);
+	}
+	
+	public boolean isConsistent(byte[] board)
+	{
+    	for (int i=getSize(); --i>=0;)
+    		assert board[get(i)]==EMPTY : "\n" + GoArray.toString(board) + "\n";    		
+    	
+    	return true;
 	}
 }
