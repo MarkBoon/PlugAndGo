@@ -8,9 +8,9 @@ import static tesuji.games.go.util.GoArray.left;
 import static tesuji.games.go.util.GoArray.right;
 import tesuji.games.general.ColorConstant;
 import tesuji.games.go.common.GoConstant;
-import tesuji.games.go.util.FourCursor;
+import tesuji.games.go.util.EightCursor;
 
-public class Cut extends LadderMoveGenerator
+public class Connect extends LadderMoveGenerator
 {
 	@Override
 	public int generate()
@@ -18,11 +18,11 @@ public class Cut extends LadderMoveGenerator
 		int xy = administration.getLastMove();
 		if (xy!=GoConstant.PASS)
 		{
-			byte color = administration.getColorToMove();
+			byte oppositeColor = ColorConstant.opposite(administration.getColorToMove());
 			for (int n=0; n<4; n++)
 			{
-				int neighbour = FourCursor.getNeighbour(xy, n);
-				if (isCut(neighbour,color) && isSafeToMove(neighbour))
+				int neighbour = EightCursor.getNeighbour(xy, n);
+				if (isConnection(neighbour,oppositeColor) && isSafeToMove(neighbour))
 					administration.getProbabilityMap().add(neighbour, getWeight());
 			}
 		}
@@ -30,7 +30,7 @@ public class Cut extends LadderMoveGenerator
 		return UNDEFINED_COORDINATE;
 	}
 
-	private boolean isCut(int xy, byte color)
+	private boolean isConnection(int xy, byte color)
 	{
 		byte[] blackNeighbours = administration.getBlackNeighbourArray();
 		byte[] whiteNeighbours = administration.getWhiteNeighbourArray();
@@ -42,9 +42,8 @@ public class Cut extends LadderMoveGenerator
 			return false;
 		
 		byte otherColor = opposite(color);
-		if (board[left(xy)]==otherColor && board[above(xy)]==otherColor
-				&& board[left(above(xy))]==color && liberties[chain[left(above(xy))]]!=1
-				&& (board[right(xy)]==color || board[below(xy)]==color))
+		if (board[left(xy)]==otherColor && board[above(xy)]==otherColor && board[left(above(xy))]==color 
+				&& liberties[chain[left(above(xy))]]!=1 && (board[right(xy)]==color || board[below(xy)]==color))
 			return true;
 		if (board[left(xy)]==otherColor && board[below(xy)]==otherColor && board[left(below(xy))]==color
 			&& liberties[chain[left(below(xy))]]!=1 && (board[right(xy)]==color || board[above(xy)]==color))
@@ -62,7 +61,7 @@ public class Cut extends LadderMoveGenerator
 	@Override
 	public MoveGenerator createClone()
 	{
-		return new Cut();
+		return new Connect();
 	}
 
 //	@Override

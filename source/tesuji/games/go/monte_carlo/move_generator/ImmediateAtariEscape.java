@@ -38,7 +38,7 @@ public class ImmediateAtariEscape extends LadderMoveGenerator
 				int chainNext = chain[next];
 				if (_boardMarker.notSet(chainNext))
 				{
-					if (liberties[chainNext]==1 && (!isCheckHistory() || administration.isPrehistoric(chainNext)))
+					if (liberties[chainNext]==1 && (!isCheckHistory() || administration.isPrehistoricChain(chainNext)))
 					{
 						_boardMarker.set(chainNext);
 						_ladderReader.setBoardArray(board);

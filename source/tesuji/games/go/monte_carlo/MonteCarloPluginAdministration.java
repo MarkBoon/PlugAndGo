@@ -365,6 +365,11 @@ public class MonteCarloPluginAdministration
 		_liberties[0] = 1000;
 	}
 	
+	public boolean isFirstRow(int xy)
+	{
+		return _maxDiagonalsOccupied[xy]==1;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see tesuji.games.go.monte_carlo.MonteCarloAdministration#copyDataFrom(tesuji.games.go.monte_carlo.MonteCarloAdministration)
@@ -1714,9 +1719,14 @@ public class MonteCarloPluginAdministration
 		}
 	}
 
-    public boolean isPrehistoric(int chain)
+    public boolean isPrehistoricChain(int chain)
     {
     	return (_stoneAge[chain]<=_playoutStart);
+    }
+    
+    public boolean isPrehistoricStone(int xy)
+    {
+    	return (_stoneAge[_chain[xy]]<=_playoutStart);
     }
     
     public void setSimulationMoveFilterList(List<MoveFilter> list)
@@ -1788,6 +1798,11 @@ public class MonteCarloPluginAdministration
     	return _liberties;
     }
     
+    public byte[] getNeighbourArray()
+    {
+    	return _neighbours;
+    }
+    
     public byte[] getBlackNeighbourArray()
     {
     	return _blackNeighbours;
@@ -1821,5 +1836,5 @@ public class MonteCarloPluginAdministration
     public byte[] getOtherDiagonalAray()
     {
     	return _ownDiagonalNeighbours;
-    }
+    }    
 }

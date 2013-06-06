@@ -27,7 +27,7 @@ public class ImmediateLadder extends LadderMoveGenerator
 			return UNDEFINED_COORDINATE;
 		
 		int currentChain = chain[previousMove];
-		if (liberties[currentChain]==2 && (!isCheckHistory() || administration.isPrehistoric(currentChain))
+		if (liberties[currentChain]==2 && (!isCheckHistory() || administration.isPrehistoricChain(currentChain))
 			&& (maxDiagonalsOccupied[previousMove]>1 || ownDiagonalNeighbours[previousMove]>0 || otherDiagonalNeighbours[previousMove]>0))
 		{
 			_ladderReader.setBoardArray(board);

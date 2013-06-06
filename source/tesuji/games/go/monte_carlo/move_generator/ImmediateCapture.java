@@ -24,7 +24,7 @@ public class ImmediateCapture extends LadderMoveGenerator
 			return UNDEFINED_COORDINATE;
 		
 		int currentChain = chain[previousMove];
-		if (liberties[currentChain]==1  && (!isCheckHistory() || administration.isPrehistoric(currentChain)))
+		if (liberties[currentChain]==1  && (!isCheckHistory() || administration.isPrehistoricChain(currentChain)))
 		{
 			_ladderReader.setBoardArray(board);
 			_ladderReader.setKoPoint(koPoint);

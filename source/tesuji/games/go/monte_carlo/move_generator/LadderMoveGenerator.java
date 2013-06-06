@@ -1,7 +1,10 @@
 package tesuji.games.go.monte_carlo.move_generator;
 
+import static tesuji.games.general.ColorConstant.BLACK;
+import static tesuji.games.general.ColorConstant.WHITE;
 import tesuji.games.go.monte_carlo.MonteCarloPluginAdministration;
 import tesuji.games.go.tactics.LadderReader;
+import tesuji.games.go.tactics.TacticsConstant;
 
 public abstract class LadderMoveGenerator extends AbstractMoveGenerator
 {
@@ -32,4 +35,20 @@ public abstract class LadderMoveGenerator extends AbstractMoveGenerator
     {
 	    this.checkHistory = checkHistory;
     }
+
+	   protected boolean isSafeToMove(int moveXY)
+	   {
+			_ladderReader.setBoardArray(administration.getBoardArray());
+			_ladderReader.setKoPoint(administration.getKoPoint());
+			return (_ladderReader.wouldBeLadder(moveXY,BLACK)==TacticsConstant.CANNOT_CATCH
+				&& _ladderReader.wouldBeLadder(moveXY,WHITE)==TacticsConstant.CANNOT_CATCH);
+	   }
+
+	   protected boolean isSafeToMove(int moveXY, byte color)
+	   {
+			_ladderReader.setBoardArray(administration.getBoardArray());
+			_ladderReader.setKoPoint(administration.getKoPoint());
+			return (_ladderReader.wouldBeLadder(moveXY,color)==TacticsConstant.CANNOT_CATCH);
+	   }
+
 }
