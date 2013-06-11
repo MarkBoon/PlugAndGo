@@ -272,6 +272,11 @@ public class ArrayList<Type>
 		return _capacity;
 	}
 	
+	public boolean contains(Type o)
+	{
+		return indexOf(o)>=0;
+	}
+	
 	/**
 	 * @param o is the object to look up.
 	 * @return the index at which an object exists in the list. It returns -1

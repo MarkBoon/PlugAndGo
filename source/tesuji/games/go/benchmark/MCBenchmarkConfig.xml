@@ -6,7 +6,7 @@
 	
 		<!-- Benchmark parameters -->
 		<property name="boardSize">
-			<value>9</value>
+			<value>19</value>
 		</property>
 		<property name="komi">
 			<value>0.5</value>
@@ -52,9 +52,9 @@
 		</property>
 		<property name="simulationMoveGeneratorList">
 			<list>
-				<bean class="tesuji.games.go.monte_carlo.ImmediateAtariEscape" singleton="false"><property name="checkHistory"><value>true</value></property></bean>
-				<bean class="tesuji.games.go.monte_carlo.ImmediateCapture" singleton="false"><property name="checkHistory"><value>true</value></property></bean>
-				<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"><property name="checkHistory"><value>true</value></property></bean>
+				<!-- <bean class="tesuji.games.go.monte_carlo.ImmediateAtariEscape" singleton="false"/>
+				<bean class="tesuji.games.go.monte_carlo.ImmediateCapture" singleton="false"/>
+				<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"/> -->
 			</list>
 		</property>
 		<!--<property name="explorationMoveGeneratorList">

@@ -353,6 +353,24 @@ public class MonteCarloPluginAdministration
 		_moveStack.clear();
 		_checksumStack.clear();
 		_liberties[0] = 1000;
+
+		for (int i=_simulationMoveFilterList.size(); --i>=0;)
+		{
+			_simulationMoveFilterList.get(i).clear();
+		}
+		for (int i=_explorationMoveFilterList.size(); --i>=0;)
+		{
+			_explorationMoveFilterList.get(i).clear();
+		}
+		
+		for (int i=_simulationMoveGeneratorList.size(); --i>=0;)
+		{
+			_simulationMoveGeneratorList.get(i).clear();
+		}
+		for (int i=_explorationMoveGeneratorList.size(); --i>=0;)
+		{
+			_explorationMoveGeneratorList.get(i).clear();
+		}
 	}
 	
 	/*
@@ -683,7 +701,7 @@ public class MonteCarloPluginAdministration
 			clone._explorationMoveGeneratorList.add(clonedGenerator);
 			clonedGenerator.register(clone);
 			if (clonedGenerator instanceof BoardModelListener)
-				clone._simulationMoveSupport.addBoardModelListener((BoardModelListener)clonedGenerator);
+				clone._explorationMoveSupport.addBoardModelListener((BoardModelListener)clonedGenerator);
 		}
 		
 		clone.copyDataFrom(this);
@@ -871,6 +889,8 @@ public class MonteCarloPluginAdministration
 	@Override
     public boolean isGameFinished()
     {
+		if (_moveStack.isEmpty())
+			return false;
 		if (_moveStack.peek() == PASS && _moveStack.peek(1) == PASS && _moveStack.peek(2) == PASS)
 			return true;
 
@@ -1038,6 +1058,12 @@ public class MonteCarloPluginAdministration
 //		byte[] board = _boardModel.getSingleArray();
 //		_boardModel.set(xy, _colorToPlay);
 		_board[xy] = _colorToPlay;
+
+		if (_inPlayout)
+			_simulationMoveSupport.sendChange(xy, _colorToPlay, EMPTY);
+		else
+			_explorationMoveSupport.sendChange(xy, _colorToPlay, EMPTY);
+
 		_emptyPoints.remove(xy);
 		_checksum.add(xy, _colorToPlay);
 		
@@ -1106,6 +1132,12 @@ public class MonteCarloPluginAdministration
 			_board[xy] = EMPTY;
 //		else
 //			_boardModel.set(xy, EMPTY);
+
+		if (_inPlayout)
+			_simulationMoveSupport.sendChange(xy, EMPTY, _oppositeColor);
+		else
+			_explorationMoveSupport.sendChange(xy, EMPTY, _oppositeColor);
+		
 		_emptyPoints.add(xy);
 		_checksum.remove(xy, _oppositeColor);
 

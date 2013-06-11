@@ -84,6 +84,7 @@
   	</bean>
 
 	<bean id="eyeMoveFilter" class="tesuji.games.go.monte_carlo.EyeMoveFilter" singleton="false"/>
+	<bean id="fogOfWarFilter" class="tesuji.games.go.monte_carlo.FogOfWarFilter" singleton="true"/>
 
 	<bean id="Bot3" class="tesuji.games.go.engine.TreeSearchEngine" singleton="false">
   		<property name="jar" value="TreeSearchEngine.jar"/>
@@ -94,27 +95,29 @@
 						<property name="simulationMoveFilterList">
 							<list>
 								<ref bean="eyeMoveFilter"/>
+								<ref bean="fogOfWarFilter"/>
 							</list>
 						</property>
 						<property name="explorationMoveFilterList">
 							<list>
 								<ref bean="eyeMoveFilter"/>
+								<ref bean="fogOfWarFilter"/>
 							</list>
 						</property>
 						<property name="simulationMoveGeneratorList">
 							<list>
-								<bean class="tesuji.games.go.monte_carlo.ImmediateAtariEscape" singleton="false"/>
-								<bean class="tesuji.games.go.monte_carlo.ImmediateCapture" singleton="false"/>
-								<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"/>
+								<bean class="tesuji.games.go.monte_carlo.ImmediateAtariEscape" singleton="false"><property name="checkHistory"><value>false</value></property></bean>
+								<bean class="tesuji.games.go.monte_carlo.ImmediateCapture" singleton="false"><property name="checkHistory"><value>true</value></property></bean>
+								<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"><property name="checkHistory"><value>true</value></property></bean>
 							</list>
 						</property>
-						<!--<property name="explorationMoveGeneratorList">
+						<property name="explorationMoveGeneratorList">
 							<list>
 								<bean class="tesuji.games.go.monte_carlo.ImmediateAtariEscape" singleton="false"><property name="urgency"><value>10</value></property></bean>
 								<bean class="tesuji.games.go.monte_carlo.ImmediateCapture" singleton="false"><property name="urgency"><value>10</value></property></bean>
 								<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"><property name="urgency"><value>10</value></property></bean>
 							</list>
-						</property>-->
+						</property>
 				  	</bean>
 				</property>
 		  		<property name="secondsPerMove">
@@ -148,6 +151,63 @@
 			<bean class="tesuji.games.go.search.MonteCarloTreeSearch" singleton="false">
 				<property name="monteCarloAdministration">
 					<bean class="tesuji.games.go.monte_carlo.MCTacticsAdministration" singleton="false">
+				  	</bean>
+				</property>
+		  		<property name="secondsPerMove">
+		  			<value>0</value>
+		  		</property>
+		  		<property name="nrProcessors">
+		  			<value>1</value>
+		  		</property>
+		  		<property name="minimumNrNodes">
+		  			<value>2000</value>
+		  		</property>
+		  		<property name="useAMAF">
+		  			<value>true</value>
+		  		</property>
+		  		<property name="nrSimulationsBeforeExpansion">
+		  			<value>1</value>
+		  		</property>
+		  		<property name="isTestVersion">
+		  			<value>false</value>
+		  		</property>
+			</bean>
+  		</constructor-arg>
+  		<property name="isTestVersion">
+  			<value>false</value>
+  		</property>
+  	</bean>
+
+	<bean id="Bot5" class="tesuji.games.go.engine.TreeSearchEngine" singleton="false">
+  		<property name="jar" value="TreeSearchEngine.jar"/>
+  		<constructor-arg>
+			<bean class="tesuji.games.go.search.MonteCarloTreeSearch" singleton="false">
+				<property name="monteCarloAdministration">
+					<bean class="tesuji.games.go.monte_carlo.MonteCarloPluginAdministration" singleton="false">
+						<property name="simulationMoveFilterList">
+							<list>
+								<ref bean="eyeMoveFilter"/>
+							</list>
+						</property>
+						<property name="explorationMoveFilterList">
+							<list>
+								<ref bean="eyeMoveFilter"/>
+							</list>
+						</property>
+						<property name="simulationMoveGeneratorList">
+							<list>
+								<bean class="tesuji.games.go.monte_carlo.ImmediateAtariEscape" singleton="false"><property name="checkHistory"><value>false</value></property></bean>
+								<bean class="tesuji.games.go.monte_carlo.ImmediateCapture" singleton="false"><property name="checkHistory"><value>true</value></property></bean>
+								<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"><property name="checkHistory"><value>true</value></property></bean>
+							</list>
+						</property>
+						<property name="explorationMoveGeneratorList">
+							<list>
+								<bean class="tesuji.games.go.monte_carlo.ImmediateAtariEscape" singleton="false"><property name="urgency"><value>10</value></property></bean>
+								<bean class="tesuji.games.go.monte_carlo.ImmediateCapture" singleton="false"><property name="urgency"><value>10</value></property></bean>
+								<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"><property name="urgency"><value>10</value></property></bean>
+							</list>
+						</property>
 				  	</bean>
 				</property>
 		  		<property name="secondsPerMove">

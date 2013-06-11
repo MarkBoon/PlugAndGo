@@ -14,6 +14,9 @@ public class EyeMoveFilter
 	MonteCarloPluginAdministration _administration;
 	
 	@Override
+	public void clear() {}
+	
+	@Override
 	public void register(MonteCarloPluginAdministration administration)
 	{
 		_administration = administration;

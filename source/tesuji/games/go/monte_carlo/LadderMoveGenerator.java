@@ -9,6 +9,9 @@ public abstract class LadderMoveGenerator extends AbstractMoveGenerator
 	private boolean checkHistory = false;
 	
 	@Override
+	public void clear() {}
+	
+	@Override
 	public void register(MonteCarloPluginAdministration admin)
 	{
 		administration = admin;

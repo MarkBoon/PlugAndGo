@@ -43,6 +43,8 @@ public class BoardChangeSupport
     	_hasListeners = true;
         if (!_listeners.contains(listener))
             _listeners.add(listener);
+        else
+        	_hasListeners = true;
     }
     
     public final void removeBoardModelListener(BoardModelListener listener)
@@ -88,8 +90,11 @@ public class BoardChangeSupport
     
     public void sendChange(int xy, byte value, byte oldValue)
     {
-		BoardChange boardChange = BoardChangeFactory.createBoardChange(xy, value, oldValue);
-		sendBoardChange(boardChange);
-		boardChange.recycle();
+    	if (_hasListeners)
+    	{
+			BoardChange boardChange = BoardChangeFactory.createBoardChange(xy, value, oldValue);
+			sendBoardChange(boardChange);
+			boardChange.recycle();
+    	}
     }
 }

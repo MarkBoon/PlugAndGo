@@ -11,22 +11,33 @@ import tesuji.games.model.BoardModelListener;
 
 public class FogOfWarFilter implements MoveFilter, BoardModelListener
 {
+	private int id;
 	private byte[] _fogOfWar;
+	protected MonteCarloPluginAdministration _administration;
 
 	public FogOfWarFilter()
 	{
 	}
 	
 	@Override
-	public void register(MonteCarloPluginAdministration admin)
+	public void clear() 
 	{
-		_fogOfWar = createBytes();
-		byte[] _row = createRowArray(admin.getBoardSize());
+		byte[] _row = createRowArray(_administration.getBoardSize());
 		for (int i=FIRST; i<=LAST; i++)
 		{
 			if (_row[i]<3)
 				_fogOfWar[i] = Byte.MAX_VALUE;
-		}
+			else
+				_fogOfWar[i] = 0;
+		}		
+	}
+	
+	@Override
+	public void register(MonteCarloPluginAdministration administration)
+	{
+		_administration = administration;
+		_fogOfWar = createBytes();
+		clear();
 	}
 
 	@Override
@@ -59,5 +70,23 @@ public class FogOfWarFilter implements MoveFilter, BoardModelListener
 			if (next>=FIRST && next<=LAST)
 				_fogOfWar[next] = 0;
 		}
+    }
+	
+	@Override
+	public boolean equals(Object o)
+	{
+		if (o==null || !(o instanceof FogOfWarFilter))
+			return false;
+		return id==((FogOfWarFilter)o).id;
+	}
+
+	public int getId()
+    {
+    	return id;
+    }
+
+	public void setId(int id)
+    {
+    	this.id = id;
     }
 }
