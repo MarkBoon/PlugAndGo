@@ -925,10 +925,15 @@ public class MonteCarloPluginAdministration
 			return priorityMove;
 		
 		//return selectRandomMoveCoordinate(emptyPoints, _simulationMoveFilterList);
-//		for (int i=_priorityMoveStack.getSize(); --i>=0;)
-//		{
-//			_probabilityMap.
-//		}
+		for (int i=_priorityMoveStack.getSize(); --i>=0;)
+		{
+			int xy = _priorityMoveStack.get(i);
+			double weight = 0.0;
+			if (_boardModel.get(xy)==EMPTY && _winStack.get(i)!=0)
+				weight = (double)_visitStack.get(i)/(double)_winStack.get(i);
+			if (weight!=0.0)
+				_probabilityMap.add(xy,weight);
+		}
 		return selectWeightedMoveCoordinate(emptyPoints, _simulationMoveFilterList);
 	}
 	
@@ -1014,6 +1019,9 @@ public class MonteCarloPluginAdministration
 	protected int selectPriorityMove(List<MoveGenerator> moveGeneratorList)
 	{
 		_priorityMoveStack.clear();
+    	_urgencyStack.clear();
+    	_visitStack.clear();
+    	_winStack.clear();
 		if (_previousMove!=PASS)
 		{
 			int size = moveGeneratorList.size();

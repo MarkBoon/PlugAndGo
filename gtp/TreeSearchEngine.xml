@@ -103,18 +103,23 @@
 						</property>
 						<property name="simulationMoveGeneratorList">
 							<list>
-								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"><property name="weight"><value>0.5</value></property></bean>
+								<!--<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"><property name="weight"><value>0.5</value></property></bean>
 								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"><property name="weight"><value>0.4</value></property></bean>
 								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"><property name="weight"><value>0.3</value></property></bean>
-								<bean class="tesuji.games.go.monte_carlo.move_generator.Cut" singleton="false"><property name="weight"><value>0.1</value></property></bean>
+								<bean class="tesuji.games.go.monte_carlo.move_generator.Cut" singleton="false"><property name="weight"><value>0.3</value></property></bean>
+								<bean class="tesuji.games.go.monte_carlo.move_generator.Connect" singleton="false"><property name="weight"><value>0.3</value></property></bean>-->
+								<bean class="tesuji.games.go.monte_carlo.move_generator.Distance" singleton="false"><property name="weight"><value>0.0001</value></property></bean>
 							</list>
 						</property>
 						<property name="explorationMoveGeneratorList">
 							<list>
-								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"><property name="urgency"><value>5</value></property></bean>
+								<!--<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"><property name="urgency"><value>5</value></property></bean>
 								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"><property name="urgency"><value>5</value></property></bean>
 								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"><property name="urgency"><value>5</value></property></bean>
-								<bean class="tesuji.games.go.monte_carlo.move_generator.GlobalTactics" singleton="false"><property name="urgency"><value>5</value></property></bean>
+								<bean class="tesuji.games.go.monte_carlo.move_generator.Cut" singleton="false"><property name="urgency"><value>5</value></property></bean>
+								<bean class="tesuji.games.go.monte_carlo.move_generator.Connect" singleton="false"><property name="urgency"><value>5</value></property></bean>
+								<bean class="tesuji.games.go.monte_carlo.move_generator.KeimaBlock" singleton="false"><property name="urgency"><value>5</value></property></bean> -->
+								<!--<bean class="tesuji.games.go.monte_carlo.move_generator.GlobalTactics" singleton="false"><property name="urgency"><value>5</value></property></bean>-->
 							</list>
 						</property>
 				  	</bean>
@@ -151,7 +156,7 @@
 				<property name="monteCarloAdministration">
 					<bean class="tesuji.games.go.monte_carlo.MCTacticsAdministration" singleton="false">
 				  		<property name="USE_TACTICS_IN_EXPLORATION">
-				  			<value>true</value>
+				  			<value>false</value>
 				  		</property>
 				  	</bean>
 				</property>

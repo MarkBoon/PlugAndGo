@@ -6,7 +6,7 @@
 	
 		<!-- Benchmark parameters -->
 		<property name="boardSize">
-			<value>9</value>
+			<value>19</value>
 		</property>
 		<property name="komi">
 			<value>1.5</value>
