@@ -103,7 +103,7 @@ public class MonteCarloTreeSearchResult<MoveType extends Move>
 	 * The urgency-factor determines how strongly the search will favour exploring
 	 * nodes that have been an urgency-value from a (hard-coded) pattern.
 	 */
-	private static double _urgencyFactor = 10.0;
+//	private static double _urgencyFactor = 10.0;
 	
 	private MonteCarloTreeSearchResult<MoveType> _parentResult;
 	
@@ -293,10 +293,10 @@ public class MonteCarloTreeSearchResult<MoveType extends Move>
 
 	public double getUrgencyValue()
 	{
-		if (getIsTestVersion())
+//		if (getIsTestVersion())
 			return 0.0;
 		
-		return (_urgencyFactor / ((double)((GoMove)getMove()).getUrgency())) / (_nrPlayouts+1);
+//		return (_urgencyFactor / ((double)((GoMove)getMove()).getUrgency())) / (_nrPlayouts+1);
 	}
 	
 	/**

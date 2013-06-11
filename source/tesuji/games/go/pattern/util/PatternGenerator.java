@@ -11,6 +11,7 @@ import static tesuji.games.general.ColorConstant.*;
 
 public class PatternGenerator
 {
+	private static int PATTERN_SIZE = 3;
 	private static final String GROUP_NAME = "GenTest";
 	
 	public static ArrayList<Pattern> generate3x3Patterns()
@@ -18,15 +19,23 @@ public class PatternGenerator
 		ArrayList<Pattern> list = new ArrayList<Pattern>();
 		
 		Pattern pattern = new Pattern();
-		pattern.setUserX(1);
-		pattern.setUserY(1);
+//		pattern.addLeftColumn();
+//		pattern.addRightColumn();
+//		pattern.addTopRow();
+//		pattern.addBottomRow();
+		pattern.setUserX(PATTERN_SIZE/2);
+		pattern.setUserY(PATTERN_SIZE/2);
 		
 		generate3x3Pattern(0, 0, pattern, list);
 
 		Pattern sidePattern = new Pattern();
-		sidePattern.setUserX(1);
-		sidePattern.setUserY(1);
-		sidePattern.setPoint(1, 0, EDGE);
+//		pattern.addLeftColumn();
+//		pattern.addRightColumn();
+//		pattern.addTopRow();
+//		pattern.addBottomRow();
+		pattern.setUserX(PATTERN_SIZE/2);
+		pattern.setUserY(PATTERN_SIZE/2);
+		sidePattern.setPoint(PATTERN_SIZE/2, 0, EDGE);
 		sidePattern.setTopEdge(true);
 
 		generate3x3Pattern(0, 1, pattern, list);
@@ -36,9 +45,9 @@ public class PatternGenerator
 	
 	public static void generate3x3Pattern(int col, int row, Pattern p, ArrayList<Pattern> list)
 	{
-		if (col>2 || row>2)
+		if (col>=PATTERN_SIZE || row>=PATTERN_SIZE)
 			System.err.println("Out of bounds: "+col+","+row);
-		if (col==2 && row==2)
+		if (col==PATTERN_SIZE-1 && row==PATTERN_SIZE-1)
 		{
 			p.setPoint(col, row, WHITE);
 			list.add((Pattern)p.clone());
@@ -54,7 +63,7 @@ public class PatternGenerator
 		int newCol = col;
 		int newRow = row;
 		newCol++;
-		if (newCol==3)
+		if (newCol==PATTERN_SIZE)
 		{
 			newCol=0;
 			newRow++;

@@ -158,4 +158,10 @@ public class DefaultBoardModel
 
     	return clone;
     }
+
+	@Override
+    public boolean hasListeners()
+    {
+	    return _boardchangeSupport.hasListeners();
+    }
 }

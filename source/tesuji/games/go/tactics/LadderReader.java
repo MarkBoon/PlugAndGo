@@ -1131,6 +1131,7 @@ public class LadderReader
 	 */
 	public int wouldBeLadder(int xy, byte color)
 	{
+		colorToMove = color;
 		if (!isLegal(xy))
 			return CAN_CATCH;
 

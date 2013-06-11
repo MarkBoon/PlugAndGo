@@ -26,6 +26,7 @@
 package tesuji.games.go.benchmark;
 
 //import tesuji.core.util.FactoryReport;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import tesuji.core.util.LoggerConfigurator;
@@ -43,6 +44,7 @@ public class SearchBenchmark
 	{
 		LoggerConfigurator.configure();
 		
+		Logger.getRootLogger().setLevel(Level.INFO);
 		long beforeTime;
 		long afterTime;
 		long beforeMemory = MemoryUtil.getFreeMemory();

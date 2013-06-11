@@ -91,7 +91,7 @@ public class MCPlayout<MoveType extends Move>
 								}
 								
 								nrMovesPlayed += playoutAdministration.getNrSimulatedMoves();
-								playingAdministration.playMove(playingAdministration.selectSimulationMove());
+								//playingAdministration.playMove(playingAdministration.selectSimulationMove());
 								i++;
 							}
 							while (i < nrPlayouts/nrThreads && !playingAdministration.isGameFinished());

@@ -201,6 +201,17 @@ public class GoArray
 	} 
 	
 	/**
+	 * Copy an array of long
+	 * 
+	 * @param source array
+	 * @param destination array
+	 */
+	public static final void copy(double[] source, double[] destination)
+	{
+		System.arraycopy(source,0,destination,0,MAX);
+	} 
+	
+	/**
 	 * Copy an array of Object
 	 * 
 	 * @param source array
@@ -678,6 +689,33 @@ public class GoArray
 				lastWasNewline = false;
 		}
 		System.out.println();	
+	}
+	
+	public static String toString(byte[] array)
+	{
+		StringBuilder out = new StringBuilder();
+		out.append('\n');
+		boolean lastWasNewline = false;
+		for (int i=FIRST; i<=LAST; i++)
+		{
+			char c;
+			switch(array[i])
+			{
+				case BLACK: c = '#'; break;
+				case WHITE: c = 'O'; break;
+				case EMPTY: c = '.'; break;
+				case EDGE: c = '\n'; break;
+				default: c = '?';
+			}
+			if (c!='\n' || !lastWasNewline)
+				out.append(c);
+			if (c=='\n')
+				lastWasNewline = true;
+			else
+				lastWasNewline = false;
+		}
+		out.append('\n');
+		return out.toString();
 	}
 	
 	public static void printBoard(BoardModel model)

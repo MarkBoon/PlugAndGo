@@ -32,7 +32,6 @@ import tesuji.core.util.List;
 import tesuji.games.go.pattern.common.Pattern;
 import tesuji.games.go.pattern.common.PatternGroup;
 import tesuji.games.go.pattern.common.PatternManager;
-import tesuji.games.go.util.DefaultBoardModel;
 import tesuji.games.go.util.GoArray;
 import tesuji.games.model.BoardChange;
 import tesuji.games.model.BoardChangeFactory;
@@ -59,7 +58,7 @@ public class IncrementalPatternMatcher
 	private PatternGroup group;
 	private FullPatternTree tree;
 	private PatternManager patternManager;
-	private DefaultBoardModel _boardModel;
+	private BoardModel _boardModel;
 	private PatternMatchList _matchList = new PatternMatchList();
 	private ArrayList<BoardChange> _boardChangeList = new ArrayList<BoardChange>(32);
 	private int _moveNr;
@@ -110,8 +109,8 @@ public class IncrementalPatternMatcher
 		_moveNr = 1;
 		_matchList.clear();
 		_boardChangeList.clear();
-		_boardModel = new DefaultBoardModel(boardModel.getBoardSize());
-		boardModel.addBoardModelListener(this);
+		_boardModel = boardModel;
+//		boardModel.addBoardModelListener(this);
 		matchingState = new MatchingState[GoArray.MAX];
 		for (int i=0; i<GoArray.MAX; i++)
 		{
@@ -129,6 +128,8 @@ public class IncrementalPatternMatcher
 				recursiveMatchAndStoreState(tree.getRoot(), i);
 			}
 		}
+		if (_boardModel.hasListeners())
+			return;
 	}
 	
 	public PatternGroup getPatternGroup()
@@ -173,6 +174,8 @@ public class IncrementalPatternMatcher
 		_moveNr++;
 		_newMatchList.clear();
 		_deletedMatchList.clear();
+		if (_boardModel.hasListeners())
+			return;
     	for (int i=0; i<_boardChangeList.size(); i++)
     	{
     		BoardChange boardChange = _boardChangeList.get(i);
@@ -464,6 +467,8 @@ public class IncrementalPatternMatcher
 			matchingState[match.xy].add(match);
 		}   	
 		assert(isEqual(this,source));
+		if (_boardModel.hasListeners())
+			return;
     }
     
     /**
@@ -481,7 +486,8 @@ public class IncrementalPatternMatcher
     	clone.tree = tree;
     	clone.patternManager = patternManager;
     	
-    	clone._boardModel = _boardModel.createClone();
+    	System.arraycopy(_boardModel.getSingleArray(), 0, clone._boardModel.getSingleArray() , 0, _boardModel.getSingleArray().length);
+//    	clone._boardModel = _boardModel.createClone();
     	clone._matchList = _matchList.createIndexedClone();
     	clone._moveNr = _moveNr;
 
@@ -499,7 +505,9 @@ public class IncrementalPatternMatcher
 		
 		assert(isEqual(this,clone));
 
-    	return clone;
+		if (_boardModel.hasListeners())
+			return clone;
+		return clone;
     }
     
     public BoardModel getBoardModel()

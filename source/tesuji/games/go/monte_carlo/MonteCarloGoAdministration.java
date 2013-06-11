@@ -217,7 +217,7 @@ public class MonteCarloGoAdministration
 	protected int _lastRandomNumber;
 	
 	private ArrayStack<GoMoveIterator> _iteratorPool =	new ArrayStack<GoMoveIterator>();
-
+	
 	private boolean _spreadTest = false;
 
 	
@@ -316,6 +316,7 @@ public class MonteCarloGoAdministration
 				_emptyPoints.add(i);
 				
 			}
+	
 			for (int n=0; n<4; n++)
 			{
 				int next = FourCursor.getNeighbour(i, n);
@@ -774,9 +775,7 @@ public class MonteCarloGoAdministration
 	@Override
     public boolean isGameFinished()
     {
-		if (_moveStack.isEmpty())
-			return false;
-		if (_moveStack.peek() == PASS && _moveStack.peek(1) == PASS && _moveStack.peek(2) == PASS)
+		if (!_moveStack.isEmpty() && _moveStack.peek() == PASS && _moveStack.peek(1) == PASS && _moveStack.peek(2) == PASS)
 			return true;
 
 	    return false;
@@ -822,7 +821,7 @@ public class MonteCarloGoAdministration
 		return selectRandomMoveCoordinate(emptyPoints);
 	}
 	
-	private  boolean accept1(int xy)
+/*	private  boolean accept1(int xy)
 	{
 		if (!isTestVersion() || _otherNeighbours[xy]!=0 || _otherDiagonalNeighbours[xy]>=_maxDiagonalsOccupied[xy])
 		{
@@ -860,7 +859,7 @@ public class MonteCarloGoAdministration
 			points++;
 		
 		return (points==0 || RANDOM.nextInt(points)==0);
-	}
+	}*/
 
 	/**
 	 * Randomly select an empty point from a set of empty points.
@@ -896,6 +895,7 @@ public class MonteCarloGoAdministration
 	
 	protected int selectRandomMoveCoordinate(PointSet emptyPoints)
 	{
+		assert(_illegalStack.isEmpty());
 		while (emptyPoints.getSize()!=0)
 		{
 			int xy = emptyPoints.get(RANDOM.nextInt(emptyPoints.getSize()));
@@ -909,7 +909,10 @@ public class MonteCarloGoAdministration
 			_illegalStack.push(xy);
 		}
 		while (!_illegalStack.isEmpty())
-			emptyPoints.add(_illegalStack.pop());
+		{
+			int xy = _illegalStack.pop();
+			emptyPoints.add(xy);
+		}
 
 		return PASS;
 	}

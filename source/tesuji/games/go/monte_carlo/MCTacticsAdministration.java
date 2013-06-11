@@ -123,7 +123,7 @@ public class MCTacticsAdministration
 	private void initProperties()
 	{
 		_flags = new boolean[Flag.LAST.ordinal()];
-		_flags[Flag.USE_STONE_AGE.ordinal()] = true;
+		_flags[Flag.USE_STONE_AGE.ordinal()] = false;
 		_flags[Flag.FOG_OF_WAR.ordinal()] = false;
 		_flags[Flag.NO_FIRST_LINE.ordinal()] = false;
 		_flags[Flag.NO_AUTO_ATARI.ordinal()] = false; // -- TODO - temporarily disabled to fix ownership.
@@ -132,9 +132,9 @@ public class MCTacticsAdministration
 		_flags[Flag.IMMEDIATE_ESCAPE_ATARI.ordinal()] = true;
 		_flags[Flag.CAPTURE_LAST_MOVE_IN_ATARI.ordinal()] = true;
 		_flags[Flag.CAPTURE_LAST_MOVE_IN_LADDER.ordinal()] = true;
-		_flags[Flag.ESCAPE_ATARI.ordinal()] = false;
-		_flags[Flag.CAPTURE_STONES_IN_ATARI.ordinal()] = false;
-		_flags[Flag.CAPTURE_STONES_IN_LADDER.ordinal()] = false;
+		_flags[Flag.ESCAPE_ATARI.ordinal()] = true;
+		_flags[Flag.CAPTURE_STONES_IN_ATARI.ordinal()] = true;
+		_flags[Flag.CAPTURE_STONES_IN_LADDER.ordinal()] = true;
 		_flags[Flag.CAPTURE_STONES.ordinal()] = false;
 		_flags[Flag.SEPARATE_PATTERN.ordinal()] = false;
 		_flags[Flag.USE_HARD_PATTERNS.ordinal()] = false;
@@ -449,6 +449,8 @@ public class MCTacticsAdministration
 	@Override
 	protected void getPriorityMoves()
 	{
+		if (isUSE_TACTICS_IN_EXPLORATION())
+			getTacticalPriorityMoves();
 	}
 	
 	public int getTacticalMove(int previousMove)
@@ -576,6 +578,7 @@ public class MCTacticsAdministration
 			}
 		}
 		// TODO - instead of looping over the whole board it's probably faster to keep lists with chains with 1 and 2 liberties.
+
 		_boardMarker.getNewMarker();
 		for (int i=FIRST; i<=LAST; i++)
 		{

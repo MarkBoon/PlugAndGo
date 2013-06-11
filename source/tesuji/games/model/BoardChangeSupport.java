@@ -40,6 +40,7 @@ public class BoardChangeSupport
     
     public final void addBoardModelListener(BoardModelListener listener)
     {
+    	assert(listener!=null);
     	_hasListeners = true;
         if (!_listeners.contains(listener))
             _listeners.add(listener);

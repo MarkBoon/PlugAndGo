@@ -45,6 +45,8 @@ public interface BoardModel
      */
     public void removeBoardModelListener(BoardModelListener listener);
     
+    public boolean hasListeners();
+    
     /**
      * Set whether many changes in a row are to be expected.
      * This is used so that 'updating' either of the graphics

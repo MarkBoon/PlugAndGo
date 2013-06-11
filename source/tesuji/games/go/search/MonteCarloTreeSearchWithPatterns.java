@@ -46,7 +46,6 @@ import tesuji.games.general.search.SearchProperties;
 import tesuji.games.go.monte_carlo.MCPatternsAdministration;
 import tesuji.games.go.monte_carlo.MonteCarloAdministration;
 import tesuji.games.go.pattern.common.HibernatePatternManager;
-import tesuji.games.go.pattern.common.Pattern;
 import tesuji.games.go.pattern.common.PatternGroup;
 import tesuji.games.go.pattern.common.PatternManager;
 import tesuji.games.go.pattern.incremental.IncrementalPatternMatcher;
@@ -58,7 +57,6 @@ import tesuji.games.go.util.DefaultDoubleArrayProvider;
 import tesuji.games.go.util.GoArray;
 import tesuji.games.go.util.IntStack;
 import tesuji.games.go.util.Statistics;
-import tesuji.games.model.BoardModel;
 
 import static tesuji.games.general.ColorConstant.*;
 import static tesuji.games.go.util.GoArray.createDoubles;

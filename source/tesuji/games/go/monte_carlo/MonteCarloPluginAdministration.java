@@ -40,17 +40,21 @@ import tesuji.games.go.common.GoMove;
 import tesuji.games.go.common.GoMoveFactory;
 import tesuji.games.go.common.Util;
 
+import tesuji.games.go.monte_carlo.move_generator.MoveGenerator;
 import tesuji.games.go.util.ArrayFactory;
 import tesuji.games.go.util.BoardMarker;
+import tesuji.games.go.util.DefaultBoardModel;
 import tesuji.games.go.util.DiagonalCursor;
 import tesuji.games.go.util.FourCursor;
 import tesuji.games.go.util.GoArray;
 import tesuji.games.go.util.IntStack;
 import tesuji.games.go.util.PointSet;
 import tesuji.games.go.util.PointSetFactory;
+import tesuji.games.go.util.ProbabilityMap;
 import tesuji.games.go.util.SGFUtil;
 import tesuji.games.gtp.GTPCommand;
 import tesuji.games.model.BoardChangeSupport;
+import tesuji.games.model.BoardModel;
 import tesuji.games.model.BoardModelListener;
 
 import static tesuji.games.general.ColorConstant.*;
@@ -64,7 +68,7 @@ import static tesuji.games.go.common.GoConstant.*;
 public class MonteCarloPluginAdministration
 	implements MonteCarloAdministration<GoMove>
 {
-	public static final boolean USE_MERCY_RULE = false;
+	public static final boolean USE_MERCY_RULE = true;
 	
 	protected final MersenneTwisterFast RANDOM = new MersenneTwisterFast();
 	
@@ -157,15 +161,14 @@ public class MonteCarloPluginAdministration
 	protected PointSet _emptyPoints;
 	
 	protected BoardChangeSupport _simulationMoveSupport;
-	protected BoardChangeSupport _explorationMoveSupport;
-	protected byte[] _board;
+	public BoardChangeSupport _explorationMoveSupport;
 
 	/**
 	 * BoardModel representing the board-state of the current position.
 	 * This model is affected by the playout() method and will contain
 	 * the end position when done.
 	 */
-//	protected DefaultBoardModel _boardModel;
+	protected DefaultBoardModel _boardModel;
 	
 	/**
 	 * Point where a ko-stone might have been captured by the previous move.
@@ -219,6 +222,8 @@ public class MonteCarloPluginAdministration
 		
 	protected BoardMarker _boardMarker;
 
+	private ProbabilityMap _probabilityMap;
+
 	private boolean _isTestVersion;
 	
 	protected int _lastRandomNumber;
@@ -238,7 +243,7 @@ public class MonteCarloPluginAdministration
 		_simulationMoveSupport = new BoardChangeSupport();
 		_explorationMoveSupport = new BoardChangeSupport();
 		
-//		_boardModel = new DefaultBoardModel();
+		_boardModel = new DefaultBoardModel();
 		
 		_emptyPoints = PointSetFactory.createPointSet();
 		
@@ -269,6 +274,8 @@ public class MonteCarloPluginAdministration
 		_stoneAge = GoArray.createIntegers();
 		
 		_boardMarker = new BoardMarker();
+		
+		_probabilityMap = new ProbabilityMap(RANDOM);
 	}
 
 	protected MonteCarloPluginAdministration(int boardSize)
@@ -308,7 +315,7 @@ public class MonteCarloPluginAdministration
 		GoArray.clear(_white);
 
 		GoArray.clear(_stoneAge);
-		
+
 		_ownNeighbours = _blackNeighbours;
 		_otherNeighbours = _whiteNeighbours;
 		_ownDiagonalNeighbours = _blackDiagonalNeighbours;
@@ -316,13 +323,14 @@ public class MonteCarloPluginAdministration
 		
 		_koPoint = UNDEFINED_COORDINATE;
 		
+		_probabilityMap.reset();
+
 		for (int i=FIRST; i<=LAST; i++)
 		{
-			if (_board[i]!=EDGE)
-			//if (_boardModel.get(i)!=EDGE)
+			if (_boardModel.get(i)!=EDGE)
 			{
-				_board[i] = EMPTY;
-				//_boardModel.set(i, EMPTY);
+				//_board[i] = EMPTY;
+				_boardModel.set(i, EMPTY);
 				int x = getX(i);
 				int y = getY(i);
 
@@ -331,14 +339,16 @@ public class MonteCarloPluginAdministration
 				else
 					_maxDiagonalsOccupied[i] = 2;
 				
-				_emptyPoints.add(i);
-				
+				_emptyPoints.add(i);			
 			}
+			else 
+				_probabilityMap.reset(i);
+			
 			for (int n=0; n<4; n++)
 			{
 				int next = FourCursor.getNeighbour(i, n);
-				if (_board[next]==EDGE)
-				//if (_boardModel.get(next)==EDGE)
+				//if (_board[next]==EDGE)
+				if (_boardModel.get(next)==EDGE)
 				{
 					_neighbours[i]++;
 					_blackNeighbours[i]++;
@@ -353,24 +363,11 @@ public class MonteCarloPluginAdministration
 		_moveStack.clear();
 		_checksumStack.clear();
 		_liberties[0] = 1000;
-
-		for (int i=_simulationMoveFilterList.size(); --i>=0;)
-		{
-			_simulationMoveFilterList.get(i).clear();
-		}
-		for (int i=_explorationMoveFilterList.size(); --i>=0;)
-		{
-			_explorationMoveFilterList.get(i).clear();
-		}
-		
-		for (int i=_simulationMoveGeneratorList.size(); --i>=0;)
-		{
-			_simulationMoveGeneratorList.get(i).clear();
-		}
-		for (int i=_explorationMoveGeneratorList.size(); --i>=0;)
-		{
-			_explorationMoveGeneratorList.get(i).clear();
-		}
+	}
+	
+	public boolean isFirstRow(int xy)
+	{
+		return _maxDiagonalsOccupied[xy]==1;
 	}
 	
 	/*
@@ -399,9 +396,9 @@ public class MonteCarloPluginAdministration
 		
 		_checksum.setValue(source._checksum.getValue());
 		
-		//_boardModel.setBoardSize(source.getBoardModel().getBoardSize());
-		copy(source._board,_board);
-//		copy(source._boardModel.getSingleArray(),_boardModel.getSingleArray());
+		_boardModel.setBoardSize(source.getBoardModel().getBoardSize());
+		//copy(source._board,_board);
+		copy(source._boardModel.getSingleArray(),_boardModel.getSingleArray());
 		
 		copy(source._liberties,_liberties);
 		copy(source._chain,_chain);
@@ -421,6 +418,7 @@ public class MonteCarloPluginAdministration
 		
 		_moveStack.copyFrom(source._moveStack);
 		_checksumStack.copyFrom(source._checksumStack);
+		_probabilityMap.copyFrom(source._probabilityMap);
 		
 		_ownNeighbours = source._ownNeighbours;
 		_otherNeighbours = source._otherNeighbours;
@@ -491,6 +489,15 @@ public class MonteCarloPluginAdministration
 	{
 		setColorToMove(move.getColor());
 		playMove(move.getXY());
+		update();
+	}
+	
+	private void update()
+	{
+		for (int i=_explorationMoveGeneratorList.size(); --i>=0;)
+		{
+			_explorationMoveGeneratorList.get(i).update();
+		}
 	}
 	
 	/*
@@ -549,8 +556,8 @@ public class MonteCarloPluginAdministration
 		if (xy<0) // Temporary hack
 			return false;
 
-//		byte[] board = _boardModel.getSingleArray();
-		if (_board[xy]!=EMPTY)
+		byte[] board = _boardModel.getSingleArray();
+		if (board[xy]!=EMPTY)
 			return false; // Occupied.
 
 		if (_neighbours[xy]!=4)
@@ -562,7 +569,7 @@ public class MonteCarloPluginAdministration
 		{
 			int next = FourCursor.getNeighbour(xy, n);
 			int liberties = _liberties[_chain[next]];
-			byte nextBoardValue = _board[next];
+			byte nextBoardValue = board[next];
 			if (nextBoardValue==_oppositeColor)
 			{
 				if (liberties==1)
@@ -583,10 +590,10 @@ public class MonteCarloPluginAdministration
 		{
 			boolean extended = false;
 			boolean merged = false;
-//			byte[] board = _boardModel.getSingleArray();
+			byte[] board = _boardModel.getSingleArray();
 			
-			assert _board[xy] == EMPTY : SGFUtil.createSGF(getMoveStack());
-//			assert _boardModel.get(xy) == EMPTY : SGFUtil.createSGF(getMoveStack());
+//			assert _board[xy] == EMPTY : SGFUtil.createSGF(getMoveStack());
+			assert _boardModel.get(xy) == EMPTY : SGFUtil.createSGF(getMoveStack());
 			
 			_chain[xy] = xy;
 			_chainNext[xy] = xy;
@@ -597,7 +604,7 @@ public class MonteCarloPluginAdministration
 			for (int n=0; n<4; n++)
 			{
 				int next = FourCursor.getNeighbour(xy, n);
-				if (_board[next]==_colorToPlay)
+				if (board[next]==_colorToPlay)
 				{
 					if (!extended)
 					{
@@ -638,7 +645,7 @@ public class MonteCarloPluginAdministration
 			for (int n=0; n<4; n++)
 			{
 				int next = FourCursor.getNeighbour(xy, n);
-				if (_board[next]==_oppositeColor)
+				if (board[next]==_oppositeColor)
 				{
 					if (_liberties[_chain[next]]==0)
 					{
@@ -701,7 +708,7 @@ public class MonteCarloPluginAdministration
 			clone._explorationMoveGeneratorList.add(clonedGenerator);
 			clonedGenerator.register(clone);
 			if (clonedGenerator instanceof BoardModelListener)
-				clone._explorationMoveSupport.addBoardModelListener((BoardModelListener)clonedGenerator);
+				clone._simulationMoveSupport.addBoardModelListener((BoardModelListener)clonedGenerator);
 		}
 		
 		clone.copyDataFrom(this);
@@ -721,9 +728,13 @@ public class MonteCarloPluginAdministration
 		_playoutStart = _moveStack.getSize();
 		while (true)
 		{
+			assert(_probabilityMap.isConsistent());
 			selectAndPlay();
-			
-			// Check some of the criteria that end a game.
+
+//    		System.out.println( "\n" + GoArray.toString(_board) + "\n");
+//			assert _emptyPoints.isConsistent(_board);
+
+    		// Check some of the criteria that end a game.
 			if (getNrPasses()>1)
 			{
 				_inPlayout = false;
@@ -748,7 +759,7 @@ public class MonteCarloPluginAdministration
 
 		int nrLiberties = 0;
 		_boardMarker.getNewMarker();
-//		byte[] board = _boardModel.getSingleArray();
+		byte[] board = _boardModel.getSingleArray();
 		
 		int stoneXY = xy;
 		do
@@ -761,22 +772,22 @@ public class MonteCarloPluginAdministration
 				int right = right(stoneXY);
 				int above = above(stoneXY);
 				int below = below(stoneXY);
-				if (_board[left]==EMPTY && _boardMarker.notSet(left))
+				if (board[left]==EMPTY && _boardMarker.notSet(left))
 				{
 					_boardMarker.set(left);
 					nrLiberties++;
 				}
-				if (_board[right]==EMPTY && _boardMarker.notSet(right))
+				if (board[right]==EMPTY && _boardMarker.notSet(right))
 				{
 					_boardMarker.set(right);
 					nrLiberties++;
 				}
-				if (_board[above]==EMPTY && _boardMarker.notSet(above))
+				if (board[above]==EMPTY && _boardMarker.notSet(above))
 				{
 					_boardMarker.set(above);
 					nrLiberties++;
 				}
-				if (_board[below]==EMPTY && _boardMarker.notSet(below))
+				if (board[below]==EMPTY && _boardMarker.notSet(below))
 				{
 					_boardMarker.set(below);
 					nrLiberties++;
@@ -797,8 +808,8 @@ public class MonteCarloPluginAdministration
 		int captive = xy;
 		do
 		{
-			assert _board[captive]==_oppositeColor : SGFUtil.createSGF(getMoveStack());
-//			assert _boardModel.get(captive)==_oppositeColor : SGFUtil.createSGF(getMoveStack());
+//			assert _board[captive]==_oppositeColor : SGFUtil.createSGF(getMoveStack());
+			assert _boardModel.get(captive)==_oppositeColor : SGFUtil.createSGF(getMoveStack());
 			
 			_chain[captive] = 0;
 			
@@ -816,18 +827,18 @@ public class MonteCarloPluginAdministration
 		int right = right(xy);
 		int above = above(xy);
 		int below = below(xy);
-//		byte[] board = _boardModel.getSingleArray();
+		byte[] board = _boardModel.getSingleArray();
 		
-		if (_board[left]==EMPTY &&
+		if (board[left]==EMPTY &&
 						(_chain[left(left)]==chain || _chain[left(above)]==chain || _chain[left(below)]==chain))
 			shared++;
-		if (_board[right]==EMPTY &&
+		if (board[right]==EMPTY &&
 						(_chain[right(right)]==chain || _chain[right(above)]==chain || _chain[right(below)]==chain))
 			shared++;
-		if (_board[above]==EMPTY &&
+		if (board[above]==EMPTY &&
 						(_chain[above(above)]==chain || _chain[above(left)]==chain || _chain[above(right)]==chain))
 			shared++;
-		if (_board[below]==EMPTY &&
+		if (board[below]==EMPTY &&
 						(_chain[below(below)]==chain || _chain[below(left)]==chain || _chain[below(right)]==chain))
 			shared++;
 		return shared;
@@ -835,16 +846,17 @@ public class MonteCarloPluginAdministration
 	
 	public int getLiberty(int xy)
 	{
+		byte[] board = _boardModel.getSingleArray();
 		int stone = xy;
 		do
 		{
-			if (_board[left(stone)]==EMPTY)
+			if (board[left(stone)]==EMPTY)
 				return left(stone);
-			if (_board[right(stone)]==EMPTY)
+			if (board[right(stone)]==EMPTY)
 				return right(stone);
-			if (_board[above(stone)]==EMPTY)
+			if (board[above(stone)]==EMPTY)
 				return above(stone);
-			if (_board[below(stone)]==EMPTY)
+			if (board[below(stone)]==EMPTY)
 				return below(stone);
 			
 			stone = _chainNext[stone];
@@ -889,9 +901,7 @@ public class MonteCarloPluginAdministration
 	@Override
     public boolean isGameFinished()
     {
-		if (_moveStack.isEmpty())
-			return false;
-		if (_moveStack.peek() == PASS && _moveStack.peek(1) == PASS && _moveStack.peek(2) == PASS)
+		if (!_moveStack.isEmpty() && _moveStack.peek() == PASS && _moveStack.peek(1) == PASS && _moveStack.peek(2) == PASS)
 			return true;
 
 	    return false;
@@ -914,7 +924,17 @@ public class MonteCarloPluginAdministration
 		if (priorityMove!=PASS && priorityMove!=UNDEFINED_COORDINATE && isLegal(priorityMove))
 			return priorityMove;
 		
-		return selectRandomMoveCoordinate(emptyPoints, _simulationMoveFilterList);
+		//return selectRandomMoveCoordinate(emptyPoints, _simulationMoveFilterList);
+		for (int i=_priorityMoveStack.getSize(); --i>=0;)
+		{
+			int xy = _priorityMoveStack.get(i);
+			double weight = 0.0;
+			if (_boardModel.get(xy)==EMPTY && _winStack.get(i)!=0)
+				weight = (double)_visitStack.get(i)/(double)_winStack.get(i);
+			if (weight!=0.0)
+				_probabilityMap.add(xy,weight);
+		}
+		return selectWeightedMoveCoordinate(emptyPoints, _simulationMoveFilterList);
 	}
 	
 	/**
@@ -941,8 +961,43 @@ public class MonteCarloPluginAdministration
 	 * @return coordinate of a move that's legal and not 'verboten',
 	 * i.e. does something terrible like filling an own eye.
 	 */
+	protected int selectWeightedMoveCoordinate(PointSet emptyPoints, List<MoveFilter> filterList)
+	{
+		while (emptyPoints.getSize()!=0 && _probabilityMap.hasPoints())
+		{
+			int xy = _probabilityMap.getCoordinate();
+			if (!isVerboten(xy,filterList) && isLegal(xy))
+			{
+				while (!_illegalStack.isEmpty())
+				{
+					int illegalXY = _illegalStack.pop();
+					emptyPoints.add(illegalXY);
+					_probabilityMap.add(illegalXY);
+				}
+				assert(_probabilityMap.isConsistent());
+				return xy;
+			}
+			emptyPoints.remove(xy);
+			_illegalStack.push(xy);
+			_probabilityMap.reset(xy);
+		}
+//		if ((emptyPoints.getSize()==0 && _probabilityMap.hasPoints()) || (emptyPoints.getSize()!=0 && !_probabilityMap.hasPoints()))
+//			System.err.println("Inconsistent!");
+		assert((emptyPoints.getSize()!=0)==_probabilityMap.hasPoints());
+		while (!_illegalStack.isEmpty())
+		{
+			int illegalXY = _illegalStack.pop();
+			emptyPoints.add(illegalXY);
+			_probabilityMap.add(illegalXY);
+		}
+
+		assert(_probabilityMap.isConsistent());
+		return PASS;
+	}
+
 	protected int selectRandomMoveCoordinate(PointSet emptyPoints, List<MoveFilter> filterList)
 	{
+		assert(_illegalStack.isEmpty());
 		while (emptyPoints.getSize()!=0)
 		{
 			int xy = emptyPoints.get(RANDOM.nextInt(emptyPoints.getSize()));
@@ -963,6 +1018,10 @@ public class MonteCarloPluginAdministration
 
 	protected int selectPriorityMove(List<MoveGenerator> moveGeneratorList)
 	{
+		_priorityMoveStack.clear();
+    	_urgencyStack.clear();
+    	_visitStack.clear();
+    	_winStack.clear();
 		if (_previousMove!=PASS)
 		{
 			int size = moveGeneratorList.size();
@@ -1055,15 +1114,8 @@ public class MonteCarloPluginAdministration
 	 */
 	protected void addStone(int xy)
 	{
-//		byte[] board = _boardModel.getSingleArray();
-//		_boardModel.set(xy, _colorToPlay);
-		_board[xy] = _colorToPlay;
-
-		if (_inPlayout)
-			_simulationMoveSupport.sendChange(xy, _colorToPlay, EMPTY);
-		else
-			_explorationMoveSupport.sendChange(xy, _colorToPlay, EMPTY);
-
+		byte[] board = _boardModel.getSingleArray();
+		_boardModel.set(xy, _colorToPlay);
 		_emptyPoints.remove(xy);
 		_checksum.add(xy, _colorToPlay);
 		
@@ -1077,13 +1129,13 @@ public class MonteCarloPluginAdministration
 		int aboveChain = _chain[above];
 		int belowChain = _chain[below];
 		
-		if (_board[left]==_oppositeColor)
+		if (board[left]==_oppositeColor)
 			_liberties[leftChain]--;
-		if (_board[right]==_oppositeColor && leftChain!=rightChain)
+		if (board[right]==_oppositeColor && leftChain!=rightChain)
 			_liberties[rightChain]--;
-		if (_board[above]==_oppositeColor && leftChain!=aboveChain && rightChain!=aboveChain)
+		if (board[above]==_oppositeColor && leftChain!=aboveChain && rightChain!=aboveChain)
 			_liberties[aboveChain]--;
-		if (_board[below]==_oppositeColor && leftChain!=belowChain && rightChain!=belowChain && aboveChain!=belowChain)
+		if (board[below]==_oppositeColor && leftChain!=belowChain && rightChain!=belowChain && aboveChain!=belowChain)
 			_liberties[belowChain]--;
 		
 		_neighbours[left]++;
@@ -1117,6 +1169,7 @@ public class MonteCarloPluginAdministration
 			_whiteDiagonalNeighbours[right(above)]++;
 			_whiteDiagonalNeighbours[right(below)]++;			
 		}
+		_probabilityMap.reset(xy);
 	}
 
 	/**
@@ -1127,17 +1180,9 @@ public class MonteCarloPluginAdministration
 	 */
 	protected void removeStone(int xy)
 	{
-//		byte[] board = _boardModel.getSingleArray();
-//		if (_inPlayout)
-			_board[xy] = EMPTY;
-//		else
-//			_boardModel.set(xy, EMPTY);
-
-		if (_inPlayout)
-			_simulationMoveSupport.sendChange(xy, EMPTY, _oppositeColor);
-		else
-			_explorationMoveSupport.sendChange(xy, EMPTY, _oppositeColor);
-		
+		byte[] board = _boardModel.getSingleArray();
+//		_board[xy] = EMPTY;
+		_boardModel.set(xy, EMPTY);
 		_emptyPoints.add(xy);
 		_checksum.remove(xy, _oppositeColor);
 
@@ -1151,13 +1196,13 @@ public class MonteCarloPluginAdministration
 		int aboveChain = _chain[above];
 		int belowChain = _chain[below];
 		
-		if (_board[left]==_colorToPlay)
+		if (board[left]==_colorToPlay)
 			_liberties[leftChain]++;
-		if (_board[right]==_colorToPlay && leftChain!=rightChain)
+		if (board[right]==_colorToPlay && leftChain!=rightChain)
 			_liberties[rightChain]++;
-		if (_board[above]==_colorToPlay && leftChain!=aboveChain && rightChain!=aboveChain)
+		if (board[above]==_colorToPlay && leftChain!=aboveChain && rightChain!=aboveChain)
 			_liberties[aboveChain]++;
-		if (_board[below]==_colorToPlay && leftChain!=belowChain && rightChain!=belowChain && aboveChain!=belowChain)
+		if (board[below]==_colorToPlay && leftChain!=belowChain && rightChain!=belowChain && aboveChain!=belowChain)
 			_liberties[belowChain]++;
 
 		_neighbours[left]--;
@@ -1190,6 +1235,7 @@ public class MonteCarloPluginAdministration
 			_whiteDiagonalNeighbours[right(above)]--;
 			_whiteDiagonalNeighbours[right(below)]--;		
 		}
+		_probabilityMap.add(xy);
 	}
 
 	/*
@@ -1225,8 +1271,8 @@ public class MonteCarloPluginAdministration
     	{
     		int xy = _emptyPoints.get(i);
     		
-    		assert _board[xy]==EMPTY : SGFUtil.createSGF(getMoveStack());
-//    		assert _boardModel.get(xy)==EMPTY : SGFUtil.createSGF(getMoveStack());
+//    		assert _board[xy]==EMPTY : "\n" + GoArray.toString(_board) + "\n" + SGFUtil.createSGF(getMoveStack());
+    		assert _boardModel.get(xy)==EMPTY : SGFUtil.createSGF(getMoveStack());
     		
     		if (_blackNeighbours[xy]==_neighbours[xy])
     		{
@@ -1363,24 +1409,24 @@ public class MonteCarloPluginAdministration
     	
     	for (int i=0; i<MAX; i++)
     	{
-       		if (_board[i]!=EDGE)
-       	   	//if (_boardModel.get(i)!=EDGE)
+       		//if (_board[i]!=EDGE)
+       	   	if (_boardModel.get(i)!=EDGE)
        	   	{
-//    			assert !(_boardModel.get(i)==EMPTY && markArray[i]==0);
-//    			assert !(_boardModel.get(i)!=EMPTY && markArray[i]!=0);
-    			assert !(_board[i]==EMPTY && markArray[i]==0);
-    			assert !(_board[i]!=EMPTY && markArray[i]!=0);
+    			assert !(_boardModel.get(i)==EMPTY && markArray[i]==0);
+    			assert !(_boardModel.get(i)!=EMPTY && markArray[i]!=0);
+//    			assert !(_board[i]==EMPTY && markArray[i]==0);
+//    			assert !(_board[i]!=EMPTY && markArray[i]!=0);
     			
     			int blackNeighbours = 0;
     			int whiteNeighbours = 0;
     			for (int n=0; n<4; n++)
     			{
     				int next = FourCursor.getNeighbour(i, n);
-    				if (_board[next]==BLACK || _board[next]==EDGE)
-       				//if (_boardModel.get(next)==BLACK || _boardModel.get(next)==EDGE)
+    				//if (_board[next]==BLACK || _board[next]==EDGE)
+       				if (_boardModel.get(next)==BLACK || _boardModel.get(next)==EDGE)
     					blackNeighbours++;
-    				if (_board[next]==WHITE || _board[next]==EDGE)
-       				//if (_boardModel.get(next)==WHITE || _boardModel.get(next)==EDGE)
+    				//if (_board[next]==WHITE || _board[next]==EDGE)
+       				if (_boardModel.get(next)==WHITE || _boardModel.get(next)==EDGE)
     					whiteNeighbours++;
     			}
     			if (blackNeighbours!=_blackNeighbours[i])
@@ -1393,11 +1439,11 @@ public class MonteCarloPluginAdministration
     			for (int n=0; n<4; n++)
     			{
     				int next = DiagonalCursor.getNeighbour(i,n);
-    				if (_board[next]==BLACK)
-       				//if (_boardModel.get(next)==BLACK)
+    				//if (_board[next]==BLACK)
+       				if (_boardModel.get(next)==BLACK)
     					blackDiagonalNeighbours++;
-    				if (_board[next]==WHITE)
-       				//if (_boardModel.get(next)==WHITE)
+    				//if (_board[next]==WHITE)
+       				if (_boardModel.get(next)==WHITE)
     					whiteDiagonalNeighbours++;
     			}
     			if (blackDiagonalNeighbours!=_blackDiagonalNeighbours[i])
@@ -1419,13 +1465,13 @@ public class MonteCarloPluginAdministration
     {
     	for (int i=FIRST; i<=LAST; i++)
     	{
-    		if (_board[i]==BLACK || _board[i]==WHITE)
-        	//if (_boardModel.get(i)==BLACK || _boardModel.get(i)==WHITE)
+    		//if (_board[i]==BLACK || _board[i]==WHITE)
+        	if (_boardModel.get(i)==BLACK || _boardModel.get(i)==WHITE)
     		{
     			assert _liberties[_chain[i]]==getLiberties(i) : "Inconsistent liberties at "+getX(i)+","+getY(i)+"\n"+
     				"Countedliberties="+getLiberties(i)+" Recorded liberties="+_liberties[_chain[i]]+"\n"+
-    				GoArray.printBoardToString(_board);
-    				//getBoardModel().toString();
+    				//GoArray.printBoardToString(_board);
+    				getBoardModel().toString();
     		}
     	}
     	
@@ -1461,18 +1507,17 @@ public class MonteCarloPluginAdministration
      */
     protected void getPriorityMoves()
     {
-		for (int i=_explorationMoveGeneratorList.size(); --i>=0;)
+		for (MoveGenerator generator : _explorationMoveGeneratorList)
 		{
-			MoveGenerator generator = _explorationMoveGeneratorList.get(i);
 			int xy = generator.generate();
 			if (xy!=UNDEFINED_COORDINATE)
 			{
-				addPriorityMove(xy,0,generator.getUrgency(),generator.getUrgency());
+				addPriorityMove(xy,1,generator.getUrgency(),generator.getUrgency());
 			}
 		}
     }
     
-    protected void addPriorityMove(int xy, int urgency, int visits, int wins)
+    public void addPriorityMove(int xy, int urgency, int visits, int wins)
     {
     	_priorityMoveStack.push(xy);
     	_urgencyStack.push(urgency);
@@ -1484,10 +1529,10 @@ public class MonteCarloPluginAdministration
      * (non-Javadoc)
      * @see tesuji.games.go.monte_carlo.MonteCarloAdministration#getBoardModel()
      */
-//    public BoardModel getBoardModel()
-//    {
-//    	return _boardModel;
-//    }
+    public BoardModel getBoardModel()
+    {
+    	return _boardModel;
+    }
 
     /*
      * (non-Javadoc)
@@ -1519,8 +1564,8 @@ public class MonteCarloPluginAdministration
     public void setBoardSize(int size)
     {
     	_boardSize = size;
-    	_board = GoArray.createBoardArray(size);
-//    	_boardModel.setBoardSize(size);
+    	//_board = GoArray.createBoardArray(size);
+    	_boardModel.setBoardSize(size);
     	clear();
     }
     
@@ -1552,6 +1597,11 @@ public class MonteCarloPluginAdministration
     	return _white;
     }
     
+    public ProbabilityMap getProbabilityMap()
+    {
+    	return _probabilityMap;
+    }
+    
     /**
      * This is for verification purposes.
      * 
@@ -1567,17 +1617,17 @@ public class MonteCarloPluginAdministration
 			if (_neighbours[stone]!=4)
 				return true;
 
-			if (_board[left(stone)]==EMPTY)
-			//if (_boardModel.get(left(stone))==EMPTY)
+			//if (_board[left(stone)]==EMPTY)
+			if (_boardModel.get(left(stone))==EMPTY)
 				return true;
-			if (_board[right(stone)]==EMPTY)
-			//if (_boardModel.get(right(stone))==EMPTY)
+			//if (_board[right(stone)]==EMPTY)
+			if (_boardModel.get(right(stone))==EMPTY)
 				return true;
-			if (_board[above(stone)]==EMPTY)
-			//if (_boardModel.get(above(stone))==EMPTY)
+			//if (_board[above(stone)]==EMPTY)
+			if (_boardModel.get(above(stone))==EMPTY)
 				return true;
-			if (_board[below(stone)]==EMPTY)
-			//if (_boardModel.get(below(stone))==EMPTY)
+			//if (_board[below(stone)]==EMPTY)
+			if (_boardModel.get(below(stone))==EMPTY)
 				return true;
 			
 			stone = _chainNext[stone];
@@ -1594,8 +1644,8 @@ public class MonteCarloPluginAdministration
     @Override
 	public String toString()
     {
-    	return SGFUtil.createSGF(getMoveStack()) +"\n\n"+GoArray.printBoardToString(_board);
-//    	return SGFUtil.createSGF(getMoveStack()) +"\n\n"+_boardModel.toString();
+//    	return SGFUtil.createSGF(getMoveStack()) +"\n\n"+GoArray.printBoardToString(_board);
+    	return SGFUtil.createSGF(getMoveStack()) +"\n\n"+_boardModel.toString();
     }
     
     public void setIsSpreadTest(boolean spreadTest)
@@ -1637,6 +1687,7 @@ public class MonteCarloPluginAdministration
 			_hasNext = true;
 			_color = getColorToMove();
 			_boardMarker.getNewMarker();
+			update();
 		}
 		
 		public boolean hasNext()
@@ -1680,9 +1731,14 @@ public class MonteCarloPluginAdministration
 		}
 	}
 
-    public boolean isPrehistoric(int chain)
+    public boolean isPrehistoricChain(int chain)
     {
     	return (_stoneAge[chain]<=_playoutStart);
+    }
+    
+    public boolean isPrehistoricStone(int xy)
+    {
+    	return (_stoneAge[_chain[xy]]<=_playoutStart);
     }
     
     public void setSimulationMoveFilterList(List<MoveFilter> list)
@@ -1729,6 +1785,43 @@ public class MonteCarloPluginAdministration
     	}
     }
     
+    public int getLastMove()
+    {
+    	return _previousMove;
+    }
+    
+    public int getBeforeLastMove()
+    {
+    	if (_moveStack.getSize()<2)
+    		return PASS;
+    	return _moveStack.peek(1);
+    }
+    
+    public int getKoPoint()
+    {
+    	return _koPoint;
+    }
+    
+    public byte[] getBoardArray()
+    {
+    	return _boardModel.getSingleArray();
+    }
+    
+    public int[] getChainArray()
+    {
+    	return _chain;
+    }
+    
+    public int[] getLibertyArray()
+    {
+    	return _liberties;
+    }
+    
+    public byte[] getNeighbourArray()
+    {
+    	return _neighbours;
+    }
+    
     public byte[] getBlackNeighbourArray()
     {
     	return _blackNeighbours;
@@ -1753,4 +1846,14 @@ public class MonteCarloPluginAdministration
     {
     	return _maxDiagonalsOccupied;
     }
+    
+    public byte[] getOwnDiagonalAray()
+    {
+    	return _ownDiagonalNeighbours;
+    }
+    
+    public byte[] getOtherDiagonalAray()
+    {
+    	return _ownDiagonalNeighbours;
+    }    
 }

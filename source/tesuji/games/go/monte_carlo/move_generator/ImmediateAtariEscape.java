@@ -1,4 +1,4 @@
-package tesuji.games.go.monte_carlo;
+package tesuji.games.go.monte_carlo.move_generator;
 
 import static tesuji.games.go.common.GoConstant.PASS;
 import static tesuji.games.go.common.GoConstant.UNDEFINED_COORDINATE;
@@ -18,12 +18,12 @@ public class ImmediateAtariEscape extends LadderMoveGenerator
 		if (administration.getMoveStack().getSize()==0)
 			return UNDEFINED_COORDINATE;
 
-		byte[] board = administration._board;
-		int[] chain = administration._chain;
-		int[] liberties = administration._liberties;
+		byte[] board = administration.getBoardArray();
+		int[] chain = administration.getChainArray();
+		int[] liberties = administration.getLibertyArray();
 		byte colorToMove = administration.getColorToMove();
 		int previousMove = administration.getMoveStack().peek();
-		int koPoint = administration._koPoint;
+		int koPoint = administration.getKoPoint();
 		
 		if (previousMove==PASS)
 			return UNDEFINED_COORDINATE;
@@ -38,7 +38,7 @@ public class ImmediateAtariEscape extends LadderMoveGenerator
 				int chainNext = chain[next];
 				if (_boardMarker.notSet(chainNext))
 				{
-					if (liberties[chainNext]==1 && (!isCheckHistory() || administration.isPrehistoric(chainNext)))
+					if (liberties[chainNext]==1 && (!isCheckHistory() || administration.isPrehistoricChain(chainNext)))
 					{
 						_boardMarker.set(chainNext);
 						_ladderReader.setBoardArray(board);
@@ -48,7 +48,10 @@ public class ImmediateAtariEscape extends LadderMoveGenerator
 						{
 							int escapeXY = _ladderReader.getLastLadderMove();
 							if (escapeXY!=PASS && escapeXY!=UNDEFINED_COORDINATE)
-								return escapeXY;
+							{
+								administration.getProbabilityMap().add(escapeXY, 0.5);
+								//return escapeXY;
+							}
 						}
 					}
 				}
