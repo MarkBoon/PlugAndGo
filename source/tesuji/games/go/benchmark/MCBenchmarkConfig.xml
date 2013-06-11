@@ -9,7 +9,7 @@
 			<value>9</value>
 		</property>
 		<property name="komi">
-			<value>0.5</value>
+			<value>1.5</value>
 		</property>
 		<property name="nrPlayouts">
 			<value>100000</value>
@@ -21,8 +21,8 @@
 		<!-- List with Monte-Carlo playout strategies to benchmark -->
 		<property name="list">
 			<list>
-				<!--<ref bean="mcLibertyAdministration"/>-->
-				<ref bean="mcTacticsAdministration"/>
+				<!--<ref bean="mcLibertyAdministration"/>
+				<ref bean="mcTacticsAdministration"/>-->
 				<ref bean="mcPluginAdministrationLean"/>
 				<ref bean="mcPluginAdministration"/>
 				<!-- <ref bean="mcPatternsAdministration"/> -->
@@ -30,6 +30,13 @@
 		</property>
  	</bean>
 
+	<bean id="patternMatcher" class="tesuji.games.go.monte_carlo.move_generator.MatchPatterns" singleton="true">
+		<constructor-arg>
+			<value>GenTest</value>
+		</constructor-arg>
+		<property name="urgency"><value>5</value></property>
+	</bean>
+	
 	<bean id="eyeMoveFilter" class="tesuji.games.go.monte_carlo.EyeMoveFilter" singleton="false"/>
 
 	<bean id="mcLibertyAdministration" class="tesuji.games.go.monte_carlo.MonteCarloGoAdministration" singleton="false">
@@ -55,6 +62,7 @@
 				<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"><property name="checkHistory"><value>true</value></property></bean>
 				<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"><property name="checkHistory"><value>true</value></property></bean>
 				<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"><property name="checkHistory"><value>true</value></property></bean>
+				<ref bean="patternMatcher"/>
 			</list>
 		</property>
 		<!--<property name="explorationMoveGeneratorList">

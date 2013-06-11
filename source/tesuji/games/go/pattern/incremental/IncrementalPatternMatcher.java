@@ -110,7 +110,7 @@ public class IncrementalPatternMatcher
 		_matchList.clear();
 		_boardChangeList.clear();
 		_boardModel = boardModel;
-		boardModel.addBoardModelListener(this);
+//		boardModel.addBoardModelListener(this);
 		matchingState = new MatchingState[GoArray.MAX];
 		for (int i=0; i<GoArray.MAX; i++)
 		{
@@ -128,6 +128,8 @@ public class IncrementalPatternMatcher
 				recursiveMatchAndStoreState(tree.getRoot(), i);
 			}
 		}
+		if (_boardModel.hasListeners())
+			return;
 	}
 	
 	public PatternGroup getPatternGroup()
@@ -172,6 +174,8 @@ public class IncrementalPatternMatcher
 		_moveNr++;
 		_newMatchList.clear();
 		_deletedMatchList.clear();
+		if (_boardModel.hasListeners())
+			return;
     	for (int i=0; i<_boardChangeList.size(); i++)
     	{
     		BoardChange boardChange = _boardChangeList.get(i);
@@ -463,6 +467,8 @@ public class IncrementalPatternMatcher
 			matchingState[match.xy].add(match);
 		}   	
 		assert(isEqual(this,source));
+		if (_boardModel.hasListeners())
+			return;
     }
     
     /**
@@ -480,7 +486,7 @@ public class IncrementalPatternMatcher
     	clone.tree = tree;
     	clone.patternManager = patternManager;
     	
-    	clone._boardModel = _boardModel;
+    	System.arraycopy(_boardModel.getSingleArray(), 0, clone._boardModel.getSingleArray() , 0, _boardModel.getSingleArray().length);
 //    	clone._boardModel = _boardModel.createClone();
     	clone._matchList = _matchList.createIndexedClone();
     	clone._moveNr = _moveNr;
@@ -499,7 +505,9 @@ public class IncrementalPatternMatcher
 		
 		assert(isEqual(this,clone));
 
-    	return clone;
+		if (_boardModel.hasListeners())
+			return clone;
+		return clone;
     }
     
     public BoardModel getBoardModel()

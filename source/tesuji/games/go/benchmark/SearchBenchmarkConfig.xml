@@ -83,21 +83,18 @@
 				</property>
 				<property name="simulationMoveGeneratorList">
 					<list>
-						<!--<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"/>
+						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"/>
 						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"/>
-						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"/>-->
-						<bean class="tesuji.games.go.monte_carlo.move_generator.Cut" singleton="false"><property name="weight"><value>0.3</value></property></bean>
-						<bean class="tesuji.games.go.monte_carlo.move_generator.Connect" singleton="false"><property name="weight"><value>0.3</value></property></bean>
-						<bean class="tesuji.games.go.monte_carlo.move_generator.KeimaBlock" singleton="false"><property name="weight"><value>0.5</value></property></bean>
-						<!--<ref bean="patternMatcher"/>-->
+						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"/>
+						<ref bean="patternMatcher"/>
 					</list>
 				</property>
 				<property name="explorationMoveGeneratorList">
 					<list>
-						<!--<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"><property name="urgency"><value>5</value></property></bean>
+						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"><property name="urgency"><value>5</value></property></bean>
 						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"><property name="urgency"><value>5</value></property></bean>
-						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"><property name="urgency"><value>5</value></property></bean>-->
-						<!--<ref bean="patternMatcher"/>-->
+						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"><property name="urgency"><value>5</value></property></bean>
+						<ref bean="patternMatcher"/>
 					</list>
 				</property>
 		  	</bean>
@@ -109,7 +106,7 @@
 			<value>true</value>
 		</property>
 		<property name="nrSimulationsBeforeExpansion">
-			<value>1</value>
+			<value>64</value>
 		</property>
 		<property name="isTestVersion">
 			<value>false</value>

@@ -775,7 +775,7 @@ public class MonteCarloGoAdministration
 	@Override
     public boolean isGameFinished()
     {
-		if (_moveStack.peek() == PASS && _moveStack.peek(1) == PASS && _moveStack.peek(2) == PASS)
+		if (!_moveStack.isEmpty() && _moveStack.peek() == PASS && _moveStack.peek(1) == PASS && _moveStack.peek(2) == PASS)
 			return true;
 
 	    return false;

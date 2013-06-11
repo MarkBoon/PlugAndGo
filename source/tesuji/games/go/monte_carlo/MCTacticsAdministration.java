@@ -127,7 +127,7 @@ public class MCTacticsAdministration
 		_flags[Flag.FOG_OF_WAR.ordinal()] = false;
 		_flags[Flag.NO_FIRST_LINE.ordinal()] = false;
 		_flags[Flag.NO_AUTO_ATARI.ordinal()] = false; // -- TODO - temporarily disabled to fix ownership.
-		_flags[Flag.USE_TACTICS_IN_SIMULATION.ordinal()] = false;
+		_flags[Flag.USE_TACTICS_IN_SIMULATION.ordinal()] = true;
 		_flags[Flag.USE_TACTICS_IN_EXPLORATION.ordinal()] = false;
 		_flags[Flag.IMMEDIATE_ESCAPE_ATARI.ordinal()] = true;
 		_flags[Flag.CAPTURE_LAST_MOVE_IN_ATARI.ordinal()] = true;

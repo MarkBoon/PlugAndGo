@@ -1,10 +1,20 @@
 package tesuji.games.go.monte_carlo.move_generator;
 
+import tesuji.games.go.monte_carlo.MonteCarloPluginAdministration;
+
 public abstract class AbstractMoveGenerator implements MoveGenerator
 {
+	protected MonteCarloPluginAdministration administration;
+
 	private int _urgency;
 	private double _weight;
 
+	@Override
+	public void register(MonteCarloPluginAdministration admin)
+	{
+		administration = admin;
+	}
+	
 	@Override
 	public int getUrgency()
 	{

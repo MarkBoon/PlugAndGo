@@ -10,6 +10,7 @@ import tesuji.games.go.pattern.incremental.IncrementalPatternMatcher;
 import tesuji.games.go.pattern.incremental.PatternMatch;
 import tesuji.games.go.pattern.incremental.PatternMatchList;
 import tesuji.games.go.util.DefaultBoardModel;
+import tesuji.games.model.BoardModelListener;
 
 public class MatchPatterns extends AbstractMoveGenerator
 {
@@ -27,7 +28,6 @@ public class MatchPatterns extends AbstractMoveGenerator
     public void register(MonteCarloPluginAdministration admin)
     {
 		administration = admin;
-		administration._explorationMoveSupport.addBoardModelListener(_patternMatcher);
 		PatternManager patternManager = HibernatePatternManager.getSingleton();
 		patternMatcher = new IncrementalPatternMatcher();
 		PatternGroup group = patternManager.getPatternGroup(patternGroupName);
@@ -36,6 +36,8 @@ public class MatchPatterns extends AbstractMoveGenerator
 	    _patternMatcher.setPatternGroup(group);
 	    _patternMatcher.setPatternManager(patternManager);
 	    _patternMatcher.initialise(new DefaultBoardModel(administration.getBoardSize()));
+		administration._explorationMoveSupport.addBoardModelListener(_patternMatcher);
+		administration.getBoardModel().addBoardModelListener(_patternMatcher);
     }
 
 	@Override
@@ -47,11 +49,11 @@ public class MatchPatterns extends AbstractMoveGenerator
 		{
 			if (administration.getColorToMove()==ColorConstant.BLACK)
 			{
-				administration.addPriorityMove(pm.getBlackXY(), 1 /*pm.getUrgencyValue(ColorConstant.BLACK)*/, pm.getNrOccurences(ColorConstant.BLACK), pm.getNrPlayed(ColorConstant.BLACK));
+				administration.addPriorityMove(pm.getXY(), 1 /*pm.getUrgencyValue(ColorConstant.BLACK)*/, pm.getNrOccurences(ColorConstant.BLACK), pm.getNrPlayed(ColorConstant.BLACK));
 			}
 			else
 			{
-				administration.addPriorityMove(pm.getWhiteXY(), 1 /*pm.getUrgencyValue(ColorConstant.WHITE)*/, pm.getNrOccurences(ColorConstant.WHITE), pm.getNrPlayed(ColorConstant.WHITE));
+				administration.addPriorityMove(pm.getXY(), 1 /*pm.getUrgencyValue(ColorConstant.WHITE)*/, pm.getNrOccurences(ColorConstant.WHITE), pm.getNrPlayed(ColorConstant.WHITE));
 			}
 		}
 		return UNDEFINED_COORDINATE;

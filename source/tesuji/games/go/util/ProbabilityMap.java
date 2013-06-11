@@ -68,6 +68,13 @@ public class ProbabilityMap
 			add(i,DEFAULT);
 	}
 	
+	public void decay(int xy)
+	{
+		double weight = _weights[xy];
+		if (weight!=DEFAULT && weight!=0)
+			subtract(xy,_weights[xy]/2);
+	}
+	
 	public int getCoordinate()
 	{
 		double randomValue = _random.nextDouble() * _total;

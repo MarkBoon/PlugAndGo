@@ -8,7 +8,6 @@ import tesuji.games.go.tactics.TacticsConstant;
 
 public abstract class LadderMoveGenerator extends AbstractMoveGenerator
 {
-	protected MonteCarloPluginAdministration administration;
 	protected LadderReader _ladderReader;
 	private boolean checkHistory = false;
 	
