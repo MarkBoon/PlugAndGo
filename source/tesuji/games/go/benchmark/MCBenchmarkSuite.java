@@ -28,6 +28,7 @@ package tesuji.games.go.benchmark;
 
 import java.util.List;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.core.io.FileSystemResource;
@@ -54,7 +55,8 @@ public class MCBenchmarkSuite
 	public static void main(String[] args)
 	{
     	LoggerConfigurator.configure();
-
+    	Logger.getRootLogger().setLevel(Level.INFO);
+    	
     	try
 		{
 			Resource resource = new FileSystemResource("source/tesuji/games/go/benchmark/MCBenchmarkConfig.xml");

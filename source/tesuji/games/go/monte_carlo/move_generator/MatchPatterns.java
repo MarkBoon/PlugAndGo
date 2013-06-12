@@ -1,6 +1,7 @@
 package tesuji.games.go.monte_carlo.move_generator;
 
 import static tesuji.games.go.common.GoConstant.UNDEFINED_COORDINATE;
+import tesuji.core.util.ArrayList;
 import tesuji.games.general.ColorConstant;
 import tesuji.games.go.monte_carlo.MonteCarloPluginAdministration;
 import tesuji.games.go.pattern.common.HibernatePatternManager;
@@ -14,7 +15,6 @@ import tesuji.games.model.BoardModelListener;
 
 public class MatchPatterns extends AbstractMoveGenerator
 {
-	protected MonteCarloPluginAdministration administration;
 	protected IncrementalPatternMatcher patternMatcher;
 	private String patternGroupName;
 	private IncrementalPatternMatcher _patternMatcher;
@@ -44,7 +44,7 @@ public class MatchPatterns extends AbstractMoveGenerator
     public int generate()
     {
 		_patternMatcher.updatePatternMatches();
-		PatternMatchList matchList = _patternMatcher.getMatchList();
+		ArrayList<PatternMatch> matchList = _patternMatcher.getNewMatchList();
 		for (PatternMatch pm : matchList)
 		{
 			if (administration.getColorToMove()==ColorConstant.BLACK)

@@ -766,6 +766,31 @@ public class GoArray
 		return stringBuilder.toString();
 	}
 	
+	public static String printBoardToString(byte[] array, int boardSize)
+	{
+		StringBuilder stringBuilder = new StringBuilder();
+		for (int row=1; row<=boardSize; row++)
+		{
+			for (int col=1; col<=boardSize; col++)
+			{
+				int xy = toXY(col,row);
+				char c;
+				switch(array[xy])
+				{
+					case BLACK: c = 'X'; break;
+					case WHITE: c = 'O'; break;
+					case EMPTY: c = '.'; break;
+					case EDGE: c = '#'; break;
+					default: c = '?';
+				}
+				stringBuilder.append(c);
+			}
+			stringBuilder.append('\n');
+		}
+		stringBuilder.append('\n');
+		return stringBuilder.toString();
+	}
+	
 	public static void printNumbers(byte[] array)
 	{
 		System.out.println();

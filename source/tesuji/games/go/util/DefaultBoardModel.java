@@ -133,7 +133,7 @@ public class DefaultBoardModel
     @Override
 	public String toString()
     {
-    	return GoArray.printBoardToString(getSingleArray());
+    	return GoArray.printBoardToString(getSingleArray(),getBoardSize());
     }
     
     @Override

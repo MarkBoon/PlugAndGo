@@ -132,9 +132,9 @@ public class MCTacticsAdministration
 		_flags[Flag.IMMEDIATE_ESCAPE_ATARI.ordinal()] = true;
 		_flags[Flag.CAPTURE_LAST_MOVE_IN_ATARI.ordinal()] = true;
 		_flags[Flag.CAPTURE_LAST_MOVE_IN_LADDER.ordinal()] = true;
-		_flags[Flag.ESCAPE_ATARI.ordinal()] = true;
-		_flags[Flag.CAPTURE_STONES_IN_ATARI.ordinal()] = true;
-		_flags[Flag.CAPTURE_STONES_IN_LADDER.ordinal()] = true;
+		_flags[Flag.ESCAPE_ATARI.ordinal()] = false;
+		_flags[Flag.CAPTURE_STONES_IN_ATARI.ordinal()] = false;
+		_flags[Flag.CAPTURE_STONES_IN_LADDER.ordinal()] = false;
 		_flags[Flag.CAPTURE_STONES.ordinal()] = false;
 		_flags[Flag.SEPARATE_PATTERN.ordinal()] = false;
 		_flags[Flag.USE_HARD_PATTERNS.ordinal()] = false;

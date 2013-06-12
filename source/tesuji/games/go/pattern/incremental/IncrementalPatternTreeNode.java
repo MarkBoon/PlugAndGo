@@ -58,6 +58,7 @@ class IncrementalPatternTreeNode
 	private IncrementalPatternTreeNode emptyChild;
 	private IncrementalPatternTreeNode edgeChild;
 	private IncrementalPatternTreeNode noCareChild;
+	private boolean isLeaf = true;
 	
 	// Don't serialize the leafs.
 	private transient ArrayList<IncrementalPatternTreeLeaf> leafList;
@@ -119,6 +120,7 @@ class IncrementalPatternTreeNode
 				terminalList.add(pattern);
 				continue;
 			}
+			isLeaf = false;
 			
 			// Find the value of the pattern bit at this pattern point and then
 			// add this pattern to the appropriate list.
@@ -191,6 +193,11 @@ class IncrementalPatternTreeNode
 		}
 			
 		done[pointNr] = 0;
+	}
+	
+	public boolean isLeaf()
+	{
+		return isLeaf;
 	}
 	
 	public final IncrementalPatternTreeNode getBlackChild() 

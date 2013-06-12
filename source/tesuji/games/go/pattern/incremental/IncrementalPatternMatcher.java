@@ -114,9 +114,12 @@ public class IncrementalPatternMatcher
 		matchingState = new MatchingState[GoArray.MAX];
 		for (int i=0; i<GoArray.MAX; i++)
 		{
-			_boardModel.set(i,boardModel.get(i));
-			matchingState[i] = new MatchingState();
-			matchingState[i].add(tree.getRoot());
+			if (_boardModel.get(i)!=EDGE)
+			{
+				_boardModel.set(i,boardModel.get(i));
+				matchingState[i] = new MatchingState();
+				matchingState[i].add(tree.getRoot());
+			}
 		}
 		for (int i=0; i<GoArray.MAX; i++)
 		{
@@ -128,8 +131,6 @@ public class IncrementalPatternMatcher
 				recursiveMatchAndStoreState(tree.getRoot(), i);
 			}
 		}
-		if (_boardModel.hasListeners())
-			return;
 	}
 	
 	public PatternGroup getPatternGroup()
@@ -302,8 +303,9 @@ public class IncrementalPatternMatcher
 	private final IncrementalPatternTreeNode getNextNodeAndStoreState(IncrementalPatternTreeNode node, int startXY)
 	{
 		IncrementalPatternTreeNode nextNode = getNextNode(node,startXY);
-		if (nextNode!=null)
+		if (nextNode!=null && !nextNode.isLeaf())
 		{
+			assert(nextNode.getEdgeChild()!=null || nextNode.getEmptyChild()!=null || nextNode.getBlackChild()!=null || nextNode.getWhiteChild()!=null);
 			int nextCoordinate = startXY + nextNode.getNextCoordinate();
 			if (nextCoordinate>=0 && nextCoordinate<MAX)
 			{
@@ -327,7 +329,7 @@ public class IncrementalPatternMatcher
 	private final IncrementalPatternTreeNode getNextNodeAndRemoveState(IncrementalPatternTreeNode node, int startXY)
 	{
 		IncrementalPatternTreeNode nextNode = getNextNode(node,startXY);
-		if (nextNode!=null)
+		if (nextNode!=null && !nextNode.isLeaf())
 		{
 			int nextCoordinate = startXY + nextNode.getNextCoordinate();
 			if (nextCoordinate>=0 && nextCoordinate<MAX)
@@ -458,7 +460,7 @@ public class IncrementalPatternMatcher
     	_moveNr = source._moveNr;
 		for (int i=0; i<GoArray.MAX; i++)
 		{
-//			if (source.matchingState[i]!=null)
+			if (source.matchingState[i]!=null)
 				matchingState[i].copyDataFrom(source.matchingState[i]);
 		}
 		for (int i=0; i<_matchList.size(); i++)

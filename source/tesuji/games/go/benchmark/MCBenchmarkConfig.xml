@@ -2,11 +2,16 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <beans>
+	<bean id="BoardSize" class="java.lang.Integer">
+		<constructor-arg>
+			<value>9</value>
+		</constructor-arg>
+	</bean>
 	<bean id="BenchmarkSuite" class="tesuji.games.go.benchmark.MCBenchmarkSuite" singleton="false">
 	
 		<!-- Benchmark parameters -->
 		<property name="boardSize">
-			<value>19</value>
+			<value>9</value>
 		</property>
 		<property name="komi">
 			<value>1.5</value>
@@ -22,8 +27,8 @@
 		<property name="list">
 			<list>
 				<!--<ref bean="mcLibertyAdministration"/>
-				<ref bean="mcTacticsAdministration"/>-->
-				<ref bean="mcPluginAdministrationLean"/>
+				<ref bean="mcTacticsAdministration"/>
+				<ref bean="mcPluginAdministrationLean"/>-->
 				<ref bean="mcPluginAdministration"/>
 				<!-- <ref bean="mcPatternsAdministration"/> -->
 			</list>
@@ -46,6 +51,9 @@
 	</bean>
  	
 	<bean id="mcPluginAdministration" class="tesuji.games.go.monte_carlo.MonteCarloPluginAdministration" singleton="false">
+		<constructor-arg>
+			<ref bean="BoardSize"/>
+		</constructor-arg>
 		<property name="simulationMoveFilterList">
 			<list>
 				<ref bean="eyeMoveFilter"/>
@@ -73,6 +81,7 @@
 			</list>
 		</property>-->
 	</bean>
+	
 	<bean id="mcPluginAdministrationLean" class="tesuji.games.go.monte_carlo.MonteCarloPluginAdministration" singleton="false">
 		<property name="simulationMoveFilterList">
 			<list>
