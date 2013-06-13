@@ -660,6 +660,11 @@ public class MonteCarloPluginAdministration
 					}
 				}
 			}
+			if (_liberties[_chain[xy]]==1)
+			{
+				int lib = getLiberty(xy);
+				_probabilityMap.add(lib);
+			}
 			
 			assert _liberties[_chain[xy]]==getLiberties(xy) :
 				"Computed liberties incorrect at "+GoArray.getX(xy)+","+GoArray.getY(xy)+"\nGot "+_liberties[_chain[xy]]+" but should be "+getLiberties(xy)+"\n\n"+toString();
@@ -977,6 +982,7 @@ public class MonteCarloPluginAdministration
 		{
 			int xy = _probabilityMap.getCoordinate();
 			assert(xy!=PASS);
+			assert(_boardModel.get(xy)==EMPTY);
 			if (!isVerboten(xy,filterList) && isLegal(xy))
 			{
 				while (!_illegalStack.isEmpty())
@@ -1247,6 +1253,8 @@ public class MonteCarloPluginAdministration
 			--_blackNeighbours[right];
 			--_blackNeighbours[above];
 			--_blackNeighbours[below];
+			if (_whiteNeighbours[xy]==4)
+				_probabilityMap.reset(xy);
 			if (_blackNeighbours[left]==3 && _boardModel.get(left)==EMPTY)
 				_probabilityMap.add(left);
 			if (_blackNeighbours[right]==3 && _boardModel.get(right)==EMPTY)
@@ -1268,6 +1276,8 @@ public class MonteCarloPluginAdministration
 			--_whiteNeighbours[right];
 			--_whiteNeighbours[above];
 			--_whiteNeighbours[below];
+			if (_blackNeighbours[xy]==4)
+				_probabilityMap.reset(xy);
 			if (_whiteNeighbours[left]==3 && _boardModel.get(left)==EMPTY)
 				_probabilityMap.add(left);
 			if (_whiteNeighbours[right]==3 && _boardModel.get(right)==EMPTY)
