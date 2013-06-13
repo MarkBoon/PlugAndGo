@@ -103,7 +103,7 @@ public interface MonteCarloAdministration<MoveType extends Move>
 	 * 
 	 * @return
 	 */
-	public double getScore();
+	public int getScore();
 	
 	/**
 	 * @return the color for the winning side

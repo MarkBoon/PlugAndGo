@@ -9,9 +9,7 @@ import tesuji.games.go.pattern.common.PatternGroup;
 import tesuji.games.go.pattern.common.PatternManager;
 import tesuji.games.go.pattern.incremental.IncrementalPatternMatcher;
 import tesuji.games.go.pattern.incremental.PatternMatch;
-import tesuji.games.go.pattern.incremental.PatternMatchList;
 import tesuji.games.go.util.DefaultBoardModel;
-import tesuji.games.model.BoardModelListener;
 
 public class MatchPatterns extends AbstractMoveGenerator
 {

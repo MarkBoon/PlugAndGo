@@ -70,8 +70,11 @@ public class DefaultBoardModel
 	@Override
 	public void setBoardSize(int boardSize)
 	{
-		super.setBoardSize(boardSize);
-        _array = GoArray.createBoardArray(boardSize);
+		if (getBoardSize()!=boardSize)
+		{
+			super.setBoardSize(boardSize);
+	        _array = GoArray.createBoardArray(boardSize);
+		}
 	}
 	
 	@Override

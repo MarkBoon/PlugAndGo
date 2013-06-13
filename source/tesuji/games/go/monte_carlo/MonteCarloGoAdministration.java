@@ -1113,9 +1113,9 @@ public class MonteCarloGoAdministration
      * (non-Javadoc)
      * @see tesuji.games.go.monte_carlo.MonteCarloAdministration#getScore()
      */
-    public double getScore()
+    public int getScore()
     {
-    	double score = getScoreEstimate();
+    	int score = getScoreEstimate();
     	
     	for (int i=_emptyPoints.getSize(); --i>=0;)
     	{
@@ -1145,9 +1145,9 @@ public class MonteCarloGoAdministration
     /**
      * @return a very rough estimate of the score, counting just the stones and komi.
      */
-    private double getScoreEstimate()
+    private int getScoreEstimate()
     {
-    	return (double)_nrBlackStones - (double)_nrWhiteStones - _komi;
+    	return _nrBlackStones - _nrWhiteStones - (int)_komi;
     }
     
     /*

@@ -52,6 +52,7 @@ import tesuji.games.go.util.PointSet;
 import tesuji.games.go.util.PointSetFactory;
 import tesuji.games.go.util.ProbabilityMap;
 import tesuji.games.go.util.SGFUtil;
+import tesuji.games.go.util.Statistics;
 import tesuji.games.gtp.GTPCommand;
 import tesuji.games.model.BoardChangeSupport;
 import tesuji.games.model.BoardModel;
@@ -74,6 +75,7 @@ public class MonteCarloPluginAdministration
 	
 	protected int		_boardSize;
 	protected double	_komi = 7.5;
+	protected int		_intKomi = 7;
 	protected byte		_colorToPlay;
 	protected byte		_oppositeColor;
 	protected int		_previousMove;
@@ -340,9 +342,8 @@ public class MonteCarloPluginAdministration
 					_maxDiagonalsOccupied[i] = 2;
 				
 				_emptyPoints.add(i);			
+				_probabilityMap.add(i);
 			}
-			else 
-				_probabilityMap.reset(i);
 			
 			for (int n=0; n<4; n++)
 			{
@@ -387,6 +388,7 @@ public class MonteCarloPluginAdministration
 		_nrBlackStones = source._nrBlackStones;
 		_nrWhiteStones = source._nrWhiteStones;
 		_komi = source._komi;
+		_intKomi = source._intKomi;
 		_nrPasses = source._nrPasses;
 		_colorToPlay = source._colorToPlay;
 		_oppositeColor = source._oppositeColor;
@@ -461,7 +463,7 @@ public class MonteCarloPluginAdministration
 	{
 		int xy = selectSimulationMove(_emptyPoints);
 		playMove(xy);
-		_checksumStack.push(getPositionalChecksum());
+///		_checksumStack.push(getPositionalChecksum());
 		return xy;
 	}
 	
@@ -489,6 +491,7 @@ public class MonteCarloPluginAdministration
 	{
 		setColorToMove(move.getColor());
 		playMove(move.getXY());
+		_checksumStack.push(getPositionalChecksum());
 		update();
 	}
 	
@@ -553,12 +556,8 @@ public class MonteCarloPluginAdministration
 	
 	public boolean isLegal(int xy)
 	{
-		if (xy<0) // Temporary hack
-			return false;
-
 		byte[] board = _boardModel.getSingleArray();
-		if (board[xy]!=EMPTY)
-			return false; // Occupied.
+		assert (board[xy]==EMPTY);
 
 		if (_neighbours[xy]!=4)
 			return true;
@@ -647,11 +646,17 @@ public class MonteCarloPluginAdministration
 				int next = FourCursor.getNeighbour(xy, n);
 				if (board[next]==_oppositeColor)
 				{
-					if (_liberties[_chain[next]]==0)
+					int libs = _liberties[_chain[next]];
+					if (libs==0)
 					{
 						if (_ownNeighbours[next]==4 && _otherNeighbours[xy]==4)
 							_koPoint = next;
 						removeCapturedChain(next);
+					}
+					if (libs==1)
+					{
+						int lib = getLiberty(next);
+						_probabilityMap.add(lib);
 					}
 				}
 			}
@@ -721,34 +726,38 @@ public class MonteCarloPluginAdministration
 	 * (non-Javadoc)
 	 * @see tesuji.games.go.monte_carlo.MonteCarloAdministration#playout()
 	 */
-	@SuppressWarnings("unused")
     public boolean playout()
 	{
 		_inPlayout = true;
 		_playoutStart = _moveStack.getSize();
+		int nrMovesSofar = _playoutStart;
 		while (true)
 		{
 			assert(_probabilityMap.isConsistent());
 			selectAndPlay();
 
-//    		System.out.println( "\n" + GoArray.toString(_board) + "\n");
-//			assert _emptyPoints.isConsistent(_board);
+//    		System.out.println( "\n" + GoArray.toString(_boardModel.getSingleArray()) + "\n");
+			assert _emptyPoints.isConsistent(_boardModel.getSingleArray());
 
     		// Check some of the criteria that end a game.
 			if (getNrPasses()>1)
 			{
 				_inPlayout = false;
-				return (getScore()>0.0);
+				return (getScore()>0);
 			}
-			else if (USE_MERCY_RULE && exceedsMercyThreshold())
+			else if (++nrMovesSofar>_maxGameLength)
 			{
 				_inPlayout = false;
-				return (getScoreEstimate()>0.0);
+				return (getScoreEstimate()>0);
 			}
-			else if (isGameTooLong())
+			else if (USE_MERCY_RULE)
 			{
-				_inPlayout = false;
-				return (getScoreEstimate()>0.0); // Should never happen.
+				int score = getScoreEstimate();
+		    	if (score>_mercyThreshold || score<-_mercyThreshold)
+		    	{
+		    		_inPlayout = false;
+		    		return (score>0);
+		    	}
 			}
 		}
 	}
@@ -921,8 +930,8 @@ public class MonteCarloPluginAdministration
 	protected int selectSimulationMove(PointSet emptyPoints)
 	{
 		int priorityMove = selectPriorityMove(_simulationMoveGeneratorList);
-		if (priorityMove!=PASS && priorityMove!=UNDEFINED_COORDINATE && isLegal(priorityMove))
-			return priorityMove;
+		//if (priorityMove!=UNDEFINED_COORDINATE && priorityMove!=PASS && isLegal(priorityMove))
+		//	return priorityMove;
 		
 		//return selectRandomMoveCoordinate(emptyPoints, _simulationMoveFilterList);
 		for (int i=_priorityMoveStack.getSize(); --i>=0;)
@@ -963,9 +972,11 @@ public class MonteCarloPluginAdministration
 	 */
 	protected int selectWeightedMoveCoordinate(PointSet emptyPoints, List<MoveFilter> filterList)
 	{
+		assert(_illegalStack.isEmpty());
 		while (emptyPoints.getSize()!=0 && _probabilityMap.hasPoints())
 		{
 			int xy = _probabilityMap.getCoordinate();
+			assert(xy!=PASS);
 			if (!isVerboten(xy,filterList) && isLegal(xy))
 			{
 				while (!_illegalStack.isEmpty())
@@ -980,6 +991,7 @@ public class MonteCarloPluginAdministration
 			emptyPoints.remove(xy);
 			_illegalStack.push(xy);
 			_probabilityMap.reset(xy);
+			Statistics.increment("IllegalTries");
 		}
 //		if ((emptyPoints.getSize()==0 && _probabilityMap.hasPoints()) || (emptyPoints.getSize()!=0 && !_probabilityMap.hasPoints()))
 //			System.err.println("Inconsistent!");
@@ -1117,7 +1129,8 @@ public class MonteCarloPluginAdministration
 		byte[] board = _boardModel.getSingleArray();
 		_boardModel.set(xy, _colorToPlay);
 		_emptyPoints.remove(xy);
-		_checksum.add(xy, _colorToPlay);
+		if (!_inPlayout)
+			_checksum.add(xy, _colorToPlay);
 		
 		int left = left(xy);
 		int right = right(xy);
@@ -1147,10 +1160,18 @@ public class MonteCarloPluginAdministration
 		{
 			_nrBlackStones++;
 			_black[xy] = 1;
-			_blackNeighbours[left]++;
-			_blackNeighbours[right]++;
-			_blackNeighbours[above]++;
-			_blackNeighbours[below]++;
+			++_blackNeighbours[left];
+			++_blackNeighbours[right];
+			++_blackNeighbours[above];
+			++_blackNeighbours[below];
+			if (_blackNeighbours[left]==4)
+				_probabilityMap.reset(left);
+			if (_blackNeighbours[right]==4)
+				_probabilityMap.reset(right);
+			if (_blackNeighbours[above]==4)
+				_probabilityMap.reset(above);
+			if (_blackNeighbours[below]==4)
+				_probabilityMap.reset(below);
 			_blackDiagonalNeighbours[left(above)]++;
 			_blackDiagonalNeighbours[left(below)]++;
 			_blackDiagonalNeighbours[right(above)]++;
@@ -1160,10 +1181,18 @@ public class MonteCarloPluginAdministration
 		{
 			_nrWhiteStones++;
 			_white[xy] = 1;
-			_whiteNeighbours[left]++;
-			_whiteNeighbours[right]++;
-			_whiteNeighbours[above]++;
-			_whiteNeighbours[below]++;
+			++_whiteNeighbours[left];
+			++_whiteNeighbours[right];
+			++_whiteNeighbours[above];
+			++_whiteNeighbours[below];
+			if (_whiteNeighbours[left]==4)
+				_probabilityMap.reset(left);
+			if (_whiteNeighbours[right]==4)
+				_probabilityMap.reset(right);
+			if (_whiteNeighbours[above]==4)
+				_probabilityMap.reset(above);
+			if (_whiteNeighbours[below]==4)
+				_probabilityMap.reset(below);
 			_whiteDiagonalNeighbours[left(above)]++;
 			_whiteDiagonalNeighbours[left(below)]++;
 			_whiteDiagonalNeighbours[right(above)]++;
@@ -1184,7 +1213,8 @@ public class MonteCarloPluginAdministration
 //		_board[xy] = EMPTY;
 		_boardModel.set(xy, EMPTY);
 		_emptyPoints.add(xy);
-		_checksum.remove(xy, _oppositeColor);
+		if (!_inPlayout)
+			_checksum.remove(xy, _oppositeColor);
 
 		int left = left(xy);
 		int right = right(xy);
@@ -1213,10 +1243,18 @@ public class MonteCarloPluginAdministration
 		{
 			_nrBlackStones--;
 			_black[xy] = 0;
-			_blackNeighbours[left]--;
-			_blackNeighbours[right]--;
-			_blackNeighbours[above]--;
-			_blackNeighbours[below]--;
+			--_blackNeighbours[left];
+			--_blackNeighbours[right];
+			--_blackNeighbours[above];
+			--_blackNeighbours[below];
+			if (_blackNeighbours[left]==3 && _boardModel.get(left)==EMPTY)
+				_probabilityMap.add(left);
+			if (_blackNeighbours[right]==3 && _boardModel.get(right)==EMPTY)
+				_probabilityMap.add(right);
+			if (_blackNeighbours[above]==3 && _boardModel.get(above)==EMPTY)
+				_probabilityMap.add(above);
+			if (_blackNeighbours[below]==3 && _boardModel.get(below)==EMPTY)
+				_probabilityMap.add(below);
 			_blackDiagonalNeighbours[left(above)]--;
 			_blackDiagonalNeighbours[left(below)]--;
 			_blackDiagonalNeighbours[right(above)]--;
@@ -1226,10 +1264,18 @@ public class MonteCarloPluginAdministration
 		{
 			_nrWhiteStones--;
 			_white[xy] = 0;
-			_whiteNeighbours[left]--;
-			_whiteNeighbours[right]--;
-			_whiteNeighbours[above]--;
-			_whiteNeighbours[below]--;
+			--_whiteNeighbours[left];
+			--_whiteNeighbours[right];
+			--_whiteNeighbours[above];
+			--_whiteNeighbours[below];
+			if (_whiteNeighbours[left]==3 && _boardModel.get(left)==EMPTY)
+				_probabilityMap.add(left);
+			if (_whiteNeighbours[right]==3 && _boardModel.get(right)==EMPTY)
+				_probabilityMap.add(right);
+			if (_whiteNeighbours[above]==3 && _boardModel.get(above)==EMPTY)
+				_probabilityMap.add(above);
+			if (_whiteNeighbours[below]==3 && _boardModel.get(below)==EMPTY)
+				_probabilityMap.add(below);
 			_whiteDiagonalNeighbours[left(above)]--;
 			_whiteDiagonalNeighbours[left(below)]--;
 			_whiteDiagonalNeighbours[right(above)]--;
@@ -1263,11 +1309,22 @@ public class MonteCarloPluginAdministration
      * (non-Javadoc)
      * @see tesuji.games.go.monte_carlo.MonteCarloAdministration#getScore()
      */
-    public double getScore()
+    public int getScore()
     {
-    	double score = getScoreEstimate();
+    	int nrEmptyPoints = _emptyPoints.getSize();
+    	int score = getScoreEstimate();
+    	if (score>0)
+    	{
+    		if (score-nrEmptyPoints>0)
+    			return score;
+    	}
+    	else
+    	{
+    		if (score+nrEmptyPoints<0)
+    			return score;
+    	}
     	
-    	for (int i=_emptyPoints.getSize(); --i>=0;)
+    	for (int i=nrEmptyPoints; --i>=0;)
     	{
     		int xy = _emptyPoints.get(i);
     		
@@ -1296,9 +1353,9 @@ public class MonteCarloPluginAdministration
     /**
      * @return a very rough estimate of the score, counting just the stones and komi.
      */
-    private double getScoreEstimate()
+    private int getScoreEstimate()
     {
-    	return (double)_nrBlackStones - (double)_nrWhiteStones - _komi;
+    	return _nrBlackStones - _nrWhiteStones - _intKomi;
     }
     
     /*
@@ -1332,7 +1389,7 @@ public class MonteCarloPluginAdministration
      */
     public boolean exceedsMercyThreshold()
     {
-    	double score = getScoreEstimate();
+    	int score = getScoreEstimate();
     	return (score>_mercyThreshold || score<-_mercyThreshold);
     }
 
@@ -1377,6 +1434,7 @@ public class MonteCarloPluginAdministration
     public void setKomi(double komi)
     {
     	_komi = komi;
+    	_intKomi = (int) komi;
     }
 
     /*

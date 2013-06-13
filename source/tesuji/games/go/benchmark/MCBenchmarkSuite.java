@@ -87,6 +87,7 @@ public class MCBenchmarkSuite
 		}		
 		_logger.info("");
 		_logger.info("Done.");
+		_logger.info("IllegalTries: "+Statistics.get("IllegalTries"));
 		_logger.info("-Escapes: "+Statistics.get("-Escape"));
 		_logger.info("-Captures: "+Statistics.get("-Capture"));
 		_logger.info("-Ladders: "+Statistics.get("-Ladder"));

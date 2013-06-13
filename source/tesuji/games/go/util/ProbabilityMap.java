@@ -46,7 +46,9 @@ public class ProbabilityMap
 		int y = GoArray.getY(xy);
 		_weights[xy] -= weight;
 		_rowSum[y] -= weight;
+//		assert(_rowSum[y]>=0.0);
 		_total -= weight;
+//		assert(_total>=0.0);
 	}
 
 	public void reset(int xy)
@@ -55,17 +57,16 @@ public class ProbabilityMap
 		double weight = _weights[xy];
 		_weights[xy] = 0.0;
 		_rowSum[y] -= weight;
+//		assert(_rowSum[y]>=0.0);
 		_total -= weight;
+//		assert(_total>=0.0);
 	}
 
 	public void reset()
 	{
 		GoArray.clear(_weights);
-		Arrays.fill(_rowSum,0);
+		Arrays.fill(_rowSum,0.0);
 		_total = 0.0;
-		
-		for (int i=GoArray.FIRST; i<GoArray.LAST; i++)
-			add(i,DEFAULT);
 	}
 	
 	public void decay(int xy)
