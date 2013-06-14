@@ -335,4 +335,10 @@ public class TextFilePatternManager
 			pattern.setPatternNr(i);
 		}
 	}
+    
+    public PatternGroup getDefaultPatternGroup()
+    {
+    	// Not implemented.
+    	return null;
+    }
 }

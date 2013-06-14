@@ -52,6 +52,7 @@ public class HibernatePatternManager
 	private Logger logger;
 	
 	private static HibernatePatternManager _singleton;
+	private static PatternGroup _defaultGroup;
 	
 	public static HibernatePatternManager getSingleton()
 	{
@@ -63,6 +64,13 @@ public class HibernatePatternManager
 		return _singleton;
 	}
 	
+	public HibernatePatternManager(String defaultGroupName)
+	{
+		this();
+		_defaultGroup = getPatternGroup(defaultGroupName);
+		getPatterns(_defaultGroup);
+	}
+
 	/**
 	 * 
 	 */
@@ -401,5 +409,10 @@ public class HibernatePatternManager
 	    {
 	    	closeSession();
 	    }
+    }
+    
+    public PatternGroup getDefaultPatternGroup()
+    {
+    	return _defaultGroup;
     }
 }

@@ -35,9 +35,15 @@
 	</bean>
 	<bean id="eyeMoveFilter" class="tesuji.games.go.monte_carlo.EyeMoveFilter" singleton="false"/>
 	
-	<bean id="patternMatcher" class="tesuji.games.go.monte_carlo.move_generator.MatchPatterns" singleton="true">
+	<bean id="patternManager" class="tesuji.games.go.pattern.common.HibernatePatternManager" singleton="true">
 		<constructor-arg>
 			<value>GenTest</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="patternMatcher" class="tesuji.games.go.monte_carlo.move_generator.MatchPatterns" singleton="false">
+		<constructor-arg>
+			<ref bean="patternManager"/>
 		</constructor-arg>
 		<property name="urgency"><value>5</value></property>
 	</bean>
@@ -68,7 +74,7 @@
   		</property>
 	</bean>
  
-	<bean id="PluginMonteCarloTreeSearch" class="tesuji.games.go.search.MonteCarloTreeSearch" singleton="false">
+	<bean id="PluginMonteCarloTreeSearch" class="tesuji.games.go.search.MonteCarloTreeSearchWithPatterns" singleton="false">
 		<property name="monteCarloAdministration">
 			<bean class="tesuji.games.go.monte_carlo.MonteCarloPluginAdministration" singleton="false">
 				<property name="simulationMoveFilterList">
@@ -110,6 +116,9 @@
 		</property>
 		<property name="isTestVersion">
 			<value>false</value>
+		</property>
+		<property name="patternManager">
+			<ref bean="patternManager"/>
 		</property>
 	</bean>
  	

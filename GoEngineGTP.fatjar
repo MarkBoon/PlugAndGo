@@ -1,0 +1,14 @@
+#Fat Jar Configuration File
+#Tue Sep 11 10:45:28 HST 2012
+onejar.license.required=true
+manifest.classpath=.
+manifest.removesigners=true
+onejar.checkbox=false
+jarname=gtp/GoEngineGTP.jar
+manifest.mergeall=true
+manifest.mainclass=tesuji.games.go.main.GoEngineGTPMain
+manifest.file=<createnew>
+jarname.isextern=false
+onejar.expand=
+excludes=
+includes=

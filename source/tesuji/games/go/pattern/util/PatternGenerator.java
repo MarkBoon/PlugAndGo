@@ -26,28 +26,28 @@ public class PatternGenerator
 		pattern.setUserX(PATTERN_SIZE/2);
 		pattern.setUserY(PATTERN_SIZE/2);
 		
-		generate3x3Pattern(0, 0, pattern, list);
+		generate3x3Pattern(0, 0, pattern, list, PATTERN_SIZE, PATTERN_SIZE);
 
 		Pattern sidePattern = new Pattern();
 //		pattern.addLeftColumn();
 //		pattern.addRightColumn();
 //		pattern.addTopRow();
 //		pattern.addBottomRow();
-		pattern.setUserX(PATTERN_SIZE/2);
-		pattern.setUserY(PATTERN_SIZE/2);
-		sidePattern.setPoint(PATTERN_SIZE/2, 0, EDGE);
+		sidePattern.removeTopRow();
+		sidePattern.setUserX(PATTERN_SIZE/2);
+		sidePattern.setUserY(0);
 		sidePattern.setTopEdge(true);
 
-		generate3x3Pattern(0, 1, pattern, list);
+		generate3x3Pattern(0, 0, sidePattern, list, PATTERN_SIZE, PATTERN_SIZE-1);
 		
 		return list;
 	}
 	
-	public static void generate3x3Pattern(int col, int row, Pattern p, ArrayList<Pattern> list)
+	public static void generate3x3Pattern(int col, int row, Pattern p, ArrayList<Pattern> list, int width, int height)
 	{
-		if (col>=PATTERN_SIZE || row>=PATTERN_SIZE)
+		if (col>=width || row>=height)
 			System.err.println("Out of bounds: "+col+","+row);
-		if (col==PATTERN_SIZE-1 && row==PATTERN_SIZE-1)
+		if (col==width-1 && row==height-1)
 		{
 			p.setPoint(col, row, WHITE);
 			list.add((Pattern)p.clone());
@@ -63,17 +63,17 @@ public class PatternGenerator
 		int newCol = col;
 		int newRow = row;
 		newCol++;
-		if (newCol==PATTERN_SIZE)
+		if (newCol==width)
 		{
 			newCol=0;
 			newRow++;
 		}
 		p.setPoint(col, row, WHITE);
-		generate3x3Pattern(newCol,newRow,p,list);
+		generate3x3Pattern(newCol,newRow,p,list, width, height);
 		p.setPoint(col, row, BLACK);
-		generate3x3Pattern(newCol,newRow,p,list);
+		generate3x3Pattern(newCol,newRow,p,list, width, height);
 		p.setPoint(col, row, EMPTY);
-		generate3x3Pattern(newCol,newRow,p,list);
+		generate3x3Pattern(newCol,newRow,p,list, width, height);
 	}
 	
 	public static void generateSymmetricalPatterns(ArrayList<Pattern> list)

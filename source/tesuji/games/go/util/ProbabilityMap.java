@@ -6,7 +6,7 @@ import tesuji.core.util.MersenneTwisterFast;
 
 public class ProbabilityMap
 {
-	private static final double ERROR_MARGIN = 0.000000001;
+	public static final double ERROR_MARGIN = 0.000000001;
 	private static final double DEFAULT = Math.sqrt(ERROR_MARGIN);
 	private MersenneTwisterFast _random;
 
@@ -34,11 +34,17 @@ public class ProbabilityMap
 		_weights[xy] += weight;
 		_rowSum[y] += weight;
 		_total += weight;
+		assert(isConsistent());
 	}
 
 	public void add(int xy)
 	{
 		add(xy,DEFAULT);
+	}
+	
+	public void add(int xy, int urgency)
+	{
+		add(xy,urgency*DEFAULT);
 	}
 	
 	public void subtract(int xy, double weight)
@@ -49,6 +55,12 @@ public class ProbabilityMap
 //		assert(_rowSum[y]>=0.0);
 		_total -= weight;
 //		assert(_total>=0.0);
+		assert(isConsistent());
+	}
+
+	public void subtract(int xy, int urgency)
+	{
+		subtract(xy,urgency*DEFAULT);
 	}
 
 	public void reset(int xy)
@@ -114,9 +126,15 @@ public class ProbabilityMap
 		double rowTotal = 0.0;
 		
 		for (int i=GoArray.FIRST; i<GoArray.LAST; i++)
+		{
 			total += _weights[i];
+			assert(_weights[i]>=0.0);
+		}
 		for (int i=0; i<GoArray.WIDTH; i++)
+		{
 			rowTotal += _rowSum[i];
+			assert(_rowSum[i]>-ERROR_MARGIN);
+		}
 		
 		assert(Math.abs(_total-total)<ERROR_MARGIN);
 		assert(Math.abs(_total-rowTotal)<ERROR_MARGIN);

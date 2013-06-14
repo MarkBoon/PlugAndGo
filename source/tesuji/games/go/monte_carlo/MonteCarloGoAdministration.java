@@ -414,8 +414,6 @@ public class MonteCarloGoAdministration
 	
 	private void playMove(int xy)
 	{
-		_koPoint = UNDEFINED_COORDINATE;
-
 		_moveStack.push(xy);		
 		play(xy);
 		
@@ -523,6 +521,8 @@ public class MonteCarloGoAdministration
 	
 	public void play(int xy)
 	{
+		_koPoint = UNDEFINED_COORDINATE;
+
 		if (xy!=PASS)
 		{
 			boolean extended = false;

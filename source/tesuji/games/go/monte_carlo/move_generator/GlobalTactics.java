@@ -44,7 +44,7 @@ public class GlobalTactics extends LadderMoveGenerator
 						int escapeXY = _ladderReader.getLastLadderMove();
 						if (administration.isLegal(escapeXY))
 						{
-							administration.addPriorityMove(escapeXY, getUrgency(), getUrgency(), getUrgency());
+//							administration.addPriorityMove(escapeXY, getUrgency(), getUrgency(), getUrgency());
 						}
 					}
 				}
@@ -57,7 +57,7 @@ public class GlobalTactics extends LadderMoveGenerator
 						int captureXY = administration.getLiberty(i);
 						if (administration.isLegal(captureXY))
 						{
-							administration.addPriorityMove(captureXY, getUrgency(), getUrgency(), getUrgency());
+//							administration.addPriorityMove(captureXY, getUrgency(), getUrgency(), getUrgency());
 						}
 					}
 				}
@@ -68,7 +68,7 @@ public class GlobalTactics extends LadderMoveGenerator
 					if (_ladderReader.tryLadder(i)==TacticsConstant.CAN_CATCH)
 					{
 						int ladderXY = _ladderReader.getLastLadderMove();
-						administration.addPriorityMove(ladderXY, getUrgency(), getUrgency(), getUrgency());
+//						administration.addPriorityMove(ladderXY, getUrgency(), getUrgency(), getUrgency());
 					}
 				}
 			}

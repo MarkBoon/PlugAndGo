@@ -126,18 +126,17 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 	public void setMonteCarloAdministration(MonteCarloAdministration<MoveType> administration)
 	{
 		_monteCarloAdministration = administration;
-		_patternMatcher = ((MCPatternsAdministration)administration).getPatternMatcher();
+//		_patternMatcher = ((MCPatternsAdministration)administration).getPatternMatcher();
 		initRoot();
 		
 		GoArray.clear(_ownershipArray);
 	}
 	
-	public void setPatternSet(String patternGroup)
+	public void setPatternManager(PatternManager patternManager)
 	{
-		PatternGroup group = _patternManager.getPatternGroup(patternGroup);
+		_patternManager = patternManager;
 		cleanupPatterns();
-		_patternManager.getPatterns(group);
-		_patternMatcher = new IncrementalPatternMatcher(group);
+		_patternMatcher = new IncrementalPatternMatcher(_patternManager.getDefaultPatternGroup());
 //		System.out.println(group.getPatternList().get(0).toString());
 	}
 	
@@ -183,8 +182,8 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 	{		
 		if (!_isInitialized)
 		{
-//XXX			_patternMatcher.initialise(_monteCarloAdministration.getBoardModel());
-//XXX			_monteCarloAdministration.getBoardModel().addBoardModelListener(_patternMatcher);
+			_patternMatcher.initialise(_monteCarloAdministration.getBoardModel());
+			_monteCarloAdministration.getBoardModel().addBoardModelListener(_patternMatcher);
 			_isInitialized = true;
 		}
 
@@ -815,8 +814,8 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
     		running = false;
     		_searchAdministration = _monteCarloAdministration.createClone();
     		_searchPatternMatcher = _patternMatcher.createClone();
-// XXX    		_searchAdministration.getExplorationListenerSupport().addBoardModelListener(_searchPatternMatcher);
-//    		_searchAdministration.getBoardModel().addBoardModelListener(_searchPatternMatcher);
+//    		_searchAdministration.getExplorationListenerSupport().addBoardModelListener(_searchPatternMatcher);
+    		_searchAdministration.getBoardModel().addBoardModelListener(_searchPatternMatcher);
     		_weightMap = createDoubles();
     		_colorMap = createBytes();
     	}

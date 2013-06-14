@@ -196,8 +196,8 @@ public class MonteCarloPluginAdministration
 	 * - wins as the number of times the pattern was successful
 	 */
 	protected IntStack _urgencyStack;
-	protected IntStack _visitStack;
-	protected IntStack _winStack;
+//	protected IntStack _visitStack;
+//	protected IntStack _winStack;
 	protected IntStack _illegalStack;
 	
 	/**
@@ -270,8 +270,8 @@ public class MonteCarloPluginAdministration
 		_checksumStack = ArrayFactory.createLargeIntStack();
 		_priorityMoveStack = ArrayFactory.createIntStack();
 		_urgencyStack = ArrayFactory.createIntStack();
-		_visitStack = ArrayFactory.createIntStack();
-		_winStack = ArrayFactory.createIntStack();
+//		_visitStack = ArrayFactory.createIntStack();
+//		_winStack = ArrayFactory.createIntStack();
 		
 		_stoneAge = GoArray.createIntegers();
 		
@@ -469,8 +469,6 @@ public class MonteCarloPluginAdministration
 	
 	private void playMove(int xy)
 	{
-		_koPoint = UNDEFINED_COORDINATE;
-
 		_moveStack.push(xy);		
 		play(xy);
 		
@@ -585,6 +583,7 @@ public class MonteCarloPluginAdministration
 	
 	public void play(int xy)
 	{
+		_koPoint = UNDEFINED_COORDINATE;
 		if (xy!=PASS)
 		{
 			boolean extended = false;
@@ -653,18 +652,18 @@ public class MonteCarloPluginAdministration
 							_koPoint = next;
 						removeCapturedChain(next);
 					}
-					if (libs==1)
-					{
-						int lib = getLiberty(next);
-						_probabilityMap.add(lib);
-					}
+//					if (libs==1)
+//					{
+//						int lib = getLiberty(next);
+//						addAtari(next,lib);
+//					}
 				}
 			}
-			if (_liberties[_chain[xy]]==1)
-			{
-				int lib = getLiberty(xy);
-				_probabilityMap.add(lib);
-			}
+//			if (_liberties[_chain[xy]]==1)
+//			{
+//				int lib = getLiberty(xy);
+//				addAtari(xy,lib);
+//			}
 			
 			assert _liberties[_chain[xy]]==getLiberties(xy) :
 				"Computed liberties incorrect at "+GoArray.getX(xy)+","+GoArray.getY(xy)+"\nGot "+_liberties[_chain[xy]]+" but should be "+getLiberties(xy)+"\n\n"+toString();
@@ -675,7 +674,20 @@ public class MonteCarloPluginAdministration
 		
 		setNeighbourArrays();
 		
+		assert _probabilityMap.isConsistent();
 		assert isLibertiesConsistent() : toString();
+		assert isProbabilityMapConsistent() : toString();
+	}
+	
+	private void addAtari(int xy, int lib)
+	{
+		int stone = xy;
+		do
+		{
+			_probabilityMap.add(lib);
+			stone = _chainNext[stone];
+		}
+		while (stone!=xy);		
 	}
 	
 	/*
@@ -938,17 +950,17 @@ public class MonteCarloPluginAdministration
 		//if (priorityMove!=UNDEFINED_COORDINATE && priorityMove!=PASS && isLegal(priorityMove))
 		//	return priorityMove;
 		
-		//return selectRandomMoveCoordinate(emptyPoints, _simulationMoveFilterList);
-		for (int i=_priorityMoveStack.getSize(); --i>=0;)
-		{
-			int xy = _priorityMoveStack.get(i);
-			double weight = 0.0;
-			if (_boardModel.get(xy)==EMPTY && _winStack.get(i)!=0)
-				weight = (double)_visitStack.get(i)/(double)_winStack.get(i);
-			if (weight!=0.0)
-				_probabilityMap.add(xy,weight);
-		}
-		return selectWeightedMoveCoordinate(emptyPoints, _simulationMoveFilterList);
+		return selectRandomMoveCoordinate(emptyPoints, _simulationMoveFilterList);
+//		for (int i=_priorityMoveStack.getSize(); --i>=0;)
+//		{
+//			int xy = _priorityMoveStack.get(i);
+//			double weight = 0.0;
+//			if (_boardModel.get(xy)==EMPTY && _winStack.get(i)!=0)
+//				weight = (double)_visitStack.get(i)/(double)_winStack.get(i);
+//			if (weight!=0.0)
+//				_probabilityMap.add(xy,weight);
+//		}
+		//return selectWeightedMoveCoordinate(emptyPoints, _simulationMoveFilterList);
 	}
 	
 	/**
@@ -978,12 +990,13 @@ public class MonteCarloPluginAdministration
 	protected int selectWeightedMoveCoordinate(PointSet emptyPoints, List<MoveFilter> filterList)
 	{
 		assert(_illegalStack.isEmpty());
+		assert(_probabilityMap.isConsistent());
 		while (emptyPoints.getSize()!=0 && _probabilityMap.hasPoints())
 		{
 			int xy = _probabilityMap.getCoordinate();
 			assert(xy!=PASS);
 			assert(_boardModel.get(xy)==EMPTY);
-			if (!isVerboten(xy,filterList) && isLegal(xy))
+			if (isLegal(xy) && !isVerboten(xy,filterList))
 			{
 				while (!_illegalStack.isEmpty())
 				{
@@ -997,11 +1010,12 @@ public class MonteCarloPluginAdministration
 			emptyPoints.remove(xy);
 			_illegalStack.push(xy);
 			_probabilityMap.reset(xy);
-			Statistics.increment("IllegalTries");
+//			Statistics.increment("IllegalTries");
 		}
 //		if ((emptyPoints.getSize()==0 && _probabilityMap.hasPoints()) || (emptyPoints.getSize()!=0 && !_probabilityMap.hasPoints()))
 //			System.err.println("Inconsistent!");
-		assert((emptyPoints.getSize()!=0)==_probabilityMap.hasPoints());
+		assert(_probabilityMap.isConsistent());
+//		assert((emptyPoints.getSize()!=0)==_probabilityMap.hasPoints());
 		while (!_illegalStack.isEmpty())
 		{
 			int illegalXY = _illegalStack.pop();
@@ -1036,10 +1050,17 @@ public class MonteCarloPluginAdministration
 
 	protected int selectPriorityMove(List<MoveGenerator> moveGeneratorList)
 	{
-		_priorityMoveStack.clear();
-    	_urgencyStack.clear();
-    	_visitStack.clear();
-    	_winStack.clear();
+		while (!_priorityMoveStack.isEmpty())
+		{
+			int xy = _priorityMoveStack.pop();
+			int urgency = _urgencyStack.pop();
+			_probabilityMap.subtract(xy, urgency);
+			_probabilityMap.add(xy, urgency/4);
+		}
+//		_priorityMoveStack.clear();
+//    	_urgencyStack.clear();
+//    	_visitStack.clear();
+//    	_winStack.clear();
 		if (_previousMove!=PASS)
 		{
 			int size = moveGeneratorList.size();
@@ -1170,14 +1191,14 @@ public class MonteCarloPluginAdministration
 			++_blackNeighbours[right];
 			++_blackNeighbours[above];
 			++_blackNeighbours[below];
-			if (_blackNeighbours[left]==4)
-				_probabilityMap.reset(left);
-			if (_blackNeighbours[right]==4)
-				_probabilityMap.reset(right);
-			if (_blackNeighbours[above]==4)
-				_probabilityMap.reset(above);
-			if (_blackNeighbours[below]==4)
-				_probabilityMap.reset(below);
+//			if (_blackNeighbours[left]==4)
+//				_probabilityMap.reset(left);
+//			if (_blackNeighbours[right]==4)
+//				_probabilityMap.reset(right);
+//			if (_blackNeighbours[above]==4)
+//				_probabilityMap.reset(above);
+//			if (_blackNeighbours[below]==4)
+//				_probabilityMap.reset(below);
 			_blackDiagonalNeighbours[left(above)]++;
 			_blackDiagonalNeighbours[left(below)]++;
 			_blackDiagonalNeighbours[right(above)]++;
@@ -1191,14 +1212,14 @@ public class MonteCarloPluginAdministration
 			++_whiteNeighbours[right];
 			++_whiteNeighbours[above];
 			++_whiteNeighbours[below];
-			if (_whiteNeighbours[left]==4)
-				_probabilityMap.reset(left);
-			if (_whiteNeighbours[right]==4)
-				_probabilityMap.reset(right);
-			if (_whiteNeighbours[above]==4)
-				_probabilityMap.reset(above);
-			if (_whiteNeighbours[below]==4)
-				_probabilityMap.reset(below);
+//			if (_whiteNeighbours[left]==4)
+//				_probabilityMap.reset(left);
+//			if (_whiteNeighbours[right]==4)
+//				_probabilityMap.reset(right);
+//			if (_whiteNeighbours[above]==4)
+//				_probabilityMap.reset(above);
+//			if (_whiteNeighbours[below]==4)
+//				_probabilityMap.reset(below);
 			_whiteDiagonalNeighbours[left(above)]++;
 			_whiteDiagonalNeighbours[left(below)]++;
 			_whiteDiagonalNeighbours[right(above)]++;
@@ -1253,16 +1274,14 @@ public class MonteCarloPluginAdministration
 			--_blackNeighbours[right];
 			--_blackNeighbours[above];
 			--_blackNeighbours[below];
-			if (_whiteNeighbours[xy]==4)
-				_probabilityMap.reset(xy);
-			if (_blackNeighbours[left]==3 && _boardModel.get(left)==EMPTY)
-				_probabilityMap.add(left);
-			if (_blackNeighbours[right]==3 && _boardModel.get(right)==EMPTY)
-				_probabilityMap.add(right);
-			if (_blackNeighbours[above]==3 && _boardModel.get(above)==EMPTY)
-				_probabilityMap.add(above);
-			if (_blackNeighbours[below]==3 && _boardModel.get(below)==EMPTY)
-				_probabilityMap.add(below);
+//			if (_blackNeighbours[left]==3 && _boardModel.get(left)==EMPTY)
+//				_probabilityMap.add(left);
+//			if (_blackNeighbours[right]==3 && _boardModel.get(right)==EMPTY)
+//				_probabilityMap.add(right);
+//			if (_blackNeighbours[above]==3 && _boardModel.get(above)==EMPTY)
+//				_probabilityMap.add(above);
+//			if (_blackNeighbours[below]==3 && _boardModel.get(below)==EMPTY)
+//				_probabilityMap.add(below);
 			_blackDiagonalNeighbours[left(above)]--;
 			_blackDiagonalNeighbours[left(below)]--;
 			_blackDiagonalNeighbours[right(above)]--;
@@ -1276,22 +1295,23 @@ public class MonteCarloPluginAdministration
 			--_whiteNeighbours[right];
 			--_whiteNeighbours[above];
 			--_whiteNeighbours[below];
-			if (_blackNeighbours[xy]==4)
-				_probabilityMap.reset(xy);
-			if (_whiteNeighbours[left]==3 && _boardModel.get(left)==EMPTY)
-				_probabilityMap.add(left);
-			if (_whiteNeighbours[right]==3 && _boardModel.get(right)==EMPTY)
-				_probabilityMap.add(right);
-			if (_whiteNeighbours[above]==3 && _boardModel.get(above)==EMPTY)
-				_probabilityMap.add(above);
-			if (_whiteNeighbours[below]==3 && _boardModel.get(below)==EMPTY)
-				_probabilityMap.add(below);
+//			if (_whiteNeighbours[left]==3 && _boardModel.get(left)==EMPTY)
+//				_probabilityMap.add(left);
+//			if (_whiteNeighbours[right]==3 && _boardModel.get(right)==EMPTY)
+//				_probabilityMap.add(right);
+//			if (_whiteNeighbours[above]==3 && _boardModel.get(above)==EMPTY)
+//				_probabilityMap.add(above);
+//			if (_whiteNeighbours[below]==3 && _boardModel.get(below)==EMPTY)
+//				_probabilityMap.add(below);
 			_whiteDiagonalNeighbours[left(above)]--;
 			_whiteDiagonalNeighbours[left(below)]--;
 			_whiteDiagonalNeighbours[right(above)]--;
 			_whiteDiagonalNeighbours[right(below)]--;		
 		}
-		_probabilityMap.add(xy);
+//		if (_whiteNeighbours[xy]==4 || _blackNeighbours[xy]==4)
+//			_probabilityMap.reset(xy);
+//		else
+			_probabilityMap.add(xy);
 	}
 
 	/*
@@ -1546,6 +1566,32 @@ public class MonteCarloPluginAdministration
     	return true;
     }
     
+    /**
+     * This is for verification purposes.
+     * 
+     * @return
+     */
+    private boolean isProbabilityMapConsistent()
+    {
+    	for (int i=FIRST; i<=LAST; i++)
+    	{
+    		assert (_boardModel.get(i)==EMPTY || _probabilityMap.getWeight(i)<ProbabilityMap.ERROR_MARGIN);
+//        	if (_boardModel.get(i)==EMPTY && (_blackNeighbours[i]==4 || _whiteNeighbours[i]==4))
+//    		{
+//        		boolean isCapture = false;
+//        		for (int n=0; n<4; n++)
+//        		{
+//        			int next = FourCursor.getNeighbour(i, n);
+//        			if (_liberties[_chain[next]]==1)
+//        				isCapture = true;
+//        		}
+//        		assert(isCapture==true || _probabilityMap.getWeight(i)<ProbabilityMap.ERROR_MARGIN);
+//    		}
+    	}
+    	
+    	return true;
+    }
+    
 	/**
      * @return the emptyPoints
      */
@@ -1573,24 +1619,25 @@ public class MonteCarloPluginAdministration
      * Fill _priorityMoveStack with priority moves.
      * Subclasses must override this method to give certain moves priority.
      */
-    protected void getPriorityMoves()
-    {
-		for (MoveGenerator generator : _explorationMoveGeneratorList)
-		{
-			int xy = generator.generate();
-			if (xy!=UNDEFINED_COORDINATE)
-			{
-				addPriorityMove(xy,1,generator.getUrgency(),generator.getUrgency());
-			}
-		}
-    }
+//    protected void getPriorityMoves()
+//    {
+//		for (MoveGenerator generator : _explorationMoveGeneratorList)
+//		{
+//			int xy = generator.generate();
+//			if (xy!=UNDEFINED_COORDINATE)
+//			{
+//				addPriorityMove(xy,1,generator.getUrgency(),generator.getUrgency());
+//			}
+//		}
+//    }
     
-    public void addPriorityMove(int xy, int urgency, int visits, int wins)
+    public void addPriorityMove(int xy, int urgency/*, int visits, int wins*/)
     {
     	_priorityMoveStack.push(xy);
     	_urgencyStack.push(urgency);
-    	_visitStack.push(visits);
-    	_winStack.push(wins);
+    	_probabilityMap.add(xy,urgency);
+//    	_visitStack.push(visits);
+//    	_winStack.push(wins);
     }
     
     /*
@@ -1746,9 +1793,9 @@ public class MonteCarloPluginAdministration
 		{
 			_priorityMoveStack.clear();
 			_urgencyStack.clear();
-			_visitStack.clear();
-			_winStack.clear();
-			getPriorityMoves();
+//			_visitStack.clear();
+//			_winStack.clear();
+//			getPriorityMoves();
 			priorityIndex = 0;
 			
 			_emptyPoints.copyFrom(getEmptyPoints());
@@ -1772,8 +1819,8 @@ public class MonteCarloPluginAdministration
 				{
 					GoMove move = GoMoveFactory.getSingleton().createLightMove(priorityMoveXY,_color);
 					move.setUrgency(_urgencyStack.get(priorityIndex-1));
-					move.setVisits(_visitStack.get(priorityIndex-1));
-					move.setWins(_winStack.get(priorityIndex-1));
+//					move.setVisits(_visitStack.get(priorityIndex-1));
+//					move.setWins(_winStack.get(priorityIndex-1));
 					_emptyPoints.remove(priorityMoveXY);
 					_boardMarker.set(priorityMoveXY);
 					return move;
@@ -1852,6 +1899,225 @@ public class MonteCarloPluginAdministration
 			generator.register(this);
     	}
     }
+    
+	public int getDiagonalHalfEye(int xy)
+	{
+		if (xy==0 || _otherNeighbours[xy]!=4)
+			return 0;
+		
+		int edge=0;
+		int own=0;
+		int empty=0;
+		int emptyXY = 0;
+		for (int n=0; n<4; n++)
+		{
+			int next = DiagonalCursor.getNeighbour(xy, n);
+			byte board = _boardModel.get(next);
+			if (board==EDGE)
+				edge++;
+			else if (board==EMPTY)
+			{
+				if (_neighbours[next]>2 && _neighbours[next]==_otherNeighbours[next])
+					own++;
+				else
+				{
+					empty++;
+					emptyXY = next;
+				}
+			}
+			else if (board==_oppositeColor)
+				own++;
+			else if (_liberties[_chain[next]]==1)
+				own++;
+		}
+		if (empty!=1)
+			return 0;
+		if (edge==3)
+			return emptyXY;
+		if (edge==2 && own==1)
+			return emptyXY;
+		if (own==2)
+			return emptyXY;
+		
+		return 0;
+	}
+	
+	public int getHalfEye(int xy)
+	{
+		if (xy==0 || _otherNeighbours[xy]!=3)
+			return 0;
+		
+		int edge=0;
+		int own=0;
+		int other=0;
+		int empty=0;
+		for (int n=0; n<4; n++)
+		{
+			int next = DiagonalCursor.getNeighbour(xy, n);
+			byte board = _boardModel.get(next);
+			if (board==EDGE)
+				edge++;
+			else if (board==EMPTY)
+			{
+				if (_neighbours[next]>2 && _neighbours[next]==_otherNeighbours[next])
+					own++;
+				else
+					empty++;
+			}
+			else if (board==_oppositeColor)
+				own++;
+			else if (_liberties[_chain[next]]==1)
+				own++;
+			else
+				other++;
+		}
+		
+		if (other+empty>1)
+			return 0;
+		if (edge==3 && own!=1)
+			return 0;
+		if (edge==2 && own!=2)
+			return 0;
+		for (int n=0; n<4; n++)
+		{
+			int next = FourCursor.getNeighbour(xy, n);
+			if (_boardModel.get(next)==EMPTY)
+				if (_otherNeighbours[next]==2 || (_otherNeighbours[next]==3 && _ownDiagonalNeighbours[next]>_maxDiagonalsOccupied[next]))
+					return next;
+		}
+		
+		return 0;
+	}
+
+	protected boolean isFalsePoint(int xy, byte color)
+   {
+	    if (_boardModel.get(left(xy))==color
+						&& (_boardModel.get(left_above(xy))==opposite(color) || _boardModel.get(left_above(xy))==EDGE)
+						&& (_boardModel.get(left_below(xy))==opposite(color) || _boardModel.get(left_below(xy))==EDGE))
+			return true;
+		if (_boardModel.get(right(xy))==color
+						&& (_boardModel.get(right_above(xy))==opposite(color) || _boardModel.get(right_above(xy))==EDGE)
+						&& (_boardModel.get(right_below(xy))==opposite(color) || _boardModel.get(right_below(xy))==EDGE))
+			return true;
+		if (_boardModel.get(above(xy))==color
+						&& (_boardModel.get(left_above(xy))==opposite(color) || _boardModel.get(left_above(xy))==EDGE)
+						&& (_boardModel.get(right_above(xy))==opposite(color) || _boardModel.get(right_above(xy))==EDGE))
+			return true;
+		if (_boardModel.get(below(xy))==color
+						&& (_boardModel.get(left_below(xy))==opposite(color) || _boardModel.get(left_below(xy))==EDGE)
+						&& (_boardModel.get(right_below(xy))==opposite(color) || _boardModel.get(right_below(xy))==EDGE))
+			return true;
+		return false;
+   }
+
+	protected int getNrStones(int xy)
+	{
+		int nrStones = 0;
+		int stone = xy;
+		do
+		{
+			nrStones++;
+			stone = _chainNext[stone];
+		}
+		while (stone!=xy);
+ 	
+		return nrStones;
+ 	}    
+
+	public boolean isAutoAtari(int xy)
+	{
+		if (_koPoint!=UNDEFINED_COORDINATE && _liberties[_chain[_previousMove]]==1)
+			return false;
+		
+//		if (!isPrehistoric(_chain[left(xy)]) && !isPrehistoric(_chain[right(xy)])
+//				&& !isPrehistoric(_chain[above(xy)]) && !isPrehistoric(_chain[below(xy)]))
+//			return false;
+		
+		int nLib = 4-_neighbours[xy];
+		int nStones = 0;
+		boolean hasAtari = false;
+		boolean hasCapture = false;
+		int libertyLocation = UNDEFINED_COORDINATE;
+		
+		boolean hasFalsePoint = isFalsePoint(xy,_oppositeColor);
+
+		for (int n=4; --n>=0;)
+		{
+			int next = FourCursor.getNeighbour(xy, n);
+			byte boardValue = _boardModel.get(next);
+			if (boardValue==_colorToPlay)
+			{
+				int stone = next;
+				do
+				{
+					nStones++;
+					int left = left(stone);
+					if (xy!=left && libertyLocation!=left && _boardModel.get(left)==EMPTY)
+					{
+						if (++nLib>1)
+							return false;
+						libertyLocation = left;
+					}
+					int right = right(stone);
+					if (xy!=right && libertyLocation!=right && _boardModel.get(right)==EMPTY)
+					{
+						if (++nLib>1)
+							return false;
+						libertyLocation = right;
+					}
+					int above = above(stone);
+					if (xy!=above && libertyLocation!=above && _boardModel.get(above)==EMPTY)
+					{
+						if (++nLib>1)
+							return false;
+						libertyLocation = above;
+					}
+					int below = below(stone);
+					if (xy!=below && libertyLocation!=below && _boardModel.get(below)==EMPTY)
+					{
+						if (++nLib>1)
+							return false;
+						libertyLocation = below;
+					}
+					
+					if (!hasFalsePoint && isFalsePoint(stone,_oppositeColor))
+						hasFalsePoint = true;					
+
+					stone = _chainNext[stone];
+				}
+				while (stone!=next);
+			}
+			else if (boardValue==_oppositeColor)
+			{
+				if (!hasAtari && _liberties[_chain[next]]==2 && getNrStones(next)>1)
+					hasAtari = true;
+				if (_liberties[_chain[next]]==1)
+				{
+					if (getNrStones(next)>1)
+						return false;
+					nLib++;
+					hasCapture = true;
+				}
+			}
+			else if (boardValue==EMPTY)
+				libertyLocation = next;
+		}
+		
+		if (nLib<2)
+		{
+			if (hasFalsePoint)
+				nStones-=2;
+			if (nStones>5)
+				return true;
+			if (nStones==1 && libertyLocation!=UNDEFINED_COORDINATE
+					&& _otherNeighbours[xy]==3 && _ownNeighbours[libertyLocation]>=3)
+				return true;
+			if (_neighbours[xy]==4 && !hasCapture && !hasAtari && _otherNeighbours[xy]==3)
+				return true;
+		}
+		
+		return false;
+	}
     
     public int getLastMove()
     {
