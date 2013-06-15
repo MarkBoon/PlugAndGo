@@ -86,7 +86,7 @@ public class Pattern
 	
 	private static final int NR_BITS_PER_WORD = 64;	// Nr of bits in the basic data-type.
 	private static final int NR_WORDS = 4;			// Nr of words used to store the pattern.
-	private static final int MAX_NR_BITS = 256;		// Maximum nr of bits in the pattern. (4x64) Largest pattern is 16x16.
+	private static final int MAX_NR_BITS = 256;		// Maximum nr of bits in the pattern. (4x64) Largest pattern is 16x16. (Or 13x19)
 
 	private int width = 3;							// Width of the pattern. Default=3.
 	private int height = 3;							// Height of the pattern. Default=3.
