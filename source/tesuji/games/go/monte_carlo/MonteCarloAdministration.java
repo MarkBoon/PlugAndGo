@@ -30,6 +30,7 @@ import tesuji.games.general.Move;
 import tesuji.games.general.MoveFactory;
 import tesuji.games.general.MoveIterator;
 import tesuji.games.go.util.IntStack;
+import tesuji.games.go.util.PointSet;
 
 /**
  * This interface describes a board administration that can perform a Monte-Carlo simulation.
@@ -55,7 +56,9 @@ public interface MonteCarloAdministration<MoveType extends Move>
 	 * @return a perfect, newly created, copy.
 	 */
 	public MonteCarloAdministration<MoveType> createClone();
-			
+		
+	public PointSet getEmptyPoints();
+	
 	/**
 	 * Decide whether a move is legal or not.
 	 */

@@ -2,6 +2,7 @@ package tesuji.games.go.search;
 
 import static tesuji.games.general.ColorConstant.BLACK;
 import static tesuji.games.general.ColorConstant.WHITE;
+import tesuji.core.util.ArrayStack;
 import tesuji.games.general.ColorConstant;
 import tesuji.games.general.search.SearchResult;
 import tesuji.games.go.common.GoConstant;
@@ -13,6 +14,11 @@ import tesuji.games.go.util.PointSetFactory;
 public class MonteCarloHashMapResult
 	implements SearchResult<GoMove>
 {
+	public static final double MAX_SCORE = 1.0;
+	public static final double MIN_SCORE = 0.0;
+	public static final double HOPELESS = 0.05;
+	public static final double SURE_WIN = 0.99;
+
 	/**
 	 * The exploration-factor determines how strongly the search will favour exploring
 	 * nodes that have been searched little. The ideal value depends very much on other
@@ -21,23 +27,26 @@ public class MonteCarloHashMapResult
 	private static final double _explorationFactor = Math.sqrt(0.2);
 
 	private GoMove		_move;
-	private int			_playouts;
-//	private long		_checksum;
-	private PointSet	_emptyPoints;
-//	private int[]		_checksums;
+	private int			_totalPlayouts;
 	private int[]		_wins;
-	private int[]		_nrPlayouts;
+	private int	[]		_playouts;
+	private PointSet	_emptyPoints;
 	private float[]		_virtualWins;
 	private float[]		_virtualPlayouts;
 	private double		_logNrPlayouts;
 	private double		_beta;
 	
+	private ArrayStack<MonteCarloHashMapResult> _owner;
+
+	MonteCarloHashMapResult(ArrayStack<MonteCarloHashMapResult> owner)
+	{
+		this();
+		_owner = owner;
+	}
+	
 	MonteCarloHashMapResult()
 	{
 		_emptyPoints = PointSetFactory.createPointSet();
-//		_checksums = GoArray.createIntegers();
-		_wins = GoArray.createIntegers();
-		_nrPlayouts = GoArray.createIntegers();
 		_virtualWins = GoArray.createFloats();
 		_virtualPlayouts = GoArray.createFloats();
 	}
@@ -49,10 +58,12 @@ public class MonteCarloHashMapResult
 	
 	void init()
 	{
+		_logNrPlayouts = 0.0;
+		_beta = 0.0;
+		
 		_emptyPoints.clear();
-//		GoArray.clear(_checksums);
+		GoArray.clear(_playouts);
 		GoArray.clear(_wins);
-		GoArray.clear(_nrPlayouts);
 		GoArray.clear(_virtualWins);
 		GoArray.clear(_virtualPlayouts);
 	}
@@ -60,13 +71,17 @@ public class MonteCarloHashMapResult
 	@Override
     public void recycle()
     {
-	    // TODO Auto-generated method stub
-	    
+		init();
+		if (_move!=null)
+			_move.recycle();
+		_move = null;
+
+		_owner.push(this);
     }
+
 	@Override
     public GoMove getMove()
     {
-	    // TODO Auto-generated method stub
 	    return _move;
     }
 	
@@ -84,14 +99,62 @@ public class MonteCarloHashMapResult
 	@Override
     public boolean isBetterResultThan(SearchResult<GoMove> compare)
     {
-	    // TODO Auto-generated method stub
-	    return false;
+		return false;
+		/*
+		if (compare==null)
+			return true;
+		
+		MonteCarloHashMapResult compareResult = (MonteCarloHashMapResult) compare;
+		
+		assert _move.getColor()==compare.getMove().getColor() : "Can't compare results with a different color";
+
+//		if (getWinRatio()>SURE_WIN && compareResult.getWinRatio()>SURE_WIN)
+//		{
+//			int xy = ((GoMove)getMove()).getXY();
+//			int compareXY = ((GoMove)compare.getMove()).getXY();
+//			if (_move.getColor()==BLACK)
+//			{
+//				if (getParentResult().getBlackOwnership()[xy]!=0 && getParentResult().getBlackOwnership()[compareXY]==0)
+//					return true;
+//			}
+//			else
+//			{
+//				if (getParentResult().getWhiteOwnership()[xy]!=0 && getParentResult().getWhiteOwnership()[compareXY]==0)
+//					return true;
+//			}
+//			
+//			int diff = Math.abs(getParentResult().getBlackOwnership()[xy]-getParentResult().getWhiteOwnership()[xy]);
+//			int compareDiff = Math.abs(getParentResult().getBlackOwnership()[compareXY]-getParentResult().getWhiteOwnership()[compareXY]);
+//			if (diff<compareDiff)
+//				return true;
+//		}
+		
+		if (getNrPlayouts()>compareResult.getNrPlayouts())
+			return true;
+
+		if (getNrPlayouts()==compareResult.getNrPlayouts())
+		{
+			double value = getWinRatio();
+			double compareValue = compareResult.getWinRatio();
+			
+			assert value!=Double.NaN : "Calculation error for the result-value.";
+			assert compareValue!=Double.NaN : "Calculation error for the compare-value.";
+			
+			if (value>compareValue)
+				return true;
+			
+			if (value==compareValue)
+				return getVirtualWinRatio()>compareResult.getVirtualWinRatio();
+		}
+		return false;
+		*/
     }
+
 	@Override
     public boolean isHopeless()
     {
-	    // TODO Auto-generated method stub
-	    return false;
+		return false;
+//		return getWinRatio(xy)<HOPELESS;
     }
 
 //	public void setChecksum(long checksum)
@@ -104,30 +167,25 @@ public class MonteCarloHashMapResult
 //	    return _checksum;
 //    }
 
-	public void setPlayouts(int playouts)
-    {
-	    _playouts = playouts;
-    }
+//	public void setPlayouts(int playouts)
+//    {
+//	    _playouts = playouts;
+//    }
 
 	public int getPlayouts()
     {
-	    return _playouts;
+	    return _totalPlayouts;
     }
-	
-	public int getPlayouts(int xy)
-	{
-		return _nrPlayouts[xy];
-	}
 	
 	/**
 	 * @return the number of wins (for the color of the player of the move in this node) divided by the number of visits (called playouts)
 	 */
 	private double getWinRatio(int xy)
 	{
-		if (_nrPlayouts[xy] == 0)
+		if (_playouts[xy] == 0)
 			return 0.0;
 
-		return (double)_wins[xy] / (double)_nrPlayouts[xy];
+		return (double)_wins[xy] / (double)_playouts[xy];
 	}
 	
 	/**
@@ -138,7 +196,7 @@ public class MonteCarloHashMapResult
 	 */
 	public double getUCTValue(int xy)
 	{
-		return _explorationFactor * Math.sqrt( _logNrPlayouts / (_nrPlayouts[xy]+1) );
+		return _explorationFactor * Math.sqrt( _logNrPlayouts / (_playouts[xy]+1) );
 	}
 
 	/**
@@ -178,14 +236,6 @@ public class MonteCarloHashMapResult
 		return (double)_virtualWins[xy] / (double)_virtualPlayouts[xy];
 	}
 	
-	private double computeResult(int xy)
-	{
-		if (_nrPlayouts[xy]==0)
-			return (getVirtualWinRatio(xy) + getRAVEValue(xy));
-
-		return _beta * ((getVirtualWinRatio(xy)+getRAVEValue(xy))) + (1.0-_beta) * (getWinRatio(xy)+getUCTValue(xy));		
-	}
-
 	public int getBestVirtualMove()
 	{
 		int bestMove = GoConstant.PASS;
@@ -198,6 +248,14 @@ public class MonteCarloHashMapResult
 		return bestMove;
 	}
 	
+	private double computeResult(int xy)
+	{
+		if (_playouts[xy]==0)
+			return (getVirtualWinRatio(xy) + getRAVEValue(xy));
+
+		return _beta * (getVirtualWinRatio(xy)+getRAVEValue(xy)) + (1.0-_beta) * (getWinRatio(xy)+getUCTValue(xy));		
+	}
+
 	private boolean isBetterVirtualMove(int xy1, int xy2)
 	{
 		double virtualResult;
@@ -215,7 +273,7 @@ public class MonteCarloHashMapResult
 		// Trust the most visited node more. I don't know if it's all that relevant.
 		// I could probably just as easily argue it should be the other way around.
 		if (virtualResult==compareResult)
-			return (_nrPlayouts[xy1] > _nrPlayouts[xy1]);	// TODO: check '<' instead of '>', see which plays better.
+			return (_playouts[xy1] > _playouts[xy2]);	// TODO: check '<' instead of '>', see which plays better.
 		
 		return false;
 		
@@ -227,20 +285,20 @@ public class MonteCarloHashMapResult
 		byte color = ColorConstant.opposite(_move.getColor());
 		boolean playerWins = (blackWins && color==BLACK) || (!blackWins && color==WHITE);
 		
-		_playouts++;
+		_totalPlayouts++;
 		if (playerWins)
 		{
 			_wins[xy]++;
 			_virtualWins[xy]++;
 		}
 
-		_nrPlayouts[xy]++;
+		_playouts[xy]++;
 		_virtualPlayouts[xy]++;
 		
 		// Computing log() is expensive. I see no need to do it each and every time.
-// TODO - Needs testing		if ((_playouts&0x7)==0)
-			_logNrPlayouts = Math.log(_playouts);
-			_beta = getBeta();
+		if ((_totalPlayouts&0x7)==0)
+			_logNrPlayouts = Math.log(_totalPlayouts);
+		_beta = getBeta();
 	}
 
 	public void increaseVirtualPlayouts(int xy, double win_weight, double weight)
