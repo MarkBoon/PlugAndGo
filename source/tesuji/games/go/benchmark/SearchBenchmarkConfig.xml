@@ -35,9 +35,15 @@
 	</bean>
 	<bean id="eyeMoveFilter" class="tesuji.games.go.monte_carlo.EyeMoveFilter" singleton="false"/>
 	
-	<bean id="patternMatcher" class="tesuji.games.go.monte_carlo.move_generator.MatchPatterns" singleton="true">
+	<bean id="patternManager" class="tesuji.games.go.pattern.common.HibernatePatternManager" singleton="true">
 		<constructor-arg>
 			<value>GenTest</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="patternMatcher" class="tesuji.games.go.monte_carlo.move_generator.MatchPatterns" singleton="false">
+		<constructor-arg>
+			<ref bean="patternManager"/>
 		</constructor-arg>
 		<property name="urgency"><value>5</value></property>
 	</bean>
@@ -94,7 +100,6 @@
 						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"><property name="urgency"><value>5</value></property></bean>
 						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"><property name="urgency"><value>5</value></property></bean>
 						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"><property name="urgency"><value>5</value></property></bean>
-						<ref bean="patternMatcher"/>
 					</list>
 				</property>
 		  	</bean>
@@ -111,6 +116,9 @@
 		<property name="isTestVersion">
 			<value>false</value>
 		</property>
+		<!--<property name="patternManager">
+			<ref bean="patternManager"/>
+		</property>-->
 	</bean>
  	
 </beans>

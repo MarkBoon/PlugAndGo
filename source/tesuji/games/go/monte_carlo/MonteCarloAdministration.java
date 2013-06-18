@@ -31,6 +31,7 @@ import tesuji.games.general.MoveFactory;
 import tesuji.games.general.MoveIterator;
 import tesuji.games.go.util.IntStack;
 import tesuji.games.go.util.PointSet;
+import tesuji.games.model.BoardModel;
 
 /**
  * This interface describes a board administration that can perform a Monte-Carlo simulation.
@@ -135,7 +136,7 @@ public interface MonteCarloAdministration<MoveType extends Move>
 	/**
 	 * @return the BoardModel of the MonteCarloAdministration
 	 */
-//	public BoardModel getBoardModel();
+	public BoardModel getBoardModel();
 	
 	public int getBoardSize();
 

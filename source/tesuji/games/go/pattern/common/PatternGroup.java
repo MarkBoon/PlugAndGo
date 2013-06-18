@@ -53,9 +53,6 @@ public class PatternGroup
 	private int groupId;
 	private String description;
 
-	/**
-	 * PatternEditorController constructor.
-	 */
 	public PatternGroup()
 	{
 		description = "[description]";

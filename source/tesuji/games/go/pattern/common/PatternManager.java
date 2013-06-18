@@ -54,4 +54,5 @@ public interface PatternManager
     List<PatternGroup> getPatternGroups();
     PatternGroup getPatternGroup(String groupName);
     PatternGroup getPatternGroup(int groupId);
+    PatternGroup getDefaultPatternGroup();
 }

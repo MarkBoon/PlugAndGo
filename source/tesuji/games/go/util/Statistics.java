@@ -1,6 +1,7 @@
 package tesuji.games.go.util;
 
 import java.util.HashMap;
+import java.util.Set;
 
 public class Statistics
 {
@@ -30,5 +31,10 @@ public class Statistics
 		if (v==null)
 			return 0;
 		return v;
+	}
+	
+	public static Set<String> getKeys()
+	{
+		return statistics.keySet();
 	}
 }

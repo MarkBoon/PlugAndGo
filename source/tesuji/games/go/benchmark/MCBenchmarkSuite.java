@@ -27,6 +27,7 @@
 package tesuji.games.go.benchmark;
 
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -87,19 +88,9 @@ public class MCBenchmarkSuite
 		}		
 		_logger.info("");
 		_logger.info("Done.");
-		_logger.info("IllegalTries: "+Statistics.get("IllegalTries"));
-		_logger.info("-Escapes: "+Statistics.get("-Escape"));
-		_logger.info("-Captures: "+Statistics.get("-Capture"));
-		_logger.info("-Ladders: "+Statistics.get("-Ladder"));
-		_logger.info("Escapes: "+Statistics.get("Escape"));
-		_logger.info("Captures: "+Statistics.get("Capture"));
-		_logger.info("Ladders: "+Statistics.get("Ladder"));
-		_logger.info("-Immediate Escapes: "+Statistics.get("-ImmediateEscape"));
-		_logger.info("-Immediate Captures: "+Statistics.get("-ImmediateCapture"));
-		_logger.info("-Immediate Ladders: "+Statistics.get("-ImmediateLadder"));
-		_logger.info("Immediate Escapes: "+Statistics.get("ImmediateEscape"));
-		_logger.info("Immediate Captures: "+Statistics.get("ImmediateCapture"));
-		_logger.info("Immediate Ladders: "+Statistics.get("ImmediateLadder"));
+		Set<String> keys = Statistics.getKeys();
+		for (String key : keys)
+			_logger.info(key+": "+Statistics.get(key));
 	}
 	
 	public List<MonteCarloAdministration<GoMove>> getList()

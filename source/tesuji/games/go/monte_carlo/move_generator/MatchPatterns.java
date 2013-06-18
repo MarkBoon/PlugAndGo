@@ -14,25 +14,20 @@ import tesuji.games.go.util.DefaultBoardModel;
 public class MatchPatterns extends AbstractMoveGenerator
 {
 	protected IncrementalPatternMatcher patternMatcher;
-	private String patternGroupName;
+	private PatternManager _patternManager;
 	private IncrementalPatternMatcher _patternMatcher;
 	
-	public MatchPatterns(String groupName)
+	public MatchPatterns(PatternManager patternManager)
 	{
-		patternGroupName = groupName;
+		_patternManager = patternManager;
 	}
 	
 	@Override
     public void register(MonteCarloPluginAdministration admin)
     {
 		administration = admin;
-		PatternManager patternManager = HibernatePatternManager.getSingleton();
-		patternMatcher = new IncrementalPatternMatcher();
-		PatternGroup group = patternManager.getPatternGroup(patternGroupName);
-	    patternManager.getPatterns(group);
 	    _patternMatcher = new IncrementalPatternMatcher();
-	    _patternMatcher.setPatternGroup(group);
-	    _patternMatcher.setPatternManager(patternManager);
+	    _patternMatcher.setPatternGroup(_patternManager.getDefaultPatternGroup());
 	    _patternMatcher.initialise(new DefaultBoardModel(administration.getBoardSize()));
 		administration._explorationMoveSupport.addBoardModelListener(_patternMatcher);
 		administration.getBoardModel().addBoardModelListener(_patternMatcher);
@@ -47,11 +42,11 @@ public class MatchPatterns extends AbstractMoveGenerator
 		{
 			if (administration.getColorToMove()==ColorConstant.BLACK)
 			{
-				administration.addPriorityMove(pm.getXY(), 1 /*pm.getUrgencyValue(ColorConstant.BLACK)*/, pm.getNrOccurences(ColorConstant.BLACK), pm.getNrPlayed(ColorConstant.BLACK));
+//				administration.addPriorityMove(pm.getXY(), 1 /*pm.getUrgencyValue(ColorConstant.BLACK)*/, pm.getNrOccurences(ColorConstant.BLACK), pm.getNrPlayed(ColorConstant.BLACK));
 			}
 			else
 			{
-				administration.addPriorityMove(pm.getXY(), 1 /*pm.getUrgencyValue(ColorConstant.WHITE)*/, pm.getNrOccurences(ColorConstant.WHITE), pm.getNrPlayed(ColorConstant.WHITE));
+//				administration.addPriorityMove(pm.getXY(), 1 /*pm.getUrgencyValue(ColorConstant.WHITE)*/, pm.getNrOccurences(ColorConstant.WHITE), pm.getNrPlayed(ColorConstant.WHITE));
 			}
 		}
 		return UNDEFINED_COORDINATE;
@@ -60,7 +55,7 @@ public class MatchPatterns extends AbstractMoveGenerator
 	@Override
     public MoveGenerator createClone()
     {
-	    return new MatchPatterns(patternGroupName);
+	    return new MatchPatterns(_patternManager);
     }
 
 	@Override

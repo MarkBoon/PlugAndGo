@@ -350,4 +350,10 @@ public class FilePatternManager
 			pattern.setPatternNr(i);
 		}
 	}
+    
+    public PatternGroup getDefaultPatternGroup()
+    {
+    	// Not implemented.
+    	return null;
+    }
 }
