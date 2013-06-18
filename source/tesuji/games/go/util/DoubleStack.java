@@ -66,7 +66,7 @@ public class DoubleStack
 	}
 
 	/**
-	 	IntStack constructor with a given capacity.
+	 	DoubleStack constructor with a given capacity.
 	 	This one can be used for smaller lists.
 	 	The list doesn't grow automatically and no
 	 	explicit bounds-checking is done.
@@ -79,14 +79,14 @@ public class DoubleStack
 	}
 	
 	/**
-	 	IntStack constructor with a given capacity.
+	 	DoubleStack constructor with a given capacity.
 	 	This one can be used for smaller lists.
 	 	The list doesn't grow automatically and no
 	 	explicit bounds-checking is done.
 	 	
 	 	@param size is the maximum capacity of the stack
 	 	
-	 	@param ownerStack used to recycle this IntStack instance
+	 	@param ownerStack used to recycle this DoubleStack instance
 	*/
 	public DoubleStack(int size, SynchronizedArrayStack<DoubleStack> ownerStack)
 	{
@@ -168,7 +168,7 @@ public class DoubleStack
 	}
 
 	/**
-	 * Clear the contents of the IntStack object. It will now have size 0 and
+	 * Clear the contents of the DoubleStack object. It will now have size 0 and
 	 * contain 0 items.
 	 */
 	public final boolean isEmpty()
@@ -206,7 +206,7 @@ public class DoubleStack
 	}
 	
 	/**
-	 * @return the stacks contents as an int[]
+	 * @return the stacks contents as an double[]
 	 */
 	public final double[] getList()
 	{
