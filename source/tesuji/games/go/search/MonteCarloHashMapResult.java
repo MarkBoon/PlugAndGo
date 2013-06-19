@@ -7,6 +7,8 @@ import tesuji.games.general.ColorConstant;
 import tesuji.games.general.search.SearchResult;
 import tesuji.games.go.common.GoConstant;
 import tesuji.games.go.common.GoMove;
+import tesuji.games.go.monte_carlo.MonteCarloAdministration;
+import tesuji.games.go.monte_carlo.MonteCarloPluginAdministration;
 import tesuji.games.go.util.GoArray;
 import tesuji.games.go.util.PointSet;
 import tesuji.games.go.util.PointSetFactory;
@@ -47,13 +49,30 @@ public class MonteCarloHashMapResult
 	MonteCarloHashMapResult()
 	{
 		_emptyPoints = PointSetFactory.createPointSet();
+		_wins = GoArray.createIntegers();
+		_playouts = GoArray.createIntegers();
 		_virtualWins = GoArray.createFloats();
 		_virtualPlayouts = GoArray.createFloats();
 	}
 	
-	public void setPointSet(PointSet set)
+	public void setPointSet(PointSet set, MonteCarloPluginAdministration administration)
 	{
-		_emptyPoints.copyFrom(set);
+		for (int i=0; i<set.getSize(); i++)
+		{
+			int xy = set.get(i);
+			if (administration.isLegal(xy) && !administration.isVerboten(xy))
+			{
+				_emptyPoints.add(xy);
+				_virtualPlayouts[xy] = 1;
+				_virtualWins[xy] = 1;
+			}
+		}
+		if (administration.isGameAlmostFinished())
+		{
+			_virtualPlayouts[GoConstant.PASS] = 1;
+			_virtualWins[GoConstant.PASS] = 1;
+			_emptyPoints.add(GoConstant.PASS);
+		}
 	}
 	
 	void init()
@@ -180,7 +199,7 @@ public class MonteCarloHashMapResult
 	/**
 	 * @return the number of wins (for the color of the player of the move in this node) divided by the number of visits (called playouts)
 	 */
-	private double getWinRatio(int xy)
+	public double getWinRatio(int xy)
 	{
 		if (_playouts[xy] == 0)
 			return 0.0;
@@ -248,6 +267,24 @@ public class MonteCarloHashMapResult
 		return bestMove;
 	}
 	
+	public int getBestMove()
+	{
+		int bestMove = GoConstant.PASS;
+		int bestResult = -1;
+		for (int i=_emptyPoints.getSize(); --i>0;)
+		{
+			int next = _emptyPoints.get(i);
+			if (_playouts[next]>bestResult)
+			{
+				bestMove = next;
+				bestResult = _playouts[next];
+			}
+			else if (_playouts[next]==bestResult && _wins[next]>_wins[bestMove])
+				bestMove = next;
+		}
+		return bestMove;
+	}
+	
 	private double computeResult(int xy)
 	{
 		if (_playouts[xy]==0)
@@ -279,19 +316,9 @@ public class MonteCarloHashMapResult
 		
 	}
 
-	public void increasePlayouts(int xy, boolean blackWins)
+	public void increasePlayouts(int xy)
 	{
-		
-		byte color = ColorConstant.opposite(_move.getColor());
-		boolean playerWins = (blackWins && color==BLACK) || (!blackWins && color==WHITE);
-		
 		_totalPlayouts++;
-		if (playerWins)
-		{
-			_wins[xy]++;
-			_virtualWins[xy]++;
-		}
-
 		_playouts[xy]++;
 		_virtualPlayouts[xy]++;
 		
@@ -299,6 +326,18 @@ public class MonteCarloHashMapResult
 		if ((_totalPlayouts&0x7)==0)
 			_logNrPlayouts = Math.log(_totalPlayouts);
 		_beta = getBeta();
+	}
+
+	public void increaseWins(int xy, boolean blackWins)
+	{		
+		byte color = ColorConstant.opposite(_move.getColor());
+		boolean playerWins = (blackWins && color==BLACK) || (!blackWins && color==WHITE);
+		
+		if (playerWins)
+		{
+			_wins[xy]++;
+			_virtualWins[xy]++;
+		}
 	}
 
 	public void increaseVirtualPlayouts(int xy, double win_weight, double weight)

@@ -177,7 +177,7 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 	 * @see tesuji.games.general.search.Search#doSearch()
 	 */
 	@SuppressWarnings("unchecked")
-    public MonteCarloTreeSearchResult<MoveType> doSearch(byte startColor)
+    public MoveType doSearch(byte startColor)
 		throws Exception
 	{		
 		if (!_isInitialized)
@@ -273,7 +273,7 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 		assert _monteCarloAdministration.isConsistent() : "Inconsistent Monte-Carlo administration at the end of the search.";
 
 		_logger.info("Ended search with move: "+bestNode.getContent().getMove());
-		return bestNode.getContent();
+		return bestNode.getContent().getMove();
 	}
 	
 	protected long calculateTimeLimit()

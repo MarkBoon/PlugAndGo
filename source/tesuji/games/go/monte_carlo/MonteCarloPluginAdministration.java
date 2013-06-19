@@ -993,8 +993,9 @@ public class MonteCarloPluginAdministration
 			throw new IllegalStateException();
 		assert(_illegalStack.isEmpty());
 		assert(_probabilityMap.isConsistent());
-		while (emptyPoints.getSize()!=0 && _probabilityMap.hasPoints())
+		while (emptyPoints.getSize()!=0)
 		{
+			assert(_probabilityMap.hasPoints());
 			int xy = _probabilityMap.getCoordinate();
 			assert(xy!=PASS);
 			assert(_boardModel.get(xy)==EMPTY);
@@ -1011,9 +1012,11 @@ public class MonteCarloPluginAdministration
 			}
 			emptyPoints.remove(xy);
 			_illegalStack.push(xy);
+			assert(_probabilityMap.getWeight(xy)==ProbabilityMap.DEFAULT);
 			_probabilityMap.reset(xy);
 //			Statistics.increment("IllegalTries");
 		}
+		assert(!_probabilityMap.hasPoints());
 //		if ((emptyPoints.getSize()==0 && _probabilityMap.hasPoints()) || (emptyPoints.getSize()!=0 && !_probabilityMap.hasPoints()))
 //			System.err.println("Inconsistent!");
 		assert(_probabilityMap.isConsistent());
@@ -1094,6 +1097,29 @@ public class MonteCarloPluginAdministration
 		{
 			MoveFilter filter = _simulationMoveFilterList.get(i);
 			if (filter.accept(move.getXY(), getColorToMove()))
+				return true;
+		}
+		
+		return false;
+		
+		// Check for standard 'eye' definition.
+//		return (_ownNeighbours[xy]==4 && _otherDiagonalNeighbours[xy]<_maxDiagonalsOccupied[xy]);
+	}
+
+	/**
+	 * Check if a move is not allowed, not because it's illegal but because it's undesirable.
+	 * This typically will not allow a side to fill its own eyes.
+	 * 
+	 * @param xy - coordinate of the move
+	 * @return whether allowed or not
+	 */
+	public boolean isVerboten(int xy)
+	{
+		int size = _simulationMoveFilterList.size();
+		for (int i=0; i<size; i++)
+		{
+			MoveFilter filter = _simulationMoveFilterList.get(i);
+			if (filter.accept(xy, getColorToMove()))
 				return true;
 		}
 		
@@ -1324,10 +1350,10 @@ public class MonteCarloPluginAdministration
 	 */
 	public int getPositionalChecksum()
 	{
-		return _checksum.getValue();
-//		if (_koPoint==UNDEFINED_COORDINATE)
-//			return _checksum.getValue();
-//		return  _checksum.getValue() + _koPoint;
+//		return _checksum.getValue();
+		if (_koPoint==UNDEFINED_COORDINATE)
+			return _checksum.getValue() + getNrPasses()*13;
+		return  _checksum.getValue() + _koPoint*17;
 	}
 
 	/*

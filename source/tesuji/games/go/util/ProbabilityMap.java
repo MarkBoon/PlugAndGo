@@ -7,7 +7,7 @@ import tesuji.core.util.MersenneTwisterFast;
 public class ProbabilityMap
 {
 	public static final double ERROR_MARGIN = 0.000000001;
-	private static final double DEFAULT = Math.sqrt(ERROR_MARGIN);
+	public static final double DEFAULT = Math.sqrt(ERROR_MARGIN);
 	private MersenneTwisterFast _random;
 
 	private double[] _weights;

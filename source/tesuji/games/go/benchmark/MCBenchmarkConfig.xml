@@ -76,8 +76,8 @@
 				<!--<bean class="tesuji.games.go.monte_carlo.move_generator.EyeMove" singleton="false"><property name="urgency"><value>10</value></property></bean>
 				<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"><property name="checkHistory"><value>true</value></property></bean>
 				<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"><property name="checkHistory"><value>true</value></property></bean>
-				<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"><property name="checkHistory"><value>true</value></property></bean>-->
-				<ref bean="patternMatcher"/>
+				<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"><property name="checkHistory"><value>true</value></property></bean>
+				<ref bean="patternMatcher"/>-->
 			</list>
 		</property>
 		<!--<property name="explorationMoveGeneratorList">

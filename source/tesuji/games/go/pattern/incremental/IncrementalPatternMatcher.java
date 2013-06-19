@@ -532,7 +532,7 @@ public class IncrementalPatternMatcher
     {
 		for (int i=0; i<GoArray.MAX; i++)
 		{
-//			if (set1.matchingState[i]!=null)
+			if (set1.matchingState[i]!=null)
 			{
 				assert(set1.matchingState[i].equals(set2.matchingState[i]));
 				assert(set1.matchingState[i].getMatchList().size()==set2.matchingState[i].getMatchList().size());
@@ -543,8 +543,8 @@ public class IncrementalPatternMatcher
 					assert(set2.matchingState[i].getMatchList().indexOf(match)>=0);
 				}
 			}
-//			else
-//				assert(set2.matchingState[i]==null);
+			else
+				assert(set2.matchingState[i]==null);
 		}
     	return true;
     }

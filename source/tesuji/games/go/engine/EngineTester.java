@@ -82,17 +82,15 @@ public class EngineTester
 
 		while (!_blackPlayer.isGameFinished())
 		{
-			SearchResult<GoMove> blackResult = _blackPlayer.doSearch(ColorConstant.BLACK);
-			GoMove blackMove = (GoMove)blackResult.getMove().cloneMove();
-			_blackPlayer.playMove(blackMove);
+			GoMove blackMove = _blackPlayer.doSearch(ColorConstant.BLACK);
+			_blackPlayer.playMove(blackMove); // need clone?
 			_whitePlayer.playMove(blackMove);
 			
 			if (_whitePlayer.isGameFinished())
 				break;
 			
-			SearchResult<GoMove> whiteResult = _whitePlayer.doSearch(ColorConstant.WHITE);
-			GoMove whiteMove = (GoMove)whiteResult.getMove().cloneMove();
-			_blackPlayer.playMove(whiteMove);
+			GoMove whiteMove = _whitePlayer.doSearch(ColorConstant.WHITE);
+			_blackPlayer.playMove(whiteMove); // need clone?
 			_whitePlayer.playMove(whiteMove);
 		}
 	}

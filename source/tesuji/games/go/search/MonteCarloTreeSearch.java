@@ -138,7 +138,7 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 	 * @see tesuji.games.general.search.Search#doSearch()
 	 */
 	@SuppressWarnings("unchecked")
-    public MonteCarloTreeSearchResult<MoveType> doSearch(byte startColor)
+    public MoveType doSearch(byte startColor)
 		throws Exception
 	{		
 		long time0 = System.currentTimeMillis();
@@ -234,7 +234,7 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 		
 		assert _monteCarloAdministration.isConsistent() : "Inconsistent Monte-Carlo administration at the end of the search.";
 
-		return bestNode.getContent();
+		return bestNode.getContent().getMove();
 	}
 	
 	protected long calculateTimeLimit()

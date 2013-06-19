@@ -76,7 +76,7 @@ public interface Search<MoveType extends Move>
 	 * 
 	 * @throws Exception Any exception thrown should be treated as an unrecoverable error.
 	 */
-	public SearchResult<MoveType> doSearch(byte startColor) throws Exception;
+	public MoveType doSearch(byte startColor) throws Exception;
 	
 	// These methods are used to keep the state of the Search object synchronized with the actual game.
 	public void playMove(MoveType move);

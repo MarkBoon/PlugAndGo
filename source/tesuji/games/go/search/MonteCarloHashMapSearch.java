@@ -9,20 +9,20 @@ import static tesuji.games.go.util.GoArray.createDoubles;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import org.apache.log4j.Logger;
 import org.cliffc.high_scale_lib.NonBlockingHashMapLong;
-import org.omg.stub.java.rmi._Remote_Stub;
 
 import tesuji.core.util.ArrayStack;
 import tesuji.games.general.TreeNode;
 import tesuji.games.general.search.Search;
 import tesuji.games.general.search.SearchProperties;
 import tesuji.games.general.search.SearchResult;
+import tesuji.games.go.common.GoConstant;
 import tesuji.games.go.common.GoMove;
 import tesuji.games.go.common.GoMoveFactory;
-import tesuji.games.go.monte_carlo.MCTacticsAdministration;
+//import tesuji.games.go.monte_carlo.MCTacticsAdministration;
 import tesuji.games.go.monte_carlo.MonteCarloAdministration;
-import tesuji.games.go.monte_carlo.MonteCarloGoAdministration;
-import tesuji.games.go.search.MonteCarloTreeSearch.SearchProcess;
+import tesuji.games.go.monte_carlo.MonteCarloPluginAdministration;
 import tesuji.games.go.util.GoArray;
 import tesuji.games.go.util.IntStack;
 import tesuji.games.go.util.PointSet;
@@ -30,6 +30,8 @@ import tesuji.games.go.util.PointSet;
 public class MonteCarloHashMapSearch
 	implements Search<GoMove>, PropertyChangeListener
 {
+	private static Logger _logger = Logger.getLogger(MonteCarloHashMapSearch.class);
+
 	protected MonteCarloAdministration<GoMove> _monteCarloAdministration;
 	private NonBlockingHashMapLong<MonteCarloHashMapResult> _hashMap = new NonBlockingHashMapLong<MonteCarloHashMapResult>();
 	private int _nrPlayouts;
@@ -40,7 +42,7 @@ public class MonteCarloHashMapSearch
 	protected int _secondsPerMove;
 	protected int _nrSets;
 	protected double _lastScore = 0.0;
-	protected int _nrThreads;
+	protected int _nrThreads = 1;
 	protected int _minimumNrNodes;
 	protected int _nodeLimit;
 	protected boolean _optimizeNodeLimit = false;
@@ -113,39 +115,40 @@ public class MonteCarloHashMapSearch
 	@Override
     public void setSecondsPerMove(int seconds)
     {
-	    // TODO Auto-generated method stub
-	    
+	   _secondsPerMove = seconds;
+		_searchProperties.setIntProperty(SearchProperties.TIME_PER_MOVE,_secondsPerMove);
     }
 
 	@Override
     public void setMinimumNrNodes(int minimum)
     {
-	    // TODO Auto-generated method stub
-	    
+		_minimumNrNodes = minimum;
+		_searchProperties.setIntProperty(SearchProperties.NR_NODES,minimum);
     }
 
 	@Override
     public void setNrProcessors(int nrProcessors)
     {
-	    // TODO Auto-generated method stub
-	    
+		_nrThreads = nrProcessors;
+		if (_nrThreads<=0)
+			_nrThreads = 1;
+		_searchProperties.setIntProperty(SearchProperties.NR_PROCESSORS,_nrThreads);
     }
 
 	@Override
     public void setIsTestVersion(boolean testVersion)
     {
-	    // TODO Auto-generated method stub
-	    
+	    // TODO Auto-generated method stub	    
     }
 
 	@Override
-    public SearchResult<GoMove> doSearch(byte startColor) throws Exception
+    public GoMove doSearch(byte startColor) throws Exception
     {
 		long time0 = System.currentTimeMillis();
 
 		assert _monteCarloAdministration.isConsistent() : "Inconsistent Monte-Carlo administration at the start of the search.";
 
-		MCTacticsAdministration.reset();
+//?		MCTacticsAdministration.reset();
 		
 		_monteCarloAdministration.setColorToMove(startColor);
 		_nrPlayouts = 0;
@@ -153,12 +156,21 @@ public class MonteCarloHashMapSearch
 		
 		_nrGeneratedMoves++;
 
+		MonteCarloHashMapResult startNode = _hashMap.get(_monteCarloAdministration.getPositionalChecksum());
+		if (startNode==null)
+		{
+			startNode = new MonteCarloHashMapResult();
+			startNode.setPointSet(_monteCarloAdministration.getEmptyPoints(),(MonteCarloPluginAdministration)_monteCarloAdministration);
+			startNode.setMove(GoMoveFactory.getSingleton().createPassMove(opposite(_monteCarloAdministration.getColorToMove())));
+			_hashMap.put(_monteCarloAdministration.getPositionalChecksum(),startNode);
+		}
+
 		long time1 = System.currentTimeMillis();
 		long time2;
 		long timeLimit = calculateTimeLimit();
-		if (isOptimizeNodeLimit())
-			_nodeLimit = calculateNodeLimit();
-		else
+//		if (isOptimizeNodeLimit())
+//			_nodeLimit = calculateNodeLimit();
+//		else
 			_nodeLimit = _minimumNrNodes;
 		
 		// Create a thread for each available processor and start a search in it.
@@ -198,41 +210,40 @@ public class MonteCarloHashMapSearch
 				
 		_totalNrPlayouts += _nrPlayouts;
 		_averagePlayouts = (int) (_totalNrPlayouts/_nrGeneratedMoves);
-		long saved = 0;
-		if (_minimumNrNodes!=0)
-			saved = ((_minimumNrNodes*_nrGeneratedMoves - _totalNrPlayouts) * 100) / (_minimumNrNodes*_nrGeneratedMoves);
+//		long saved = 0;
+//		if (_minimumNrNodes!=0)
+//			saved = ((_minimumNrNodes*_nrGeneratedMoves - _totalNrPlayouts) * 100) / (_minimumNrNodes*_nrGeneratedMoves);
 		long time3 = System.currentTimeMillis();
 
-		if (getIsTestVersion())
-			_logger.info("TEST VERSION");
 		_logger.info("Playout limit "+_nodeLimit + " - last score " + _lastScore);
 		_logger.info("Nr playouts "+_nrPlayouts);
 		_logger.info("Nr sets "+_nrSets);
-		_logger.info("Nr root visits "+_rootNode.getContent().getNrPlayouts());
+		_logger.info("Nr root visits "+startNode.getPlayouts());
 		_logger.info(""+((double)_nrPlayouts/(double)(time3-time0))+" kpos/sec");
-		if (isOptimizeNodeLimit())
-		{
-			_logger.info("Percentage saved "+saved+"%");
-			_logger.info("Average nr playouts "+_averagePlayouts);
-		}
+//		if (isOptimizeNodeLimit())
+//		{
+//			_logger.info("Percentage saved "+saved+"%");
+//			_logger.info("Average nr playouts "+_averagePlayouts);
+//		}
 //		_logger.info("Nr pattern moves per playout "+(Statistics.nrPatternsPlayed/_totalNrPlayouts));
 //		_logger.info("Nr hard-coded patterns generated: "+MCTacticsAdministration.getNrPatternsGenerated());
 //		_logger.info("Nr hard-coded patterns played: "+MCTacticsAdministration.getNrPatternsUsed());
 		
-		TreeNode<MonteCarloTreeSearchResult<MoveType>> bestNode = getBestChildNode(_rootNode);
-		if (bestNode==null)
-			return null;
+		assert _monteCarloAdministration.isConsistent() : "Inconsistent Monte-Carlo administration at the end of the search.";
+//		fillOwnershipArray();
+		
+		int xy = startNode.getBestMove();
 //		TreeNode<MonteCarloTreeSearchResult<MoveType>> secondBestNode = getSecondBestChildNode(_rootNode,bestNode);
 //		_logger.info("Second-best: "+secondBestNode.getContent());
-		if (bestNode.getContent().getMove().isPass())
+		if (xy==GoConstant.PASS)
 			_logger.info("PASS!");
-		_lastScore = bestNode.getContent().getWinRatio();
-
-		fillOwnershipArray();
+		_lastScore = startNode.getWinRatio(xy);
+//		if (_lastScore<0.05)
+//			return GoMoveFactory.getSingleton().createResignMove(_monteCarloAdministration.getColorToMove());
 		
 		assert _monteCarloAdministration.isConsistent() : "Inconsistent Monte-Carlo administration at the end of the search.";
 
-		return bestNode.getContent();
+		return GoMoveFactory.getSingleton().createMove(xy, _monteCarloAdministration.getColorToMove());
     }
 
 	protected long calculateTimeLimit()
@@ -293,8 +304,7 @@ public class MonteCarloHashMapSearch
 	@Override
     public void playMove(GoMove move)
     {
-	    // TODO Auto-generated method stub
-	    
+		_monteCarloAdministration.playMove(move);
     }
 
 	@Override
@@ -307,9 +317,8 @@ public class MonteCarloHashMapSearch
 	@Override
     public void clear()
     {
-	    // TODO Auto-generated method stub
-	    
-    }
+		_monteCarloAdministration.clear();    
+	}
 
 	@Override
     public void getBestMovePath(ArrayStack<GoMove> moveList)
@@ -342,19 +351,19 @@ public class MonteCarloHashMapSearch
 		private IntStack _moveStack;
 		private ArrayStack<MonteCarloHashMapResult> _resultStack;
     	
-    	public SearchProcess(byte startColor, MonteCarloGoAdministration admin)
+    	public SearchProcess(byte startColor, MonteCarloAdministration<GoMove> admin)
     	{
     		_startColor = startColor;
     		running = false;
-    		_initAdministration = (MonteCarloGoAdministration) admin.createClone();
-    		_searchAdministration = (MonteCarloGoAdministration) admin.createClone();
+    		_initAdministration = (MonteCarloAdministration<GoMove>) admin.createClone();
+    		_searchAdministration = (MonteCarloAdministration<GoMove>) admin.createClone();
     		_weightMap = createDoubles();
     		_colorMap = createBytes();
     		_moveStack = new IntStack(GoArray.LAST, null);
     		_resultStack = new ArrayStack<MonteCarloHashMapResult>();
     	}
     	
-    	public void updateAdministration(MonteCarloGoAdministration admin)
+    	public void updateAdministration(MonteCarloAdministration<GoMove> admin)
     	{
     		_newAdministration = admin;
     	}
@@ -444,6 +453,7 @@ public class MonteCarloHashMapSearch
     		{
 	    		int xy = node.getBestVirtualMove();
 	   			GoMove move = GoMoveFactory.getSingleton().createMove(xy, _searchAdministration.getColorToMove());
+	   			node.increasePlayouts(xy);
 	    		_resultStack.push(node);
 	    		_moveStack.push(xy);
 	   			_searchAdministration.playExplorationMove(move);
@@ -458,7 +468,7 @@ public class MonteCarloHashMapSearch
 	    			{
 	    				nextNode = SearchResultFactory.createMonteCarloHashMapResult();
 	    				nextNode.setMove(move);
-	    				nextNode.setPointSet(_searchAdministration.getEmptyPoints());
+	    				nextNode.setPointSet(_searchAdministration.getEmptyPoints(),(MonteCarloPluginAdministration)_searchAdministration);
 	    				// Fill virtual playouts of all children with pattern-matcher.
 	    				GoMove nextMove = _searchAdministration.selectSimulationMove(); // temporary
 	    				_resultStack.push(nextNode);
@@ -479,7 +489,7 @@ public class MonteCarloHashMapSearch
     			int xy = _moveStack.peek(i);
     			MonteCarloHashMapResult node = _resultStack.peek(i);    			
     			assert(node!=null);
-    			node.increasePlayouts(xy,blackWins);
+    			node.increaseWins(xy,blackWins);
     		}
     	}
     }
@@ -509,4 +519,24 @@ public class MonteCarloHashMapSearch
     {
 	    _nrPlayouts = nrPlayouts;
     }
+	public int getNrSimulationsBeforeExpansion()
+	{
+		return _nrSimulationsBeforeExpansion;
+	}
+
+	public void setNrSimulationsBeforeExpansion(int nrSimulationsBeforeExpansion)
+	{
+		_nrSimulationsBeforeExpansion = nrSimulationsBeforeExpansion;
+	}
+
+	public boolean getUseAMAF()
+	{
+		return _useAMAF;
+	}
+
+	public void setUseAMAF(boolean useAMAF)
+	{
+		_useAMAF = useAMAF;
+	}
+
 }

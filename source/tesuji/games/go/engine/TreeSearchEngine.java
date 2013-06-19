@@ -156,27 +156,27 @@ public class TreeSearchEngine
     @Override
 	public GoMove requestMove(byte color)
     {
-    	SearchResult<GoMove> result = null;
+    	GoMove move = null;
 		try
 		{
-			result = _search.doSearch(color);
+			move = _search.doSearch(color);
 		}
 		catch (Exception exception)
 		{
 			exception.printStackTrace();
 		}
     	
-    	if (result==null)
+    	if (move==null)
     		return getMoveFactory().createPassMove(color);
-    	else if (!result.getMove().isPass() && result.isHopeless())
-    		return getMoveFactory().createResignMove(color);
+//    	else if (!move.isPass() && result.isHopeless())
+//    		return getMoveFactory().createResignMove(color);
     	else
     	{
     		MoveStack<GoMove> moveList = new MoveStack<GoMove>();
     		getBestMovePath(moveList);
     		_logger.info(moveList.toSGF());
-    		_logger.info("Result: "+result.toString());
-    		return (GoMove)result.getMove().cloneMove();
+    		_logger.info("Move: "+move.toString());
+    		return move;
     	}
     }
     

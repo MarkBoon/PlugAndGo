@@ -12,7 +12,7 @@
 			<value>0.5</value>
 		</property>
 		<property name="nrPlayouts">
-			<value>50000</value>
+			<value>100000</value>
 		</property>
 		<property name="nrProcessors">
 			<value>1</value>
@@ -21,8 +21,9 @@
 		<!-- List with Monte-Carlo playout strategies to benchmark -->
 		<property name="list">
 			<list>
-				<!--<ref bean="MonteCarloTreeSearch"/>-->
-				<ref bean="PluginMonteCarloTreeSearch"/>
+				<!--<ref bean="MonteCarloTreeSearch"/>
+				<ref bean="PluginMonteCarloTreeSearch"/>-->
+				<ref bean="MonteCarloHashmapSearch"/>
 			</list>
 		</property>
  	</bean>
@@ -89,17 +90,17 @@
 				</property>
 				<property name="simulationMoveGeneratorList">
 					<list>
-						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"/>
+						<!--<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"/>
 						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"/>
 						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"/>
-						<ref bean="patternMatcher"/>
+						<ref bean="patternMatcher"/>-->
 					</list>
 				</property>
 				<property name="explorationMoveGeneratorList">
 					<list>
-						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"><property name="urgency"><value>5</value></property></bean>
+						<!--<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"><property name="urgency"><value>5</value></property></bean>
 						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"><property name="urgency"><value>5</value></property></bean>
-						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"><property name="urgency"><value>5</value></property></bean>
+						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"><property name="urgency"><value>5</value></property></bean>-->
 					</list>
 				</property>
 		  	</bean>
@@ -109,6 +110,59 @@
 		</property>
 		<property name="useAMAF">
 			<value>true</value>
+		</property>
+		<property name="nrSimulationsBeforeExpansion">
+			<value>64</value>
+		</property>
+		<property name="isTestVersion">
+			<value>false</value>
+		</property>
+		<!--<property name="patternManager">
+			<ref bean="patternManager"/>
+		</property>-->
+	</bean>
+ 	
+	<bean id="MonteCarloHashmapSearch" class="tesuji.games.go.search.MonteCarloHashMapSearch" singleton="false">
+		<property name="monteCarloAdministration">
+			<bean class="tesuji.games.go.monte_carlo.MonteCarloPluginAdministration" singleton="false">
+				<property name="simulationMoveFilterList">
+					<list>
+						<ref bean="eyeMoveFilter"/>
+					</list>
+				</property>
+				<property name="explorationMoveFilterList">
+					<list>
+						<ref bean="eyeMoveFilter"/>
+					</list>
+				</property>
+				<property name="simulationMoveGeneratorList">
+					<list>
+						<!--<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"/>
+						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"/>
+						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"/>
+						<ref bean="patternMatcher"/>-->
+					</list>
+				</property>
+				<property name="explorationMoveGeneratorList">
+					<list>
+						<!--<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"><property name="urgency"><value>5</value></property></bean>
+						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"><property name="urgency"><value>5</value></property></bean>
+						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"><property name="urgency"><value>5</value></property></bean>-->
+					</list>
+				</property>
+		  	</bean>
+		</property>
+		<property name="nrProcessors">
+			<value>1</value>
+		</property>
+		<property name="minimumNrNodes">
+			<value>2000</value>
+		</property>
+  		<property name="useAMAF">
+  			<value>true</value>
+  		</property>
+		<property name="secondsPerMove">
+			<value>0</value>
 		</property>
 		<property name="nrSimulationsBeforeExpansion">
 			<value>64</value>

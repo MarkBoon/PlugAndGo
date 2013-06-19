@@ -50,15 +50,14 @@ public class SearchBenchmark
 		long beforeMemory = MemoryUtil.getFreeMemory();
 		long afterMemory;
 		beforeTime = System.currentTimeMillis();
-		SearchResult<GoMove> result;
+		GoMove move;
         try
         {
-	        result = search.doSearch(ColorConstant.BLACK);
+        	move = search.doSearch(ColorConstant.BLACK);
 	        search.clear();
-	        result = search.doSearch(ColorConstant.BLACK);
+	        move = search.doSearch(ColorConstant.BLACK);
 	        search.clear();
-	        result = search.doSearch(ColorConstant.BLACK);
-			GoMove move = result.getMove();
+	        move = search.doSearch(ColorConstant.BLACK);
 			afterTime = System.currentTimeMillis();
 			afterMemory = MemoryUtil.getFreeMemory();
 			double total = (afterTime - beforeTime)/1000;
