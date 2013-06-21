@@ -151,7 +151,7 @@ public class EngineTesterMain
 	private static void writeResult(BasicGoMoveAdministration administration, GoEngine engine1, GoEngine engine2)
 	{
 		double score = administration.getScore();
-		String winner = (score>0.0 ? "B+" : "W+")+Math.abs(score);
+		String winner = (((score>0.0) ^ alt) ? "B+" : "W+")+Math.abs(score);
 		try
 		{
 			FileWriter writer = new FileWriter(dataFile,true);
