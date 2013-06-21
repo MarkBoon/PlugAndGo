@@ -26,8 +26,11 @@
 
 package tesuji.games.go.common;
 
+import java.util.Enumeration;
+
 import tesuji.core.util.ArrayList;
 import tesuji.games.general.GameEngineAdapter;
+import tesuji.games.general.GameProperties;
 import tesuji.games.general.MoveStack;
 import tesuji.games.go.util.GoGameProperties;
 
@@ -75,6 +78,16 @@ public abstract class GoEngineAdapter
     	_gameProperties.setProperty(propertyName, propertyValue);
     }
 
+    @Override
+	public void setProperties(GameProperties properties)
+    {
+    	for (Enumeration<Object> e=properties.keys(); e.hasMoreElements();)
+    	{
+    		Object key = e.nextElement();
+    		set(key.toString(),properties.get(key).toString());
+    	}
+    }
+    
 	/* (non-Javadoc)
      * @see tesuji.games.general.GameEngine#setTimeConstraints(int, int, int)
      */

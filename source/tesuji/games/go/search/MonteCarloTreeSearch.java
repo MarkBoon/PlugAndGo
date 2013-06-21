@@ -466,7 +466,7 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 	 */
 	public void playMove(MoveType move)
 	{
-		_monteCarloAdministration.playMove(move);
+		_monteCarloAdministration.playMove((MoveType)move.cloneMove());
 
 //		TreeNode<MonteCarloTreeSearchResult<MoveType>> newRoot = getMoveNode(move);
 		

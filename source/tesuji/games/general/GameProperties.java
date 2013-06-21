@@ -28,6 +28,7 @@ package tesuji.games.general;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.List;
 
 import tesuji.core.util.MultiTypeProperties;
 
@@ -52,6 +53,12 @@ public class GameProperties
 	 */
 	private static final long serialVersionUID = 6233934756971511202L;
 
+	public void setProperties(List<Property> list)
+	{
+		for (Property p : list)
+			setProperty(p.getName(), p.getValue());
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see java.util.Properties#setProperty(java.lang.String, java.lang.String)

@@ -43,6 +43,7 @@ public interface GameEngine<MoveType extends Move>
 	// Setup commands
 	void set(String propertyName, String propertyValue);
 	void clearBoard();
+	void setProperties(GameProperties properties);
 	
 	// Core play commands
 	void playMove(MoveType move);

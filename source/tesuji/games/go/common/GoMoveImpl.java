@@ -43,6 +43,8 @@ import static tesuji.games.gtp.GTPCommand.*;
 public class GoMoveImpl
 	implements GoMove
 {
+	protected boolean inUse;
+
 	private static final long serialVersionUID = -5217137005185445957L;
 	
 	private byte _color;
@@ -99,6 +101,7 @@ public class GoMoveImpl
 	@Override
 	public boolean equals(Object o)
 	{
+		assert(inUse);
 		if (o==null || !(o instanceof GoMove))
 			return false;
 		
@@ -130,6 +133,7 @@ public class GoMoveImpl
 	 */
 	public String toSGF()
 	{
+		assert(inUse);
 		StringBuffer output = new StringBuffer();
 		if (getXY()!=UNDEFINED_COORDINATE && !isResignation())
 		{
@@ -236,6 +240,7 @@ public class GoMoveImpl
 	 */
 	public final byte getColor()
 	{
+		assert(inUse);
 		return _color;
 	}
 	/**
@@ -243,6 +248,7 @@ public class GoMoveImpl
 	 */
 	public final void setColor(byte color)
 	{
+		assert(inUse);
 		_color = color;
 	}
 	/**
@@ -250,6 +256,7 @@ public class GoMoveImpl
 	 */
 	public final int getMoveNr()
 	{
+		assert(inUse);
 		return _moveNr;
 	}
 	
@@ -258,6 +265,7 @@ public class GoMoveImpl
 	 */
 	public final void setMoveNr(int moveNr)
 	{
+		assert(inUse);
 		_moveNr = moveNr;
 	}
 	
@@ -266,11 +274,13 @@ public class GoMoveImpl
 	 */
 	public final int getXY()
 	{
+		assert(inUse);
 		return _xy;
 	}
     
     public final void setXY(int xy)
     {
+		assert(inUse);
 		_xy = xy;
     }
     
@@ -279,6 +289,7 @@ public class GoMoveImpl
 	 */
 	public final int getX()
 	{
+		assert(inUse);
 		return GoArray.getX(_xy);
 	}
 	
@@ -287,21 +298,25 @@ public class GoMoveImpl
 	 */
 	public final int getY()
 	{
+		assert(inUse);
 		return GoArray.getY(_xy);
 	}
 	
 	public void setXY(int x, int y)
 	{
+		assert(inUse);
 		setXY(toXY(x,y));		
 	}
 	
 	public boolean hasCaptives()
 	{
+		assert(inUse);
 		return _captives!=null;
 	}
 	
 	public void addCaptive(int xy)
 	{
+		assert(inUse);
 		if (_captives==null)
 			_captives = ArrayFactory.createIntStack();
 		_captives.push(xy);
@@ -312,6 +327,7 @@ public class GoMoveImpl
 	 */
 	public IntStack getCaptives()
 	{
+		assert(inUse);
 		return _captives;
 	}
 	
@@ -320,6 +336,7 @@ public class GoMoveImpl
 	 */
 	public final void recycle()
 	{
+		assert(inUse);
 		_color = COLOR_UNDEFINED;
 		_moveNr = 0;
 		_xy = UNDEFINED_COORDINATE;
@@ -339,6 +356,7 @@ public class GoMoveImpl
 		
 		if (_owner!=null)
 			_owner.push(this);
+		assert(!(inUse=false));
 	}
 	
 	/**
@@ -346,6 +364,7 @@ public class GoMoveImpl
 	 */
 	public ArrayList<BoardMark> getBoardMarks()
 	{
+		assert(inUse);
 		return _boardMarks;
 	}
 	
@@ -354,6 +373,7 @@ public class GoMoveImpl
 	 */
 	public final boolean hasBoardMarks()
 	{
+		assert(inUse);
 		return (_boardMarks!=null);
 	}
 	
@@ -364,6 +384,7 @@ public class GoMoveImpl
 	 */
 	public void addBoardMark(BoardMark boardMark)
 	{
+		assert(inUse);
 		if (_boardMarks==null)
 			_boardMarks = new ArrayList<BoardMark>();
 		
@@ -392,6 +413,7 @@ public class GoMoveImpl
      */
     public String getText()
     {
+		assert(inUse);
 	    return _text;
     }
 
@@ -400,6 +422,7 @@ public class GoMoveImpl
      */
     public void setText(String text)
     {
+		assert(inUse);
 	    _text = text;
     }
 
@@ -408,6 +431,7 @@ public class GoMoveImpl
      */
     public int getUrgency()
     {
+		assert(inUse);
 	    return _urgency;
     }
 
@@ -416,6 +440,7 @@ public class GoMoveImpl
      */
     public void setUrgency(int urgency)
     {
+		assert(inUse);
 	    _urgency = urgency;   
     }
 
@@ -425,6 +450,7 @@ public class GoMoveImpl
      */
     public int getVisits()
     {
+		assert(inUse);
 	    return _visits;
     }
 
@@ -433,6 +459,7 @@ public class GoMoveImpl
      */
     public void setVisits(int visits)
     {
+		assert(inUse);
 	    _visits = visits;   
     }
 
@@ -441,6 +468,7 @@ public class GoMoveImpl
      */
     public int getWins()
     {
+		assert(inUse);
 	    return _wins;
     }
 
@@ -449,6 +477,7 @@ public class GoMoveImpl
      */
     public void setWins(int wins)
     {
+		assert(inUse);
 	    _wins = wins;   
     }
 	/* (non-Javadoc)
@@ -456,6 +485,7 @@ public class GoMoveImpl
      */
 	public boolean isPass() 
 	{
+		assert(inUse);
 		return (_xy==PASS);
 	}
 
@@ -464,6 +494,7 @@ public class GoMoveImpl
      */
 	public boolean isResignation() 
 	{
+		assert(inUse);
 		return (_xy==RESIGN);
 	}
 }

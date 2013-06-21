@@ -159,7 +159,7 @@ public class TreeSearchEngine
     	GoMove move = null;
 		try
 		{
-			move = _search.doSearch(color);
+			move = (GoMove)_search.doSearch(color).cloneMove();
 		}
 		catch (Exception exception)
 		{

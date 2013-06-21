@@ -130,6 +130,9 @@ public class GoMoveFactory
         else
             newMove = movePool.pop();
         
+        assert(!newMove.inUse);
+        assert((newMove.inUse=true));
+        
         return newMove;
     }
     

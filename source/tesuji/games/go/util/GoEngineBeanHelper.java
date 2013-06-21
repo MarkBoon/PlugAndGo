@@ -120,6 +120,27 @@ public class GoEngineBeanHelper
 		
 		return engineList;
 	}
+	public static GoGameProperties getGoGameProperties(String xmlFile)
+		throws Exception
+	{
+		Logger logger = Logger.getRootLogger();
+
+		try
+		{
+			Resource xmlResource = new FileSystemResource(xmlFile);
+			logger.debug("Loading file "+xmlFile);
+			XmlBeanFactory factory = new XmlBeanFactory(xmlResource);
+			GoGameProperties gameProperties = (GoGameProperties) factory.getBean("goGameProperties");
+			return gameProperties;
+		}
+		catch (Exception exception)
+		{
+			// Just keep going
+			logger.error("Unexpected exception "+exception.getClass().getName()+": "+exception.getMessage());
+			//exception.printStackTrace();
+			return null;
+		}
+	}
 	
 	public static String selectEngineFromList(Hashtable<String,GoEngine> engineList)
 	{

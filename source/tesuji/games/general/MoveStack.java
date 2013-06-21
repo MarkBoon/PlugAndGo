@@ -67,6 +67,23 @@ public class MoveStack<MoveType extends Move>
 	}
 	
 	/**
+	 * @return The list of moves contained by this stack in SGF format.
+	 */
+	public String toRawSGF()
+	{
+		StringBuffer output = StringBufferFactory.createStringBuffer();
+		for (MoveType move : this)
+		{
+			output.append(";");
+			output.append(move.toSGF());
+		}
+		
+		String outputString = output.toString();
+		StringBufferFactory.recycleStringBuffer(output);
+		return outputString;
+	}
+	
+	/**
 	 * Empty the stack and recycle all the moves on it.
 	 */
 	public void recycleMoves()

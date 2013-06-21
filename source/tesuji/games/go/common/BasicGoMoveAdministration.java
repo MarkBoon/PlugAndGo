@@ -377,7 +377,9 @@ public class BasicGoMoveAdministration
 
     public boolean isGameFinished()
     {
-    	if (_moveStack.peek().isPass() && _moveStack.peek(1).isPass() && _moveStack.peek(2).isPass())
+    	if (_moveStack.size()<2)
+    		return false;
+    	if (_moveStack.peek().isPass() && _moveStack.peek(1).isPass())
     		return true;
     	return false;
     }
@@ -391,10 +393,15 @@ public class BasicGoMoveAdministration
 			clear();
 	}
 	
+	public double getKomi()
+	{
+		return _gameProperties.getDoubleProperty(GoGameProperties.KOMI);
+	}
+	
 	public double getScore()
 	{
 		double score = 0.0;
-		score -= _gameProperties.getDoubleProperty(GoGameProperties.KOMI);
+		score -= getKomi();
 
 		_scoreBoard = new DefaultBoardModel(_board.getBoardSize());
 		for (int i=0; i<MAX; i++)
@@ -444,6 +451,7 @@ public class BasicGoMoveAdministration
 		
 		boolean hasBlackNeighbour = false;
 		boolean hasWhiteNeighbour = false;
+		boolean hasNeutralNeighbour = false;
 		for (int n=0; n<4; n++)
 		{
 			int neighbour = FourCursor.getNeighbour(xy, n);
@@ -451,8 +459,10 @@ public class BasicGoMoveAdministration
 				hasBlackNeighbour = true;
 			if (_scoreBoard.get(neighbour)==WHITE_POINT)
 				hasWhiteNeighbour = true;
+			if (_scoreBoard.get(neighbour)==NEUTRAL_POINT)
+				hasNeutralNeighbour = true;
 		}
-		if (hasBlackNeighbour && hasWhiteNeighbour)
+		if (hasNeutralNeighbour || (hasBlackNeighbour && hasWhiteNeighbour))
 			neutralize(xy);
 		else
 		{

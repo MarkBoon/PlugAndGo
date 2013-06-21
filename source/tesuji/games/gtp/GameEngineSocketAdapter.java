@@ -29,10 +29,12 @@ package tesuji.games.gtp;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Enumeration;
 
 import org.apache.log4j.Logger;
 
 import tesuji.games.general.GameEngine;
+import tesuji.games.general.GameProperties;
 import tesuji.games.general.Move;
 import tesuji.games.general.MoveFactory;
 import tesuji.games.model.BoardModel;
@@ -232,6 +234,16 @@ public abstract class GameEngineSocketAdapter<MoveType extends Move>
     		_engineDelegate.set(propertyName,propertyValue);
     }
 
+    @Override
+	public void setProperties(GameProperties properties)
+    {
+    	for (Enumeration<Object> e=properties.keys(); e.hasMoreElements();)
+    	{
+    		Object key = e.nextElement();
+    		set(key.toString(),properties.get(key).toString());
+    	}
+    }
+    
 	/* (non-Javadoc)
      * @see tesuji.games.general.GameEngine#setTimeConstraints(int, int, int)
      */

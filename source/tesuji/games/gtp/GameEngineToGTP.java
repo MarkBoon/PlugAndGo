@@ -31,10 +31,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.Enumeration;
 
 import org.apache.log4j.Logger;
 
 import tesuji.games.general.GameEngineAdapter;
+import tesuji.games.general.GameProperties;
 import tesuji.games.general.Move;
 import tesuji.games.general.MoveFactory;
 import tesuji.games.general.MoveStack;
@@ -173,6 +175,16 @@ public class GameEngineToGTP<MoveType extends Move>
 		sendGTPCommand(propertyName+" "+propertyValue);
 	}
 
+    @Override
+	public void setProperties(GameProperties properties)
+    {
+    	for (Enumeration<Object> e=properties.keys(); e.hasMoreElements();)
+    	{
+    		Object key = e.nextElement();
+    		set(key.toString(),properties.get(key).toString());
+    	}
+    }
+    
 	/* (non-Javadoc)
 	 * @see tesuji.games.go.common.GoEngine#setTimeConstraints(int, int, int)
 	 */
