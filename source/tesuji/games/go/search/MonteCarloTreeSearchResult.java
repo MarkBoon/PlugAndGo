@@ -444,8 +444,6 @@ public class MonteCarloTreeSearchResult<MoveType extends Move>
     		" value = "+computeResult()+" RAVE="+getRAVEValue()+" virtual-ratio="+getVirtualWinRatio()+" uct="+getUCTValue()+" ratio="+getWinRatio();
     }
     
-    // Some setter /  getters below.
-
     public MoveType getMove()
     {
     	return _move;

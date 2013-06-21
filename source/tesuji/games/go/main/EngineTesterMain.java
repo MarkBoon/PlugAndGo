@@ -101,6 +101,10 @@ public class EngineTesterMain
 		BasicGoMoveAdministration administration = new BasicGoMoveAdministration(gameProperties);
 		engine1.clearBoard();
 		engine2.clearBoard();
+		engine1.requestMove(ColorConstant.BLACK);
+		engine2.requestMove(ColorConstant.BLACK);
+		engine1.clearBoard();
+		engine2.clearBoard();
 		
 		GoMove move;
 		while (!administration.isGameFinished())

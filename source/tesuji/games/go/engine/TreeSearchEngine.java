@@ -26,8 +26,6 @@
 
 package tesuji.games.go.engine;
 
-import java.awt.BorderLayout;
-
 import org.apache.log4j.Logger;
 
 import tesuji.core.util.ArrayStack;
@@ -39,7 +37,6 @@ import tesuji.games.general.renderer.DataRendererManager;
 import tesuji.games.general.renderer.DataSelector;
 import tesuji.games.general.search.Search;
 import tesuji.games.general.search.SearchProperties;
-import tesuji.games.general.search.SearchResult;
 
 import tesuji.games.go.common.BasicGoMoveAdministration;
 import tesuji.games.go.common.GoEngineAdapter;
@@ -105,9 +102,7 @@ public class TreeSearchEngine
 		GoDataPanel goDataPanel = new GoDataPanel(rendererManager);
 		DataSelector dataSelector = new DataSelector(rendererManager);
 		
-		Console.getSingleton().getDataPanel().add(goDataPanel, BorderLayout.CENTER);
-		Console.getSingleton().getDataPanel().add(dataSelector, BorderLayout.SOUTH);
-		Console.getSingleton().getWindow().validate();
+		Console.getSingleton().addDataPanels(goDataPanel, dataSelector);
     }
 
 	/* (non-Javadoc)

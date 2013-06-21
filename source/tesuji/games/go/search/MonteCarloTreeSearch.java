@@ -217,6 +217,9 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 			_logger.info("Percentage saved "+saved+"%");
 			_logger.info("Average nr playouts "+_averagePlayouts);
 		}
+		
+		dump();
+		
 //		_logger.info("Nr pattern moves per playout "+(Statistics.nrPatternsPlayed/_totalNrPlayouts));
 //		_logger.info("Nr hard-coded patterns generated: "+MCTacticsAdministration.getNrPatternsGenerated());
 //		_logger.info("Nr hard-coded patterns played: "+MCTacticsAdministration.getNrPatternsUsed());
@@ -235,6 +238,53 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 		assert _monteCarloAdministration.isConsistent() : "Inconsistent Monte-Carlo administration at the end of the search.";
 
 		return bestNode.getContent().getMove();
+	}
+	
+	private void dump()
+	{
+		int[] wins = GoArray.createIntegers();
+		int[] playouts = GoArray.createIntegers();
+		int[] virtualWins = GoArray.createIntegers();
+		int[] virtualPlayouts = GoArray.createIntegers();
+		for (TreeNode<MonteCarloTreeSearchResult<MoveType>> r : _rootNode.getChildren())
+		{
+			int xy = ((GoMove)r.getContent().getMove()).getXY();
+			wins[xy] = r.getContent()._nrWins;
+			playouts[xy] = r.getContent()._nrPlayouts;
+			virtualWins[xy] = (int)r.getContent()._nrVirtualWins;
+			virtualPlayouts[xy] = (int)r.getContent()._nrVirtualPlayouts;
+		}
+
+		StringBuilder out = new StringBuilder();
+		
+		out.append("\n");
+		for (int row=1; row<=_monteCarloAdministration.getBoardSize(); row++)
+		{
+			for (int col=1; col<=_monteCarloAdministration.getBoardSize(); col++)
+			{
+				int xy = GoArray.toXY(col,row);
+				out.append(Integer.toString(wins[xy]));
+				out.append("/");
+				out.append(Integer.toString(playouts[xy]));
+				out.append("\t");
+			}
+			out.append("\n");
+		}
+		out.append("\n");
+		for (int row=1; row<=_monteCarloAdministration.getBoardSize(); row++)
+		{
+			for (int col=1; col<=_monteCarloAdministration.getBoardSize(); col++)
+			{
+				int xy = GoArray.toXY(col,row);
+				out.append(Integer.toString(virtualWins[xy]));
+				out.append("/");
+				out.append(Integer.toString(virtualPlayouts[xy]));
+				out.append("\t");
+			}
+			out.append("\n");
+		}
+		out.append("\n");
+		System.out.print(out);
 	}
 	
 	protected long calculateTimeLimit()
@@ -810,7 +860,7 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 									playoutNode.getContent().addOwnership(_searchAdministration.getBlackOwnership(), _searchAdministration.getWhiteOwnership());
 							}
 							
-					    	color = opposite(playoutNode.getContent().getMove().getColor());
+					    	color = playoutNode.getContent().getMove().getColor();
 							boolean playerWins = (blackWins && color==BLACK) || (!blackWins && color==WHITE);
 							double score = playerWins ? MonteCarloTreeSearchResult.MAX_SCORE : MonteCarloTreeSearchResult.MIN_SCORE;
 							for (int i=0; i<playoutNode.getChildCount(); i++)

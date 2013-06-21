@@ -7,7 +7,6 @@ import tesuji.games.general.ColorConstant;
 import tesuji.games.general.search.SearchResult;
 import tesuji.games.go.common.GoConstant;
 import tesuji.games.go.common.GoMove;
-import tesuji.games.go.monte_carlo.MonteCarloAdministration;
 import tesuji.games.go.monte_carlo.MonteCarloPluginAdministration;
 import tesuji.games.go.util.GoArray;
 import tesuji.games.go.util.PointSet;
@@ -38,6 +37,8 @@ public class MonteCarloHashMapResult
 	private double		_logNrPlayouts;
 	private double		_beta;
 	
+	private int _boardSize;
+	
 	private ArrayStack<MonteCarloHashMapResult> _owner;
 
 	MonteCarloHashMapResult(ArrayStack<MonteCarloHashMapResult> owner)
@@ -57,6 +58,7 @@ public class MonteCarloHashMapResult
 	
 	public void setPointSet(PointSet set, MonteCarloPluginAdministration administration)
 	{
+		_boardSize = administration.getBoardSize();
 		for (int i=0; i<set.getSize(); i++)
 		{
 			int xy = set.get(i);
@@ -344,5 +346,39 @@ public class MonteCarloHashMapResult
 	{
 		_virtualWins[xy] += win_weight;
 		_virtualPlayouts[xy] += weight;
+	}
+
+	public String toString()
+	{
+		StringBuilder out = new StringBuilder();
+		
+		out.append("\n");
+		for (int row=1; row<=_boardSize; row++)
+		{
+			for (int col=1; col<=_boardSize; col++)
+			{
+				int xy = GoArray.toXY(col,row);
+				out.append(Integer.toString(_wins[xy]));
+				out.append("/");
+				out.append(Integer.toString(_playouts[xy]));
+				out.append("\t");
+			}
+			out.append("\n");
+		}
+		out.append("\n");
+		for (int row=1; row<=_boardSize; row++)
+		{
+			for (int col=1; col<=_boardSize; col++)
+			{
+				int xy = GoArray.toXY(col,row);
+				out.append(Integer.toString((int)_virtualWins[xy]));
+				out.append("/");
+				out.append(Integer.toString((int)_virtualPlayouts[xy]));
+				out.append("\t");
+			}
+			out.append("\n");
+		}
+		out.append("\n");
+		return out.toString();
 	}
 }

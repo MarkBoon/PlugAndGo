@@ -220,6 +220,9 @@ public class MonteCarloHashMapSearch
 		_logger.info("Nr sets "+_nrSets);
 		_logger.info("Nr root visits "+startNode.getPlayouts());
 		_logger.info(""+((double)_nrPlayouts/(double)(time3-time0))+" kpos/sec");
+		
+		System.out.println(startNode.toString());
+		
 //		if (isOptimizeNodeLimit())
 //		{
 //			_logger.info("Percentage saved "+saved+"%");

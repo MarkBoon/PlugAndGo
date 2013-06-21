@@ -33,6 +33,7 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.Socket;
 
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
@@ -62,6 +63,7 @@ public class Console
 	private Appender _logAppender;
 	private JScrollPane _scrollPane;
 	private JPanel _dataPanel;
+	private boolean isDataPanelInitialized = false;
 	
 	private static Console _singleton;
 	
@@ -163,6 +165,17 @@ public class Console
 	public JPanel getDataPanel()
 	{
 		return _dataPanel;
+	}
+	
+	public void addDataPanels(JComponent dataPanel, JComponent selectorPanel)
+	{
+		if (!isDataPanelInitialized)
+		{
+			isDataPanelInitialized = true;
+			_dataPanel.add(dataPanel, BorderLayout.CENTER);
+			_dataPanel.add(selectorPanel, BorderLayout.SOUTH);
+			getWindow().validate();
+		}
 	}
 	
 	public void setTitle(String title)

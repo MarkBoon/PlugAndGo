@@ -153,20 +153,22 @@ public class MCTacticsAdministration
 		_logger.info("USE_TACTICS_IN_SIMULATION = "+_flags[Flag.USE_TACTICS_IN_SIMULATION.ordinal()]);
 		_logger.info("USE_TACTICS_IN_EXPLORATION = "+_flags[Flag.USE_TACTICS_IN_EXPLORATION.ordinal()]);
 		_logger.info("USE_HARD_PATTERNS = "+useHardPatterns());
-
 		createFogOfWar();
 	}
 	
 	private void createFogOfWar()
 	{
-		_row = createRowArray(getBoardSize());
-		if (useFogOfWar())
+		if (isFOG_OF_WAR())
 		{
-			_fogOfWar = createBytes();
-			for (int i=FIRST; i<=LAST; i++)
+			_row = createRowArray(getBoardSize());
+			if (useFogOfWar())
 			{
-				if (_row[i]<3)
-					_fogOfWar[i] = Byte.MAX_VALUE;
+				_fogOfWar = createBytes();
+				for (int i=FIRST; i<=LAST; i++)
+				{
+					if (_row[i]<3)
+						_fogOfWar[i] = Byte.MAX_VALUE;
+				}
 			}
 		}
 	}
