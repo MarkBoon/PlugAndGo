@@ -246,6 +246,8 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 		int[] playouts = GoArray.createIntegers();
 		int[] virtualWins = GoArray.createIntegers();
 		int[] virtualPlayouts = GoArray.createIntegers();
+		double[] results = GoArray.createDoubles();
+		double[] vresults = GoArray.createDoubles();
 		for (TreeNode<MonteCarloTreeSearchResult<MoveType>> r : _rootNode.getChildren())
 		{
 			int xy = ((GoMove)r.getContent().getMove()).getXY();
@@ -253,6 +255,8 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 			playouts[xy] = r.getContent()._nrPlayouts;
 			virtualWins[xy] = (int)r.getContent()._nrVirtualWins;
 			virtualPlayouts[xy] = (int)r.getContent()._nrVirtualPlayouts;
+			vresults[xy] = r.getContent().getVirtualWinRatio();
+			results[xy] = r.getContent().getWinRatio();
 		}
 
 		StringBuilder out = new StringBuilder();
@@ -279,6 +283,19 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 				out.append(Integer.toString(virtualWins[xy]));
 				out.append("/");
 				out.append(Integer.toString(virtualPlayouts[xy]));
+				out.append("\t");
+			}
+			out.append("\n");
+		}
+		out.append("\n");
+		for (int row=1; row<=_monteCarloAdministration.getBoardSize(); row++)
+		{
+			for (int col=1; col<=_monteCarloAdministration.getBoardSize(); col++)
+			{
+				int xy = GoArray.toXY(col,row);
+				out.append(Double.toString(vresults[xy]));
+				out.append("/");
+				out.append(Double.toString(results[xy]));
 				out.append("\t");
 			}
 			out.append("\n");

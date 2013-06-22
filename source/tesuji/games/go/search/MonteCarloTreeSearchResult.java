@@ -45,8 +45,8 @@ public class MonteCarloTreeSearchResult<MoveType extends Move>
 	public static final double HOPELESS = 0.05;
 	public static final double SURE_WIN = 0.99;
 	
-	public static final float INITIAL_WINS = 7.0f;
-	public static final float INITIAL_VISITS = INITIAL_WINS*2.0f;
+	private static final float INITIAL_WINS = 7.0f;
+	private static final float INITIAL_VISITS = INITIAL_WINS*2.0f;
 	
 	public static final int OWNERSHIP_MAXIMUM = 63;
 	
@@ -257,7 +257,7 @@ public class MonteCarloTreeSearchResult<MoveType extends Move>
 		_logNrPlayouts = (float)Math.log(_nrPlayouts);
 	}
 	
-	private double computeResult()
+	public double computeResult()
 	{
 		if (_nrPlayouts==0)
 			return (getVirtualWinRatio() + getRAVEValue()) * getOwnershipValue() + getUrgencyValue();

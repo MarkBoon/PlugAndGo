@@ -65,14 +65,14 @@ public class MonteCarloHashMapResult
 			if (administration.isLegal(xy) && !administration.isVerboten(xy))
 			{
 				_emptyPoints.add(xy);
-				_virtualPlayouts[xy] = 1;
-				_virtualWins[xy] = 1;
+				_virtualPlayouts[xy] = 0;
+				_virtualWins[xy] = 0;
 			}
 		}
 		if (administration.isGameAlmostFinished())
 		{
-			_virtualPlayouts[GoConstant.PASS] = 1;
-			_virtualWins[GoConstant.PASS] = 1;
+			_virtualPlayouts[GoConstant.PASS] = 0;
+			_virtualWins[GoConstant.PASS] = 0;
 			_emptyPoints.add(GoConstant.PASS);
 		}
 	}
@@ -81,6 +81,7 @@ public class MonteCarloHashMapResult
 	{
 		_logNrPlayouts = 0.0;
 		_beta = 0.0;
+		_totalPlayouts = 0;
 		
 		_emptyPoints.clear();
 		GoArray.clear(_playouts);
@@ -287,7 +288,7 @@ public class MonteCarloHashMapResult
 		return bestMove;
 	}
 	
-	private double computeResult(int xy)
+	public double computeResult(int xy)
 	{
 		if (_playouts[xy]==0)
 			return (getVirtualWinRatio(xy) + getRAVEValue(xy));
@@ -312,23 +313,28 @@ public class MonteCarloHashMapResult
 		// Trust the most visited node more. I don't know if it's all that relevant.
 		// I could probably just as easily argue it should be the other way around.
 		if (virtualResult==compareResult)
-			return (_playouts[xy1] > _playouts[xy2]);	// TODO: check '<' instead of '>', see which plays better.
+			return (xy2==GoConstant.PASS || _playouts[xy1] > _playouts[xy2]);	// TODO: check '<' instead of '>', see which plays better.
 		
 		return false;
 		
 	}
 
-	public void increasePlayouts(int xy)
+	public void increasePlayouts()
 	{
 		_totalPlayouts++;
-		_playouts[xy]++;
-		_virtualPlayouts[xy]++;
-		
-		// Computing log() is expensive. I see no need to do it each and every time.
-		if ((_totalPlayouts&0x7)==0)
-			_logNrPlayouts = Math.log(_totalPlayouts);
-		_beta = getBeta();
 	}
+
+//	public void increasePlayouts(int xy)
+//	{
+//		_totalPlayouts++;
+//		_playouts[xy]++;
+//		_virtualPlayouts[xy]++;
+//		
+//		// Computing log() is expensive. I see no need to do it each and every time.
+//		if ((_totalPlayouts&0x7)==0)
+//			_logNrPlayouts = Math.log(_totalPlayouts);
+//		_beta = getBeta();
+//	}
 
 	public void increaseWins(int xy, boolean blackWins)
 	{		
@@ -340,6 +346,11 @@ public class MonteCarloHashMapResult
 			_wins[xy]++;
 			_virtualWins[xy]++;
 		}
+		_playouts[xy]++;
+		_virtualPlayouts[xy]++;
+		if ((_totalPlayouts&0x7)==0)
+			_logNrPlayouts = Math.log(_totalPlayouts);
+		_beta = getBeta();
 	}
 
 	public void increaseVirtualPlayouts(int xy, double win_weight, double weight)
@@ -374,6 +385,19 @@ public class MonteCarloHashMapResult
 				out.append(Integer.toString((int)_virtualWins[xy]));
 				out.append("/");
 				out.append(Integer.toString((int)_virtualPlayouts[xy]));
+				out.append("\t");
+			}
+			out.append("\n");
+		}
+		out.append("\n");
+		for (int row=1; row<=_boardSize; row++)
+		{
+			for (int col=1; col<=_boardSize; col++)
+			{
+				int xy = GoArray.toXY(col,row);
+				out.append(Double.toString(getVirtualWinRatio(xy)));
+				out.append("/");
+				out.append(Double.toString(getWinRatio(xy)));
 				out.append("\t");
 			}
 			out.append("\n");

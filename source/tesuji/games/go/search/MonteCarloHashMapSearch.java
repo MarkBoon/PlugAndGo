@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import org.cliffc.high_scale_lib.NonBlockingHashMapLong;
 
 import tesuji.core.util.ArrayStack;
+import tesuji.games.general.Checksum;
 import tesuji.games.general.TreeNode;
 import tesuji.games.general.search.Search;
 import tesuji.games.general.search.SearchProperties;
@@ -83,6 +84,9 @@ public class MonteCarloHashMapSearch
 	private void initRoot()
 	{
 		_nrSets = 0;
+		for (MonteCarloHashMapResult r : _hashMap.values())
+			r.recycle();
+		_hashMap.clear();
 	}
 
 	/* (non-Javadoc)
@@ -381,6 +385,8 @@ public class MonteCarloHashMapSearch
     		_searchAdministration.copyDataFrom(_initAdministration);
     		_moveStack.clear();
     		_resultStack.clear();
+    		MonteCarloHashMapResult rootNode = _hashMap.get(_searchAdministration.getPositionalChecksum());
+    		_resultStack.push(rootNode);
     	}
     	
     	public void run()
@@ -391,11 +397,11 @@ public class MonteCarloHashMapSearch
     			reset();
     			
     			MonteCarloHashMapResult node = getNodeToExpand();
-    			MonteCarloHashMapResult playoutNode = node;
    				
 	    		if (node != null)
 				{
 					boolean blackWins = _searchAdministration.playout();
+					node.increasePlayouts();
 					setNrSimulatedMoves(getNrSimulatedMoves() + _searchAdministration.getNrSimulatedMoves());
 					setNrPlayouts(getNrPlayouts() + 1);
 			    	adjustTreeValue(blackWins);
@@ -425,7 +431,8 @@ public class MonteCarloHashMapSearch
 						
 						for (int i=0; i<_resultStack.size(); i++)
 						{
-					    	color = opposite(playoutNode.getMove().getColor());
+							MonteCarloHashMapResult playoutNode = _resultStack.peek(i);
+					    	color = playoutNode.getMove().getColor();
 							boolean playerWins = (blackWins && color==BLACK) || (!blackWins && color==WHITE);
 							double score = playerWins ? MonteCarloTreeSearchResult.MAX_SCORE : MonteCarloTreeSearchResult.MIN_SCORE;
 							PointSet points = playoutNode.getEmptyPoints();
@@ -436,7 +443,6 @@ public class MonteCarloHashMapSearch
 								if (_colorMap[xy]==color)
 									playoutNode.increaseVirtualPlayouts(xy,weightXY*score,weightXY);
 							}
-							playoutNode = _resultStack.peek(i);
 						}
 			    	}
 				}
@@ -451,6 +457,36 @@ public class MonteCarloHashMapSearch
     	
     	private MonteCarloHashMapResult getNodeToExpand()
     	{
+    		while (_searchAdministration.getNrPasses()<2)
+    		{
+	    		MonteCarloHashMapResult node = _hashMap.get(_searchAdministration.getPositionalChecksum());
+	    		if (node.getPlayouts()<_nrSimulationsBeforeExpansion)
+	    			return node;
+	
+	    		int xy = node.getBestVirtualMove();
+	   			GoMove move = GoMoveFactory.getSingleton().createMove(xy, _searchAdministration.getColorToMove());
+	    		_resultStack.push(node);
+	    		_moveStack.push(xy);
+	   			_searchAdministration.playExplorationMove(move);
+	
+	    		MonteCarloHashMapResult bestNode = _hashMap.get(_searchAdministration.getPositionalChecksum());
+	   			if (bestNode==null)
+	   			{
+	   				bestNode = SearchResultFactory.createMonteCarloHashMapResult();
+	   				bestNode.setMove(move);
+	   				bestNode.setPointSet(_searchAdministration.getEmptyPoints(),(MonteCarloPluginAdministration)_searchAdministration);
+	   				return bestNode;
+	   			}
+	   			node.increasePlayouts();
+	   			node = bestNode;
+    		}
+
+   			boolean win = (_searchAdministration.getWinner()==BLACK);
+   			adjustTreeValue(win);
+   			return null;
+   		}
+/*
+    		
     		MonteCarloHashMapResult node = _hashMap.get(_searchAdministration.getPositionalChecksum());
     		while (_searchAdministration.getNrPasses()<2)
     		{
@@ -473,26 +509,29 @@ public class MonteCarloHashMapSearch
 	    				nextNode.setMove(move);
 	    				nextNode.setPointSet(_searchAdministration.getEmptyPoints(),(MonteCarloPluginAdministration)_searchAdministration);
 	    				// Fill virtual playouts of all children with pattern-matcher.
-	    				GoMove nextMove = _searchAdministration.selectSimulationMove(); // temporary
-	    				_resultStack.push(nextNode);
-	    				_moveStack.push(nextMove.getXY());
-	    	   			_searchAdministration.playExplorationMove(nextMove);
+	    				//GoMove nextMove = _searchAdministration.selectSimulationMove(); // temporary
+	    				//_resultStack.push(nextNode);
+	    				//_moveStack.push(nextMove.getXY());
+	    	   			//_searchAdministration.playExplorationMove(nextMove);
 	    				return nextNode;
 	    			}
 	    		}
 	    		node = nextNode;
     		}
-    		return node;
-    	}
+			boolean win = (_searchAdministration.getWinner()==BLACK);
+			assert (bestNode.getParent()==node); // node should be parent of bestNode
+			adjustTreeValue(bestNode, win);
+			return null;
+			
+   	}*/
     	
     	public void adjustTreeValue(boolean blackWins)
     	{
-    		for (int i=0; i<_resultStack.size(); i++)
+    		for (int i=0; i<_moveStack.getSize(); i++)
     		{
     			int xy = _moveStack.peek(i);
-    			MonteCarloHashMapResult node = _resultStack.peek(i);    			
-    			assert(node!=null);
-    			node.increaseWins(xy,blackWins);
+    			MonteCarloHashMapResult node = _resultStack.peek(i=1);
+   				node.increaseWins(xy,blackWins);
     		}
     	}
     }

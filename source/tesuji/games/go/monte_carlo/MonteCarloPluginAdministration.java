@@ -357,7 +357,19 @@ public class MonteCarloPluginAdministration
 				}
 			}
 		}
-
+		
+		// Randomize the order of the empty points.
+		PointSet tmpPoints = PointSetFactory.createPointSet();
+		while (_emptyPoints.getSize()>0)
+		{
+			int index = RANDOM.nextInt(_emptyPoints.getSize());
+			int xy = _emptyPoints.get(index);
+			tmpPoints.add(xy);
+			_emptyPoints.remove(xy);
+		}
+		_emptyPoints.recycle();
+		_emptyPoints = tmpPoints;
+		
 		_maxGameLength = _emptyPoints.getSize() * 3;
 		_mercyThreshold = _boardSize*3;
 		
@@ -950,7 +962,7 @@ public class MonteCarloPluginAdministration
 		//if (priorityMove!=UNDEFINED_COORDINATE && priorityMove!=PASS && isLegal(priorityMove))
 		//	return priorityMove;
 		
-		//return selectRandomMoveCoordinate(emptyPoints, _simulationMoveFilterList);
+		return selectRandomMoveCoordinate(emptyPoints, _simulationMoveFilterList);
 //		for (int i=_priorityMoveStack.getSize(); --i>=0;)
 //		{
 //			int xy = _priorityMoveStack.get(i);
@@ -960,7 +972,7 @@ public class MonteCarloPluginAdministration
 //			if (weight!=0.0)
 //				_probabilityMap.add(xy,weight);
 //		}
-		return selectWeightedMoveCoordinate(emptyPoints, _simulationMoveFilterList);
+		//return selectWeightedMoveCoordinate(emptyPoints, _simulationMoveFilterList);
 	}
 	
 	/**
