@@ -13,7 +13,6 @@ import org.apache.log4j.Logger;
 import org.cliffc.high_scale_lib.NonBlockingHashMapLong;
 
 import tesuji.core.util.ArrayStack;
-import tesuji.games.general.Checksum;
 import tesuji.games.general.TreeNode;
 import tesuji.games.general.search.Search;
 import tesuji.games.general.search.SearchProperties;
@@ -163,7 +162,7 @@ public class MonteCarloHashMapSearch
 		MonteCarloHashMapResult startNode = _hashMap.get(_monteCarloAdministration.getPositionalChecksum());
 		if (startNode==null)
 		{
-			startNode = new MonteCarloHashMapResult();
+			startNode = SearchResultFactory.createMonteCarloHashMapResult();
 			startNode.setPointSet(_monteCarloAdministration.getEmptyPoints(),(MonteCarloPluginAdministration)_monteCarloAdministration);
 			startNode.setMove(GoMoveFactory.getSingleton().createPassMove(opposite(_monteCarloAdministration.getColorToMove())));
 			_hashMap.put(_monteCarloAdministration.getPositionalChecksum(),startNode);
@@ -312,6 +311,7 @@ public class MonteCarloHashMapSearch
     public void playMove(GoMove move)
     {
 		_monteCarloAdministration.playMove(move);
+		initRoot();   
     }
 
 	@Override
@@ -326,7 +326,7 @@ public class MonteCarloHashMapSearch
     {
 		_monteCarloAdministration.clear();    
 	}
-
+    
 	@Override
     public void getBestMovePath(ArrayStack<GoMove> moveList)
     {
@@ -401,7 +401,6 @@ public class MonteCarloHashMapSearch
 	    		if (node != null)
 				{
 					boolean blackWins = _searchAdministration.playout();
-					node.increasePlayouts();
 					setNrSimulatedMoves(getNrSimulatedMoves() + _searchAdministration.getNrSimulatedMoves());
 					setNrPlayouts(getNrPlayouts() + 1);
 			    	adjustTreeValue(blackWins);
@@ -432,7 +431,7 @@ public class MonteCarloHashMapSearch
 						for (int i=0; i<_resultStack.size(); i++)
 						{
 							MonteCarloHashMapResult playoutNode = _resultStack.peek(i);
-					    	color = playoutNode.getMove().getColor();
+					    	color = opposite(playoutNode.getMove().getColor());
 							boolean playerWins = (blackWins && color==BLACK) || (!blackWins && color==WHITE);
 							double score = playerWins ? MonteCarloTreeSearchResult.MAX_SCORE : MonteCarloTreeSearchResult.MIN_SCORE;
 							PointSet points = playoutNode.getEmptyPoints();
@@ -447,12 +446,20 @@ public class MonteCarloHashMapSearch
 			    	}
 				}
     		}
-    		while (running);
+    		while (running && !reachedStopCondition());
     	}
     	
     	public void stop()
     	{
     		running = false;
+    	}
+    	
+    	private boolean reachedStopCondition()
+    	{
+    		if (_nrPlayouts>=_nodeLimit && _secondsPerMove==0)
+    			return true;
+    		    		
+    		return false;
     	}
     	
     	private MonteCarloHashMapResult getNodeToExpand()
@@ -465,7 +472,6 @@ public class MonteCarloHashMapSearch
 	
 	    		int xy = node.getBestVirtualMove();
 	   			GoMove move = GoMoveFactory.getSingleton().createMove(xy, _searchAdministration.getColorToMove());
-	    		_resultStack.push(node);
 	    		_moveStack.push(xy);
 	   			_searchAdministration.playExplorationMove(move);
 	
@@ -475,9 +481,10 @@ public class MonteCarloHashMapSearch
 	   				bestNode = SearchResultFactory.createMonteCarloHashMapResult();
 	   				bestNode.setMove(move);
 	   				bestNode.setPointSet(_searchAdministration.getEmptyPoints(),(MonteCarloPluginAdministration)_searchAdministration);
+		    		_resultStack.push(bestNode);
 	   				return bestNode;
 	   			}
-	   			node.increasePlayouts();
+	    		_resultStack.push(bestNode);
 	   			node = bestNode;
     		}
 
@@ -527,10 +534,15 @@ public class MonteCarloHashMapSearch
     	
     	public void adjustTreeValue(boolean blackWins)
     	{
+    		for (int i=0; i<_resultStack.size(); i++)
+    		{
+    			MonteCarloHashMapResult node = _resultStack.peek(i);
+   				node.increasePlayouts();
+    		}
     		for (int i=0; i<_moveStack.getSize(); i++)
     		{
     			int xy = _moveStack.peek(i);
-    			MonteCarloHashMapResult node = _resultStack.peek(i=1);
+    			MonteCarloHashMapResult node = _resultStack.peek(i+1);
    				node.increaseWins(xy,blackWins);
     		}
     	}

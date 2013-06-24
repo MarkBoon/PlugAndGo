@@ -89,7 +89,7 @@
 	<bean id="Bot3" class="tesuji.games.go.engine.TreeSearchEngine" singleton="false">
   		<property name="jar" value="TreeSearchEngine.jar"/>
   		<constructor-arg>
-			<bean class="tesuji.games.go.search.MonteCarloHashMapSearch" singleton="false">
+			<bean class="tesuji.games.go.search.HashMapSearch" singleton="false">
 				<property name="monteCarloAdministration">
 					<bean class="tesuji.games.go.monte_carlo.MonteCarloPluginAdministration" singleton="false">
 						<property name="simulationMoveFilterList">
@@ -140,7 +140,7 @@
 		  			<value>true</value>
 		  		</property>
 		  		<property name="nrSimulationsBeforeExpansion">
-		  			<value>1</value>
+		  			<value>5000</value>
 		  		</property>
 		  		<property name="isTestVersion">
 		  			<value>false</value>
@@ -176,7 +176,7 @@
 		  			<value>true</value>
 		  		</property>
 		  		<property name="nrSimulationsBeforeExpansion">
-		  			<value>1</value>
+		  			<value>5000</value>
 		  		</property>
 		  		<property name="isTestVersion">
 		  			<value>false</value>
@@ -204,7 +204,7 @@
 								<ref bean="eyeMoveFilter"/>
 							</list>
 						</property>
-						<property name="simulationMoveGeneratorList">
+						<!--<property name="simulationMoveGeneratorList">
 							<list>
 								<bean class="tesuji.games.go.monte_carlo.ImmediateAtariEscape" singleton="false"><property name="checkHistory"><value>false</value></property></bean>
 								<bean class="tesuji.games.go.monte_carlo.ImmediateCapture" singleton="false"><property name="checkHistory"><value>true</value></property></bean>
@@ -217,7 +217,7 @@
 								<bean class="tesuji.games.go.monte_carlo.ImmediateCapture" singleton="false"><property name="urgency"><value>10</value></property></bean>
 								<bean class="tesuji.games.go.monte_carlo.ImmediateLadder" singleton="false"><property name="urgency"><value>10</value></property></bean>
 							</list>
-						</property>
+						</property>-->
 				  	</bean>
 				</property>
 		  		<property name="secondsPerMove">
@@ -233,7 +233,7 @@
 		  			<value>true</value>
 		  		</property>
 		  		<property name="nrSimulationsBeforeExpansion">
-		  			<value>1</value>
+		  			<value>5000</value>
 		  		</property>
 		  		<property name="isTestVersion">
 		  			<value>false</value>

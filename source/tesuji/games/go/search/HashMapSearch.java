@@ -30,6 +30,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.apache.log4j.Logger;
+import org.cliffc.high_scale_lib.NonBlockingHashMapLong;
 
 import tesuji.core.util.ArrayStack;
 
@@ -44,11 +45,15 @@ import tesuji.games.general.search.SearchProperties;
 
 import tesuji.games.go.monte_carlo.MCTacticsAdministration;
 import tesuji.games.go.monte_carlo.MonteCarloAdministration;
+import tesuji.games.go.monte_carlo.MonteCarloPluginAdministration;
 
+import tesuji.games.go.common.GoConstant;
 import tesuji.games.go.common.GoMove;
+import tesuji.games.go.common.GoMoveFactory;
 import tesuji.games.go.util.DefaultDoubleArrayProvider;
 import tesuji.games.go.util.GoArray;
 import tesuji.games.go.util.IntStack;
+import tesuji.games.go.util.PointSet;
 
 import static tesuji.games.general.ColorConstant.*;
 import static tesuji.games.go.util.GoArray.createDoubles;
@@ -57,7 +62,7 @@ import static tesuji.games.go.util.GoArray.createBytes;
 /**
  * Implementation of a simple UCT / Monte-Carlo search algorithm. 
  */
-public class MonteCarloTreeSearch<MoveType extends Move>
+public class HashMapSearch<MoveType extends Move>
 	implements Search<MoveType>, PropertyChangeListener
 {
 	private static final int MAX_DUPLICATE_RUNS = 1000;
@@ -69,8 +74,10 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 	private SearchProperties _searchProperties;
 	
 	protected MonteCarloAdministration<MoveType> _monteCarloAdministration;
+	private NonBlockingHashMapLong<MonteCarloHashMapResult> _hashMap = new NonBlockingHashMapLong<MonteCarloHashMapResult>();
 	protected int _secondsPerMove;
-	protected TreeNode<MonteCarloTreeSearchResult<MoveType>> _rootNode;
+//	protected TreeNode<MonteCarloTreeSearchResult<MoveType>> _rootNode;
+	protected MonteCarloHashMapResult _rootResult;
 	protected int _nrPlayouts;
 	protected int _nrSets;
 	protected double _lastScore = 0.0;
@@ -92,14 +99,14 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 	
 	private double[] _ownershipArray;
 	
-	public MonteCarloTreeSearch()
+	public HashMapSearch()
 	{	
 		_ownershipArray = GoArray.createDoubles();
 		initRoot();
 		setSearchProperties(new SearchProperties());
 	}
 	
-	public MonteCarloTreeSearch(MonteCarloAdministration<MoveType> administration)
+	public HashMapSearch(MonteCarloAdministration<MoveType> administration)
 	{
 		this();
 		setMonteCarloAdministration(administration);
@@ -117,21 +124,30 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 	@SuppressWarnings("unchecked")
 	protected void initRoot()
 	{
-		_rootNode = (TreeNode<MonteCarloTreeSearchResult<MoveType>>) TreeNodeFactory.getSingleton().createTreeNode();
-		MonteCarloTreeSearchResult<MoveType> rootResult = 
-			(MonteCarloTreeSearchResult<MoveType>) SearchResultFactory.createMonteCarloTreeSearchResult();
-		rootResult.setExplorationFactor(_explorationFactor);
 		if (_monteCarloAdministration!=null)
-			rootResult.setMove(_monteCarloAdministration.getMoveFactory().createDummyMove(opposite(_monteCarloAdministration.getColorToMove())));
-		_rootNode.setContent(rootResult);
-		_rootNode.getContent().setIsTestVersion(getIsTestVersion());
-		if (_rootNode.hashCode()!=Checksum.UNINITIALIZED && _rootNode.hashCode()!=_monteCarloAdministration.getPositionalChecksum())
-			throw new IllegalStateException();
+		{
+		_rootResult = SearchResultFactory.getSingleton().createMonteCarloHashMapResult();
+		_rootResult.setPointSet(_monteCarloAdministration.getEmptyPoints(),(MonteCarloPluginAdministration)_monteCarloAdministration);
+
+		_hashMap.put(_monteCarloAdministration.getPositionalChecksum(),_rootResult);
+//		_rootResult.setExplorationFactor(_explorationFactor);
+		_rootResult.setMove((GoMove)_monteCarloAdministration.getMoveFactory().createDummyMove(opposite(_monteCarloAdministration.getColorToMove())));
+		}
+//		_rootNode = (TreeNode<MonteCarloTreeSearchResult<MoveType>>) TreeNodeFactory.getSingleton().createTreeNode();
+//		MonteCarloTreeSearchResult<MoveType> rootResult = 
+//			(MonteCarloTreeSearchResult<MoveType>) SearchResultFactory.createMonteCarloTreeSearchResult();
+//		rootResult.setExplorationFactor(_explorationFactor);
+//		if (_monteCarloAdministration!=null)
+//			rootResult.setMove(_monteCarloAdministration.getMoveFactory().createDummyMove(opposite(_monteCarloAdministration.getColorToMove())));
+//		_rootNode.setContent(rootResult);
+//		_rootNode.getContent().setIsTestVersion(getIsTestVersion());
+//		if (_rootNode.hashCode()!=Checksum.UNINITIALIZED && _rootNode.hashCode()!=_monteCarloAdministration.getPositionalChecksum())
+//			throw new IllegalStateException();
 	}
 	
 	public TreeNode<MonteCarloTreeSearchResult<MoveType>> getRootNode()
 	{
-		return _rootNode;
+		return null;
 	}
 			
 	/* (non-Javadoc)
@@ -210,7 +226,7 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 		_logger.info("Playout limit "+_nodeLimit + " - last score " + _lastScore);
 		_logger.info("Nr playouts "+_nrPlayouts);
 		_logger.info("Nr sets "+_nrSets);
-		_logger.info("Nr root visits "+_rootNode.getContent().getNrPlayouts());
+		_logger.info("Nr root visits "+_rootResult.getPlayouts());
 		_logger.info(""+((double)_nrPlayouts/(double)(time3-time0))+" kpos/sec");
 		if (isOptimizeNodeLimit())
 		{
@@ -218,97 +234,27 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 			_logger.info("Average nr playouts "+_averagePlayouts);
 		}
 		
-//		dump();
+		dump();
 		
 //		_logger.info("Nr pattern moves per playout "+(Statistics.nrPatternsPlayed/_totalNrPlayouts));
 //		_logger.info("Nr hard-coded patterns generated: "+MCTacticsAdministration.getNrPatternsGenerated());
 //		_logger.info("Nr hard-coded patterns played: "+MCTacticsAdministration.getNrPatternsUsed());
 		
-		TreeNode<MonteCarloTreeSearchResult<MoveType>> bestNode = getBestChildNode(_rootNode);
-		if (bestNode==null)
-			return null;
-//		TreeNode<MonteCarloTreeSearchResult<MoveType>> secondBestNode = getSecondBestChildNode(_rootNode,bestNode);
-//		_logger.info("Second-best: "+secondBestNode.getContent());
-		if (bestNode.getContent().getMove().isPass())
+		int xy = _rootResult.getBestMove();
+		if (xy==GoConstant.PASS)
 			_logger.info("PASS!");
-		_lastScore = bestNode.getContent().getWinRatio();
+		_lastScore = _rootResult.getWinRatio(xy);
 
 		fillOwnershipArray();
 		
 		assert _monteCarloAdministration.isConsistent() : "Inconsistent Monte-Carlo administration at the end of the search.";
 
-		return bestNode.getContent().getMove();
+		return (MoveType)GoMoveFactory.getSingleton().createMove(xy, _monteCarloAdministration.getColorToMove());
 	}
 	
 	private void dump()
 	{
-		int[] wins = GoArray.createIntegers();
-		int[] playouts = GoArray.createIntegers();
-		double[] virtualWins = GoArray.createDoubles();
-		double[] virtualPlayouts = GoArray.createDoubles();
-		double[] results = GoArray.createDoubles();
-		double[] vresults = GoArray.createDoubles();
-		for (TreeNode<MonteCarloTreeSearchResult<MoveType>> r : _rootNode.getChildren())
-		{
-			int xy = ((GoMove)r.getContent().getMove()).getXY();
-			wins[xy] = r.getContent()._nrWins;
-			playouts[xy] = r.getContent()._nrPlayouts;
-			virtualWins[xy] = (int)r.getContent()._nrVirtualWins;
-			virtualPlayouts[xy] = (int)r.getContent()._nrVirtualPlayouts;
-			vresults[xy] = r.getContent().getVirtualWinRatio();
-			results[xy] = r.getContent().getWinRatio();
-		}
-
-		StringBuilder out = new StringBuilder();
-		
-		out.append("\nTreeSearch\n");
-		TreeNode<MonteCarloTreeSearchResult<MoveType>> bestNode = getBestChildNode(_rootNode);
-		out.append(bestNode.getContent().getMove().toString()+"\n");
-		for (int row=1; row<=_monteCarloAdministration.getBoardSize(); row++)
-		{
-			for (int col=1; col<=_monteCarloAdministration.getBoardSize(); col++)
-			{
-				int xy = GoArray.toXY(col,row);
-				out.append(Integer.toString(wins[xy]));
-				out.append("/");
-				out.append(Integer.toString(playouts[xy]));
-				out.append("\t");
-			}
-			out.append("\n");
-		}
-		out.append("\n");
-		for (int row=1; row<=_monteCarloAdministration.getBoardSize(); row++)
-		{
-			for (int col=1; col<=_monteCarloAdministration.getBoardSize(); col++)
-			{
-				int xy = GoArray.toXY(col,row);
-				if (virtualPlayouts[xy]!=0)
-					out.append(Double.toString(virtualWins[xy]/virtualPlayouts[xy]));
-				else
-				{
-					out.append(Double.toString(virtualWins[xy]));
-					out.append("/");
-					out.append(Double.toString(virtualPlayouts[xy]));
-				}
-				out.append("\t");
-			}
-			out.append("\n");
-		}
-		out.append("\n");
-		for (int row=1; row<=_monteCarloAdministration.getBoardSize(); row++)
-		{
-			for (int col=1; col<=_monteCarloAdministration.getBoardSize(); col++)
-			{
-				int xy = GoArray.toXY(col,row);
-				out.append(Double.toString(vresults[xy]));
-				out.append("/");
-				out.append(Double.toString(results[xy]));
-				out.append("\t");
-			}
-			out.append("\n");
-		}
-		out.append("\n");
-		System.out.print(out);
+//		System.out.println(_rootResult.toString());
 	}
 	
 	protected long calculateTimeLimit()
@@ -365,41 +311,7 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 		
 		return nodeLimit;
 	}
-	
-	/**
-	 * Decide which node in the tree should be 'expanded' next. By definition the node
-	 * should be a leaf. And it must have had the required minimum number of playouts.
-	 * 
-	 * If the node passed is not a leaf-node, then it continues going down the tree
-	 * based on the best child-node. 'Best' depends on the UCT value.
-	 *  
-	 * @param node
-	 * @param moveColor
-	 * @param searchAdministration
-	 * @return
-	 */
-	protected TreeNode<MonteCarloTreeSearchResult<MoveType>> getNodeToExpand(TreeNode<MonteCarloTreeSearchResult<MoveType>> node, MonteCarloAdministration<MoveType> searchAdministration)
-	{
-		if (node.getChildCount()==0 || node.getContent().getNrPlayouts()<_nrSimulationsBeforeExpansion)
-			return node;
-
-		TreeNode<MonteCarloTreeSearchResult<MoveType>> bestNode = getBestVirtualChildNode(node);
-
-		searchAdministration.playExplorationMove(bestNode.getContent().getMove());
-		if (bestNode.hashCode()==Checksum.UNINITIALIZED)
-			bestNode.setChecksum(searchAdministration.getPositionalChecksum());
 		
-		if (searchAdministration.getNrPasses()<2)
-			return getNodeToExpand(bestNode, searchAdministration);
-		else
-		{
-			boolean win = (searchAdministration.getWinner()==BLACK);
-			assert (bestNode.getParent()==node); // node should be parent of bestNode
-			adjustTreeValue(bestNode, win);
-			return null;
-		}
-	}
-	
 	/**
 	 * Expand the tree with all possible moves. The set of moves is retrieved from the
 	 * MonteCarloAdministration object. This might exclude some legal moves that the
@@ -429,79 +341,64 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 		}
 		moveIterator.recycle();
 	}
-    
-    /**
-     * The result is passed up the tree.
-     * 
-     * @param node
-     * @param win
-     */
-	protected void adjustTreeValue(TreeNode<MonteCarloTreeSearchResult<MoveType>> node, boolean win)
-	{
-		while (node!=null)
-		{
-			synchronized(node)
-			{
-				node.getContent().increasePlayouts(win);
-			}
-			node = node.getParent();
-		}
-	}
-	
+    	
 	protected TreeNode<MonteCarloTreeSearchResult<MoveType>> getBestChildNode(TreeNode<MonteCarloTreeSearchResult<MoveType>> node)
 	{
-		TreeNode<MonteCarloTreeSearchResult<MoveType>> bestNode = null;
-		
-		for (int i=0; i<node.getChildCount(); i++)
-		{
-			TreeNode<MonteCarloTreeSearchResult<MoveType>> nextNode = node.getChildAt(i);
-			
-			if (/*!_monteCarloAdministration.hasRepetition(nextNode.hashCode()) &&*/
-						(bestNode==null || nextNode.getContent().isBetterResultThan(bestNode.getContent())))
-			{
-				if (node!=_rootNode || !nextNode.getContent().getMove().isPass() || _monteCarloAdministration.isGameAlmostFinished())
-					bestNode = nextNode;
-			}
-		}
-		return bestNode;
+		return null;
+//		TreeNode<MonteCarloTreeSearchResult<MoveType>> bestNode = null;
+//		
+//		for (int i=0; i<node.getChildCount(); i++)
+//		{
+//			TreeNode<MonteCarloTreeSearchResult<MoveType>> nextNode = node.getChildAt(i);
+//			
+//			if (/*!_monteCarloAdministration.hasRepetition(nextNode.hashCode()) &&*/
+//						(bestNode==null || nextNode.getContent().isBetterResultThan(bestNode.getContent())))
+//			{
+//				if (node!=_rootNode || !nextNode.getContent().getMove().isPass() || _monteCarloAdministration.isGameAlmostFinished())
+//					bestNode = nextNode;
+//			}
+//		}
+//		return bestNode;
 	}
 	
 	protected TreeNode<MonteCarloTreeSearchResult<MoveType>> getSecondBestChildNode(TreeNode<MonteCarloTreeSearchResult<MoveType>> node, TreeNode<MonteCarloTreeSearchResult<MoveType>> bestNode)
 	{
-		TreeNode<MonteCarloTreeSearchResult<MoveType>> secondBestNode = null;
-		
-		for (int i=0; i<node.getChildCount(); i++)
-		{
-			TreeNode<MonteCarloTreeSearchResult<MoveType>> nextNode = node.getChildAt(i);
-			
-			if (nextNode!=bestNode && !_monteCarloAdministration.hasRepetition(nextNode.hashCode()) &&
-						(secondBestNode==null || nextNode.getContent().isBetterResultThan(secondBestNode.getContent())))
-			{
-				if (node!=_rootNode || !nextNode.getContent().getMove().isPass() || _monteCarloAdministration.isGameAlmostFinished())
-					secondBestNode = nextNode;
-			}
-		}
-		return secondBestNode;
+		return null;
+//		TreeNode<MonteCarloTreeSearchResult<MoveType>> secondBestNode = null;
+//		
+//		for (int i=0; i<node.getChildCount(); i++)
+//		{
+//			TreeNode<MonteCarloTreeSearchResult<MoveType>> nextNode = node.getChildAt(i);
+//			
+//			if (nextNode!=bestNode && !_monteCarloAdministration.hasRepetition(nextNode.hashCode()) &&
+//						(secondBestNode==null || nextNode.getContent().isBetterResultThan(secondBestNode.getContent())))
+//			{
+//				if (node!=_rootNode || !nextNode.getContent().getMove().isPass() || _monteCarloAdministration.isGameAlmostFinished())
+//					secondBestNode = nextNode;
+//			}
+//		}
+//		return secondBestNode;
 	}
 	
 	protected TreeNode<MonteCarloTreeSearchResult<MoveType>> getBestVirtualChildNode(TreeNode<MonteCarloTreeSearchResult<MoveType>> node)
 	{
-		TreeNode<MonteCarloTreeSearchResult<MoveType>> bestNode = null;
-		
-		synchronized(node)
-		{
-			int nrChildren = node.getChildCount();
-			for (int i=0; i<nrChildren; i++)
-			{
-				TreeNode<MonteCarloTreeSearchResult<MoveType>> nextNode = node.getChildAt(i);
-				if (i==0 && (nextNode.getContent().getNrPlayouts()&3)!=0)
-					return nextNode;
-				if (bestNode==null || nextNode.getContent().isBetterVirtualResultThan(bestNode.getContent()))
-					bestNode = nextNode;
-			}
-			node.makeFirstChild(bestNode);
-		}
-		return bestNode;
+		return null;
+//		TreeNode<MonteCarloTreeSearchResult<MoveType>> bestNode = null;
+//		
+//		synchronized(node)
+//		{
+//			int nrChildren = node.getChildCount();
+//			for (int i=0; i<nrChildren; i++)
+//			{
+//				TreeNode<MonteCarloTreeSearchResult<MoveType>> nextNode = node.getChildAt(i);
+//				if (i==0 && (nextNode.getContent().getNrPlayouts()&3)!=0)
+//					return nextNode;
+//				if (bestNode==null || nextNode.getContent().isBetterVirtualResultThan(bestNode.getContent()))
+//					bestNode = nextNode;
+//			}
+//			node.makeFirstChild(bestNode);
+//		}
+//		return bestNode;
 	}
 	
 	/*
@@ -510,19 +407,19 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 	 */
 	public void getBestMovePath(ArrayStack<MoveType> moveList)
 	{
-		getBestMovePath(_rootNode,moveList);
+//		getBestMovePath(_rootNode,moveList);
 	}
 	
-	private void getBestMovePath(TreeNode<MonteCarloTreeSearchResult<MoveType>> startNode, ArrayStack<MoveType> moveList)
-	{
-		TreeNode<MonteCarloTreeSearchResult<MoveType>> node = startNode;
-
-		while (node.getChildCount()!=0)
-		{
-			node = getBestChildNode(node);
-			moveList.push(node.getContent().getMove());
-		}
-	}
+//	private void getBestMovePath(TreeNode<MonteCarloTreeSearchResult<MoveType>> startNode, ArrayStack<MoveType> moveList)
+//	{
+//		TreeNode<MonteCarloTreeSearchResult<MoveType>> node = startNode;
+//
+//		while (node.getChildCount()!=0)
+//		{
+//			node = getBestChildNode(node);
+//			moveList.push(node.getContent().getMove());
+//		}
+//	}
 
 //	private TreeNode<MonteCarloTreeSearchResult<MoveType>> getMoveNode(MoveType move)
 //	{
@@ -578,7 +475,9 @@ public class MonteCarloTreeSearch<MoveType extends Move>
     
     protected void reset()
     {
-		_rootNode.recycle();
+		for (MonteCarloHashMapResult r : _hashMap.values())
+			r.recycle();
+		_hashMap.clear();
 		initRoot();   
     }
     
@@ -715,24 +614,24 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 		if (_nrPlayouts>=_nodeLimit && _secondsPerMove==0)
 			return true;
 		
-		if ((_nrPlayouts&15)==0 && _nodeLimit>0 && _secondsPerMove==0)
-		{
-			TreeNode<MonteCarloTreeSearchResult<MoveType>> bestNode;
-			TreeNode<MonteCarloTreeSearchResult<MoveType>> secondBestNode;
-			bestNode = getBestChildNode(_rootNode);
-			secondBestNode = getSecondBestChildNode(_rootNode,bestNode);
-			if (secondBestNode!=null && bestNode.getContent().getNrPlayouts()-secondBestNode.getContent().getNrPlayouts()>_nodeLimit-_nrPlayouts)
-				return true;
-/*    				if (_isTestVersion && _nrPlayouts > _nodeLimit/4)
-			{
-				if (bestNode.getContent().getNrPlayouts() / 3 > secondBestNode.getContent().getNrPlayouts())
-				{
-    				_logger.info("Urgent move found, stopping search.");
-					break;
-				}
-			}
-*/
-		}
+//		if ((_nrPlayouts&15)==0 && _nodeLimit>0 && _secondsPerMove==0)
+//		{
+//			TreeNode<MonteCarloTreeSearchResult<MoveType>> bestNode;
+//			TreeNode<MonteCarloTreeSearchResult<MoveType>> secondBestNode;
+//			bestNode = getBestChildNode(_rootNode);
+//			secondBestNode = getSecondBestChildNode(_rootNode,bestNode);
+//			if (secondBestNode!=null && bestNode.getContent().getNrPlayouts()-secondBestNode.getContent().getNrPlayouts()>_nodeLimit-_nrPlayouts)
+//				return true;
+///*    				if (_isTestVersion && _nrPlayouts > _nodeLimit/4)
+//			{
+//				if (bestNode.getContent().getNrPlayouts() / 3 > secondBestNode.getContent().getNrPlayouts())
+//				{
+//    				_logger.info("Urgent move found, stopping search.");
+//					break;
+//				}
+//			}
+//*/
+//		}
 		
 		return false;
 	}
@@ -759,6 +658,8 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 		private MonteCarloAdministration<MoveType> _searchAdministration;
 		private double[] _weightMap;
 		private byte[] _colorMap;
+		private IntStack _moveStack;
+		private ArrayStack<MonteCarloHashMapResult> _resultStack;
     	
     	public SearchProcess(byte startColor)
     	{
@@ -767,6 +668,8 @@ public class MonteCarloTreeSearch<MoveType extends Move>
     		_searchAdministration = _monteCarloAdministration.createClone();
     		_weightMap = createDoubles();
     		_colorMap = createBytes();
+       		_moveStack = new IntStack(GoArray.LAST, null);
+    		_resultStack = new ArrayStack<MonteCarloHashMapResult>();
     	}
     	
     	public void run()
@@ -777,81 +680,27 @@ public class MonteCarloTreeSearch<MoveType extends Move>
     		{
     			int nrPlayouts = _nrPlayouts;
     			_searchAdministration.copyDataFrom(_monteCarloAdministration);
+    			_moveStack.clear();
+    			_resultStack.clear();
+        		_resultStack.push(_rootResult);
     			
-    			TreeNode<MonteCarloTreeSearchResult<MoveType>> node = getNodeToExpand(_rootNode, _searchAdministration);
-    			TreeNode<MonteCarloTreeSearchResult<MoveType>> playoutNode = node;
+    			MonteCarloHashMapResult node = getNodeToExpand(_rootResult, _searchAdministration);
+//    			MonteCarloHashMapResult playoutNode = node;
    				
 	    		if (node != null)
 				{
-	    			if (node.getChildCount()==0)
-	    			{
-	    				synchronized (node)
-                        {
-							expandNode(node,_searchAdministration);
-                        }
-	    			}
-	    			
-//	    			if (getIsTestVersion())
+//	    			if (node.getChildCount()==0)
 //	    			{
-//						int start = _searchAdministration.getMoveStack().getSize();
-//						boolean blackWins = _searchAdministration.playout();
-//						_nrSimulatedMoves += _searchAdministration.getNrSimulatedMoves();
-//						_nrPlayouts++;
-//				    	adjustTreeValue(playoutNode, blackWins);
-//
-//				    	if (_useAMAF)
-//				    	{
-//							IntStack playoutMoves = _searchAdministration.getMoveStack();
-//							byte color = _monteCarloAdministration.getColorToMove();
-//							int end = playoutMoves.getSize();
-//							
-//							while (playoutNode!=null)
-//							{
-//						    	if (playoutNode.getContent().getNrPlayouts()<MonteCarloTreeSearchResult.OWNERSHIP_MAXIMUM)
-//						    		playoutNode.getContent().addOwnership(_searchAdministration.getBlackOwnership(), _searchAdministration.getWhiteOwnership());
-//
-//								color = opposite(playoutNode.getContent().getMove().getColor());
-//								double weight = 1.0;
-//								double weightDelta = 1.0 / (end - start + 1); // Michael Williams' idea to use decreasing weights
-//								GoArray.clear(_weightMap);
-//								GoArray.clear(_colorMap);
-//								for (int i=start; i<end; i++)
-//								{
-//									int moveXY = playoutMoves.get(i);
-//									if (_colorMap[moveXY]==0)
-//									{
-//										_colorMap[moveXY] = color;
-//										_weightMap[moveXY] = weight;
-//									}
-//									//if (_useEnhanced)
-//										weight -= weightDelta;
-//									color = opposite(color);
-//								}
-//
-//								color = opposite(playoutNode.getContent().getMove().getColor());
-//								boolean playerWins = (blackWins && color==BLACK) || (!blackWins && color==WHITE);
-//								double score = playerWins ? MonteCarloTreeSearchResult.MAX_SCORE : MonteCarloTreeSearchResult.MIN_SCORE;
-//								for (int i=0; i<playoutNode.getChildCount(); i++)
-//								{
-//									TreeNode<MonteCarloTreeSearchResult<MoveType>> nextNode = playoutNode.getChildAt(i);
-//									MonteCarloTreeSearchResult<MoveType> result = nextNode.getContent();
-//									GoMove move = (GoMove) result.getMove();
-//									int xy = move.getXY();
-//									double weightXY = _weightMap[xy];
-//									if (_colorMap[xy]==color)
-//										result.increaseVirtualPlayouts(weightXY*score,weightXY);
-//								}
-//								playoutNode = playoutNode.getParent();
-//								start--;
-//							}
-//				    	}
+//	    				synchronized (node)
+//                        {
+//							expandNode(node,_searchAdministration);
+//                        }
 //	    			}
-//	    			else
-	    			{
+	    			
 					boolean blackWins = _searchAdministration.playout();
 					_nrSimulatedMoves += _searchAdministration.getNrSimulatedMoves();
 					_nrPlayouts++;
-			    	adjustTreeValue(playoutNode, blackWins);
+			    	adjustTreeValue(node, blackWins);
 
 			    	if (_useAMAF)
 			    	{
@@ -876,30 +725,21 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 							color = opposite(color);
 						}
 						
-						while (playoutNode!=null)
+						for (int i=0; i<_resultStack.size(); i++)
 						{
-							synchronized(playoutNode)
-							{
-								if (playoutNode.getContent().getNrPlayouts()<MonteCarloTreeSearchResult.OWNERSHIP_MAXIMUM)
-									playoutNode.getContent().addOwnership(_searchAdministration.getBlackOwnership(), _searchAdministration.getWhiteOwnership());
-							}
-							
-					    	color = opposite(playoutNode.getContent().getMove().getColor());
+							MonteCarloHashMapResult playoutNode = _resultStack.peek(i);
+					    	color = opposite(playoutNode.getMove().getColor());
 							boolean playerWins = (blackWins && color==BLACK) || (!blackWins && color==WHITE);
 							double score = playerWins ? MonteCarloTreeSearchResult.MAX_SCORE : MonteCarloTreeSearchResult.MIN_SCORE;
-							for (int i=0; i<playoutNode.getChildCount(); i++)
+							PointSet points = playoutNode.getEmptyPoints();
+							for (int p=0; p<points.getSize(); p++)
 							{
-								TreeNode<MonteCarloTreeSearchResult<MoveType>> nextNode = playoutNode.getChildAt(i);
-								MonteCarloTreeSearchResult<MoveType> result = nextNode.getContent();
-								GoMove move = (GoMove) result.getMove();
-								int xy = move.getXY();
+								int xy = points.get(p);
 								double weightXY = _weightMap[xy];
 								if (_colorMap[xy]==color)
-									result.increaseVirtualPlayouts(weightXY*score,weightXY);
+									playoutNode.increaseVirtualPlayouts(xy,weightXY*score,weightXY);
 							}
-							playoutNode = playoutNode.getParent();
 						}
-			    	}
 	    			}
 				}
    				
@@ -923,16 +763,81 @@ public class MonteCarloTreeSearch<MoveType extends Move>
     	{
     		running = false;
     	}
+    	
+    	/**
+    	 * Decide which node in the tree should be 'expanded' next. By definition the node
+    	 * should be a leaf. And it must have had the required minimum number of playouts.
+    	 * 
+    	 * If the node passed is not a leaf-node, then it continues going down the tree
+    	 * based on the best child-node. 'Best' depends on the UCT value.
+    	 *  
+    	 * @param node
+    	 * @param moveColor
+    	 * @param searchAdministration
+    	 * @return
+    	 */
+    	protected MonteCarloHashMapResult getNodeToExpand(MonteCarloHashMapResult node, MonteCarloAdministration<MoveType> searchAdministration)
+    	{
+    		if (node.getPlayouts()<_nrSimulationsBeforeExpansion)
+    			return node;
+
+    		int xy = node.getBestVirtualMove();
+    		GoMove bestMove = GoMoveFactory.getSingleton().createMove(xy, searchAdministration.getColorToMove());
+    		_moveStack.push(xy);
+    		searchAdministration.playExplorationMove((MoveType)bestMove);
+//    		if (bestNode.hashCode()==Checksum.UNINITIALIZED)
+//    			bestNode.setChecksum(searchAdministration.getPositionalChecksum());
+    		MonteCarloHashMapResult bestNode = _hashMap.get(searchAdministration.getPositionalChecksum());
+   			if (bestNode==null)
+   			{
+   				bestNode = SearchResultFactory.createMonteCarloHashMapResult();
+   				bestNode.setMove(bestMove);
+   				bestNode.setPointSet(_searchAdministration.getEmptyPoints(),(MonteCarloPluginAdministration)_searchAdministration);
+	    		_resultStack.push(bestNode);
+   				return bestNode;
+   			}
+    		_resultStack.push(bestNode);
+
+    		if (searchAdministration.getNrPasses()<2)
+    			return getNodeToExpand(bestNode, searchAdministration);
+    		else
+    		{
+    			boolean win = (searchAdministration.getWinner()==BLACK);
+    			adjustTreeValue(bestNode, win);
+    			return null;
+    		}
+    	}
+
+    	/**
+         * The result is passed up the tree.
+         * 
+         * @param node
+         * @param win
+         */
+    	protected void adjustTreeValue(MonteCarloHashMapResult startNode, boolean blackWins)
+    	{
+    		for (int i=0; i<_resultStack.size(); i++)
+    		{
+    			MonteCarloHashMapResult node = _resultStack.peek(i);
+    				node.increasePlayouts();
+    		}
+    		for (int i=0; i<_moveStack.getSize(); i++)
+    		{
+    			int xy = _moveStack.peek(i);
+    			MonteCarloHashMapResult node = _resultStack.peek(i+1);
+    				node.increaseWins(xy,blackWins);
+    		}
+    	}
     }
 
 	private void fillOwnershipArray()
 	{
-		for (int i=GoArray.FIRST; i<= GoArray.LAST; i++)
-		{
-			double black = _rootNode.getContent().getBlackOwnership()[i];
-			double white = _rootNode.getContent().getWhiteOwnership()[i];
-			_ownershipArray[i] = (black / (black+white))*200.0 - 100.0;
-		}
+//		for (int i=GoArray.FIRST; i<= GoArray.LAST; i++)
+//		{
+//			double black = _rootNode.getContent().getBlackOwnership()[i];
+//			double white = _rootNode.getContent().getWhiteOwnership()[i];
+//			_ownershipArray[i] = (black / (black+white))*200.0 - 100.0;
+//		}
 	}
 
 	@Override

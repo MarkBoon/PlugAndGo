@@ -122,7 +122,7 @@ public class SearchResultFactory
 		MonteCarloHashMapResult newResult;
         if (mctsResultPool.isEmpty())
         {
-        	newResult = new MonteCarloHashMapResult();
+        	newResult = new MonteCarloHashMapResult(mchmResultPool);
         	nrResults++;
         }
         else

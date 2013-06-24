@@ -1,6 +1,7 @@
 package tesuji.games.go.monte_carlo;
 
 import tesuji.games.general.ColorConstant;
+import static tesuji.games.go.util.GoArray.*;
 
 public class EyeMoveFilter
 	implements MoveFilter
@@ -10,6 +11,8 @@ public class EyeMoveFilter
 	private byte[] _blackDiagonalNeighbours;
 	private byte[] _whiteDiagonalNeighbours;
 	private byte[] _maxDiagonalsOccupied;
+	private int[] _liberties;
+	private int[] _chain;
 	
 	MonteCarloPluginAdministration _administration;
 	
@@ -28,11 +31,17 @@ public class EyeMoveFilter
 		_whiteDiagonalNeighbours = administration.getWhiteDiagonalNeighbourArray();
 		
 		_maxDiagonalsOccupied = administration.getMaxDiagonalArray();
+		
+		_liberties = administration.getLibertyArray();
+		_chain = administration.getChainArray();
 	}
 
 	@Override
 	public boolean accept(int xy, byte color)
 	{
+		if (_liberties[_chain[left(xy)]]==1 || _liberties[_chain[right(xy)]]==1 || _liberties[_chain[above(xy)]]==1 || _liberties[_chain[below(xy)]]==1)
+			return false;
+
 		if (color==ColorConstant.BLACK)
 			return (_blackNeighbours[xy]==4 && _whiteDiagonalNeighbours[xy]<_maxDiagonalsOccupied[xy]);
 		else

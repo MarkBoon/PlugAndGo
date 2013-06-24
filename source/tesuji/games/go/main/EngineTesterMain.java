@@ -21,7 +21,7 @@ public class EngineTesterMain
 	private static GoGameProperties gameProperties;
 	private static int gameNr;
 	private static boolean alt = false;
-	private static String dataFile = "gtp/games/test.dat";
+	private static String dataFile = "gtp/games/test/test.dat";
 	
 	public static void main(String[] args)
 					throws Exception
@@ -77,7 +77,7 @@ public class EngineTesterMain
 			Console.getSingleton().setTitle(engine1.getEngineName()+" - "+engine1.getEngineVersion()+" vs. "+engine2.getEngineName()+" - "+engine2.getEngineVersion());
 
 			BasicGoMoveAdministration administration = new BasicGoMoveAdministration(gameProperties);
-			writeResultHeader(administration, engine1, engine2);
+//			writeResultHeader(administration, engine1, engine2);
 
 			while (true)
 			{
@@ -117,7 +117,7 @@ public class EngineTesterMain
 			engine1.playMove(move);
 			engine2.playMove(move);
 		}
-		writeResult(administration,engine1,engine2);
+//		writeResult(administration,engine1,engine2);
 	}
 	
 	private static void writeResultHeader(BasicGoMoveAdministration administration, GoEngine engine1, GoEngine engine2)

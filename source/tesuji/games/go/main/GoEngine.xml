@@ -23,7 +23,7 @@
 	<bean id="Bot1" class="tesuji.games.go.engine.TreeSearchEngine" singleton="false">
   		<property name="jar" value="TreeSearchEngine.jar"/>
   		<constructor-arg>
-			<bean class="tesuji.games.go.search.MonteCarloHashMapSearch" singleton="false">
+			<bean class="tesuji.games.go.search.HashMapSearch" singleton="false">
 				<property name="monteCarloAdministration">
 					<bean class="tesuji.games.go.monte_carlo.MonteCarloPluginAdministration" singleton="false">
 						<property name="simulationMoveFilterList">
@@ -68,13 +68,13 @@
 		  			<value>1</value>
 		  		</property>
 		  		<property name="minimumNrNodes">
-		  			<value>2000</value>
+		  			<value>20000</value>
 		  		</property>
 		  		<property name="useAMAF">
 		  			<value>true</value>
 		  		</property>
 		  		<property name="nrSimulationsBeforeExpansion">
-		  			<value>1</value>
+		  			<value>50000</value>
 		  		</property>
 		  		<property name="isTestVersion">
 		  			<value>false</value>
@@ -91,11 +91,20 @@
   		<constructor-arg>
 			<bean class="tesuji.games.go.search.MonteCarloTreeSearch" singleton="false">
 				<property name="monteCarloAdministration">
-					<bean class="tesuji.games.go.monte_carlo.MCTacticsAdministration" singleton="false">
-				  		<property name="USE_TACTICS_IN_EXPLORATION">
-				  			<value>false</value>
-				  		</property>
-				  	</bean>
+					<bean class="tesuji.games.go.monte_carlo.MonteCarloPluginAdministration" singleton="false">
+						<property name="simulationMoveFilterList">
+							<list>
+								<ref bean="eyeMoveFilter"/>
+								<!--<ref bean="fogOfWarFilter"/>-->
+							</list>
+						</property>
+						<property name="explorationMoveFilterList">
+							<list>
+								<ref bean="eyeMoveFilter"/>
+								<!--<ref bean="fogOfWarFilter"/>-->
+							</list>
+						</property>
+					</bean>
 				</property>
 		  		<property name="secondsPerMove">
 		  			<value>0</value>
@@ -104,13 +113,13 @@
 		  			<value>1</value>
 		  		</property>
 		  		<property name="minimumNrNodes">
-		  			<value>2000</value>
+		  			<value>20000</value>
 		  		</property>
 		  		<property name="useAMAF">
 		  			<value>true</value>
 		  		</property>
 		  		<property name="nrSimulationsBeforeExpansion">
-		  			<value>1</value>
+		  			<value>50000</value>
 		  		</property>
 		  		<property name="isTestVersion">
 		  			<value>false</value>

@@ -7,6 +7,8 @@ import tesuji.games.general.ColorConstant;
 import tesuji.games.general.search.SearchResult;
 import tesuji.games.go.common.GoConstant;
 import tesuji.games.go.common.GoMove;
+import tesuji.games.go.common.GoMoveFactory;
+import tesuji.games.go.monte_carlo.MonteCarloAdministration;
 import tesuji.games.go.monte_carlo.MonteCarloPluginAdministration;
 import tesuji.games.go.util.GoArray;
 import tesuji.games.go.util.PointSet;
@@ -118,46 +120,18 @@ public class MonteCarloHashMapResult
 		return _emptyPoints;
 	}
 	
-	@Override
-    public boolean isBetterResultThan(SearchResult<GoMove> compare)
+    public boolean isBetterResultThan(int xy1, int xy2)
     {
-		return false;
-		/*
-		if (compare==null)
+		if (xy2==GoConstant.PASS)
 			return true;
 		
-		MonteCarloHashMapResult compareResult = (MonteCarloHashMapResult) compare;
-		
-		assert _move.getColor()==compare.getMove().getColor() : "Can't compare results with a different color";
-
-//		if (getWinRatio()>SURE_WIN && compareResult.getWinRatio()>SURE_WIN)
-//		{
-//			int xy = ((GoMove)getMove()).getXY();
-//			int compareXY = ((GoMove)compare.getMove()).getXY();
-//			if (_move.getColor()==BLACK)
-//			{
-//				if (getParentResult().getBlackOwnership()[xy]!=0 && getParentResult().getBlackOwnership()[compareXY]==0)
-//					return true;
-//			}
-//			else
-//			{
-//				if (getParentResult().getWhiteOwnership()[xy]!=0 && getParentResult().getWhiteOwnership()[compareXY]==0)
-//					return true;
-//			}
-//			
-//			int diff = Math.abs(getParentResult().getBlackOwnership()[xy]-getParentResult().getWhiteOwnership()[xy]);
-//			int compareDiff = Math.abs(getParentResult().getBlackOwnership()[compareXY]-getParentResult().getWhiteOwnership()[compareXY]);
-//			if (diff<compareDiff)
-//				return true;
-//		}
-		
-		if (getNrPlayouts()>compareResult.getNrPlayouts())
+		if (_playouts[xy1]>_playouts[xy2])
 			return true;
 
-		if (getNrPlayouts()==compareResult.getNrPlayouts())
+		if (_playouts[xy1]==_playouts[xy2])
 		{
-			double value = getWinRatio();
-			double compareValue = compareResult.getWinRatio();
+			double value = getWinRatio(xy1);
+			double compareValue = getWinRatio(xy2);
 			
 			assert value!=Double.NaN : "Calculation error for the result-value.";
 			assert compareValue!=Double.NaN : "Calculation error for the compare-value.";
@@ -166,10 +140,9 @@ public class MonteCarloHashMapResult
 				return true;
 			
 			if (value==compareValue)
-				return getVirtualWinRatio()>compareResult.getVirtualWinRatio();
+				return getVirtualWinRatio(xy1)>getVirtualWinRatio(xy2);
 		}
 		return false;
-		*/
     }
 
 	@Override
@@ -273,16 +246,10 @@ public class MonteCarloHashMapResult
 	public int getBestMove()
 	{
 		int bestMove = GoConstant.PASS;
-		int bestResult = -1;
 		for (int i=_emptyPoints.getSize(); --i>0;)
 		{
 			int next = _emptyPoints.get(i);
-			if (_playouts[next]>bestResult)
-			{
-				bestMove = next;
-				bestResult = _playouts[next];
-			}
-			else if (_playouts[next]==bestResult && _wins[next]>_wins[bestMove])
+			if (isBetterResultThan(next, bestMove))
 				bestMove = next;
 		}
 		return bestMove;
@@ -322,6 +289,9 @@ public class MonteCarloHashMapResult
 	public void increasePlayouts()
 	{
 		_totalPlayouts++;
+		if ((_totalPlayouts&0x7)==0)
+			_logNrPlayouts = Math.log(_totalPlayouts);
+		_beta = getBeta();
 	}
 
 //	public void increasePlayouts(int xy)
@@ -348,9 +318,6 @@ public class MonteCarloHashMapResult
 		}
 		_playouts[xy]++;
 		_virtualPlayouts[xy]++;
-		if ((_totalPlayouts&0x7)==0)
-			_logNrPlayouts = Math.log(_totalPlayouts);
-		_beta = getBeta();
 	}
 
 	public void increaseVirtualPlayouts(int xy, double win_weight, double weight)
@@ -363,15 +330,22 @@ public class MonteCarloHashMapResult
 	{
 		StringBuilder out = new StringBuilder();
 		
-		out.append("\n");
+		out.append("\nHashMapSearch\n");
+		GoMove move = GoMoveFactory.getSingleton().createMove(getBestMove(), ColorConstant.opposite(_move.getColor()));
+		out.append(move.toString()+"\n");
 		for (int row=1; row<=_boardSize; row++)
 		{
 			for (int col=1; col<=_boardSize; col++)
 			{
 				int xy = GoArray.toXY(col,row);
-				out.append(Integer.toString(_wins[xy]));
-				out.append("/");
-				out.append(Integer.toString(_playouts[xy]));
+				if (_playouts[xy]!=0)
+					out.append(Double.toString(_wins[xy]/_playouts[xy]));
+				else
+				{
+					out.append(Integer.toString(_wins[xy]));
+					out.append("/");
+					out.append(Integer.toString(_playouts[xy]));
+				}
 				out.append("\t");
 			}
 			out.append("\n");
@@ -382,9 +356,14 @@ public class MonteCarloHashMapResult
 			for (int col=1; col<=_boardSize; col++)
 			{
 				int xy = GoArray.toXY(col,row);
-				out.append(Integer.toString((int)_virtualWins[xy]));
-				out.append("/");
-				out.append(Integer.toString((int)_virtualPlayouts[xy]));
+				if (_virtualPlayouts[xy]!=0.0)
+					out.append(Double.toString((double)_virtualWins[xy]/(double)_virtualPlayouts[xy]));
+				else
+				{
+					out.append(Double.toString(_virtualWins[xy]));
+					out.append("/");
+					out.append(Double.toString(_virtualPlayouts[xy]));
+				}
 				out.append("\t");
 			}
 			out.append("\n");
@@ -405,4 +384,11 @@ public class MonteCarloHashMapResult
 		out.append("\n");
 		return out.toString();
 	}
+
+	@Override
+    public boolean isBetterResultThan(SearchResult<GoMove> compare)
+    {
+	    // TODO Auto-generated method stub
+	    return false;
+    }
 }

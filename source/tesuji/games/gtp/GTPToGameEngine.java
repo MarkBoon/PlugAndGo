@@ -155,8 +155,8 @@ public class GTPToGameEngine<MoveType extends Move>
 				_logger.info("handleCommand#engine.play "+move);
 				_engine.playMove(move);
 				_engine.evaluate();
-				move.recycle();
 				_logger.info("handleCommand#play "+move);
+				move.recycle();
 			}
 			else if (command.equals(TAKEBACK))
 			{
