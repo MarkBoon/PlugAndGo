@@ -282,4 +282,9 @@ public class TreeSearchEngine
 	{
 		return _moveAdministration;
 	}
+	
+	public String toString()
+	{
+		return _moveAdministration.getBoardModel().toString();
+	}
 }

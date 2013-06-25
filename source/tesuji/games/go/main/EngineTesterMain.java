@@ -9,9 +9,12 @@ import org.apache.log4j.Logger;
 
 import tesuji.core.util.LoggerConfigurator;
 import tesuji.games.general.ColorConstant;
+import tesuji.games.general.MoveStack;
 import tesuji.games.go.common.BasicGoMoveAdministration;
+import tesuji.games.go.common.GoConstant;
 import tesuji.games.go.common.GoEngine;
 import tesuji.games.go.common.GoMove;
+import tesuji.games.go.common.GoMoveFactory;
 import tesuji.games.go.util.GoEngineBeanHelper;
 import tesuji.games.go.util.GoGameProperties;
 import tesuji.games.util.Console;
@@ -83,10 +86,10 @@ public class EngineTesterMain
 			{
 				playGame(engine1,engine2);
 				
-				GoEngine tmp = engine1;
-				engine1 = engine2;
-				engine2 = tmp;
-				alt = !alt;
+//				GoEngine tmp = engine1;
+//				engine1 = engine2;
+//				engine2 = tmp;
+//				alt = !alt;
 				gameNr++;
 			}
 		}
@@ -101,6 +104,16 @@ public class EngineTesterMain
 		BasicGoMoveAdministration administration = new BasicGoMoveAdministration(gameProperties);
 		engine1.clearBoard();
 		engine2.clearBoard();
+		setup(administration,engine1,engine2,new String[]{
+		".XX.XXXX.",
+		"X.XXXOOOX",
+		".XX.XXO.O",
+		"X.XX.XOOO",
+		"XX.XXXXO.",
+		"XXX.XXXXO",
+		".X.XXOOOO",
+		"XXXXXO.OO",
+		"X.X.XXO.O"});
 		engine1.requestMove(ColorConstant.BLACK);
 		engine2.requestMove(ColorConstant.BLACK);
 		engine1.clearBoard();
@@ -118,6 +131,20 @@ public class EngineTesterMain
 			engine2.playMove(move);
 		}
 //		writeResult(administration,engine1,engine2);
+	}
+	
+	private static void setup(BasicGoMoveAdministration administration, GoEngine engine1, GoEngine engine2, String[] diagram)
+	{
+		administration.setup(diagram);
+		MoveStack<GoMove> moves = administration.getMoves();
+		for (int i=0; i<moves.size(); i++)
+		{
+			GoMove move = moves.get(i);
+			engine1.playMove((GoMove)move.cloneMove());
+			engine2.playMove((GoMove)move.cloneMove());
+		}
+		engine1.playMove((GoMove)GoMoveFactory.getSingleton().createPassMove(ColorConstant.WHITE));
+		engine2.playMove((GoMove)GoMoveFactory.getSingleton().createPassMove(ColorConstant.WHITE));
 	}
 	
 	private static void writeResultHeader(BasicGoMoveAdministration administration, GoEngine engine1, GoEngine engine2)

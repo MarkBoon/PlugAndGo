@@ -69,9 +69,9 @@ import static tesuji.games.go.common.GoConstant.*;
 public class MonteCarloPluginAdministration
 	implements MonteCarloAdministration<GoMove>
 {
-	public static final boolean USE_MERCY_RULE = true;
+	public static final boolean USE_MERCY_RULE = false;
 	
-	protected final MersenneTwisterFast RANDOM = new MersenneTwisterFast();
+	public final MersenneTwisterFast RANDOM = new MersenneTwisterFast();
 	
 	protected int		_boardSize;
 	protected double	_komi = 7.5;

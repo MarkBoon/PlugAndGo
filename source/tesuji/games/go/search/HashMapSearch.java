@@ -126,7 +126,7 @@ public class HashMapSearch<MoveType extends Move>
 	{
 		if (_monteCarloAdministration!=null)
 		{
-		_rootResult = SearchResultFactory.getSingleton().createMonteCarloHashMapResult();
+		_rootResult = SearchResultFactory.createMonteCarloHashMapResult();
 		_rootResult.setPointSet(_monteCarloAdministration.getEmptyPoints(),(MonteCarloPluginAdministration)_monteCarloAdministration);
 
 		_hashMap.put(_monteCarloAdministration.getPositionalChecksum(),_rootResult);
