@@ -24,7 +24,7 @@ public class EngineTesterMain
 	private static GoGameProperties gameProperties;
 	private static int gameNr;
 	private static boolean alt = false;
-	private static String dataFile = "gtp/games/test/test.dat";
+	private static String dataFile = "gtp/games/test.dat";
 	
 	public static void main(String[] args)
 					throws Exception
@@ -80,16 +80,16 @@ public class EngineTesterMain
 			Console.getSingleton().setTitle(engine1.getEngineName()+" - "+engine1.getEngineVersion()+" vs. "+engine2.getEngineName()+" - "+engine2.getEngineVersion());
 
 			BasicGoMoveAdministration administration = new BasicGoMoveAdministration(gameProperties);
-//			writeResultHeader(administration, engine1, engine2);
+			writeResultHeader(administration, engine1, engine2);
 
 			while (true)
 			{
 				playGame(engine1,engine2);
 				
-//				GoEngine tmp = engine1;
-//				engine1 = engine2;
-//				engine2 = tmp;
-//				alt = !alt;
+				GoEngine tmp = engine1;
+				engine1 = engine2;
+				engine2 = tmp;
+				alt = !alt;
 				gameNr++;
 			}
 		}
@@ -104,20 +104,11 @@ public class EngineTesterMain
 		BasicGoMoveAdministration administration = new BasicGoMoveAdministration(gameProperties);
 		engine1.clearBoard();
 		engine2.clearBoard();
-		setup(administration,engine1,engine2,new String[]{
-		".XX.XXXX.",
-		"X.XXXOOOX",
-		".XX.XXO.O",
-		"X.XX.XOOO",
-		"XX.XXXXO.",
-		"XXX.XXXXO",
-		".X.XXOOOO",
-		"XXXXXO.OO",
-		"X.X.XXO.O"});
-		engine1.requestMove(ColorConstant.BLACK);
-		engine2.requestMove(ColorConstant.BLACK);
-		engine1.clearBoard();
-		engine2.clearBoard();
+//		setup(administration, engine1, engine2);
+//		engine1.requestMove(ColorConstant.BLACK);
+//		engine2.requestMove(ColorConstant.BLACK);
+//		engine1.clearBoard();
+//		engine2.clearBoard();
 		
 		GoMove move;
 		while (!administration.isGameFinished())
@@ -130,11 +121,21 @@ public class EngineTesterMain
 			engine1.playMove(move);
 			engine2.playMove(move);
 		}
-//		writeResult(administration,engine1,engine2);
+		writeResult(administration,engine1,engine2);
 	}
 	
-	private static void setup(BasicGoMoveAdministration administration, GoEngine engine1, GoEngine engine2, String[] diagram)
+	private static void setup(BasicGoMoveAdministration administration, GoEngine engine1, GoEngine engine2)
 	{
+		String[] diagram = new String[]{
+		".XX.XXXX.",
+		"X.XXXOOOX",
+		".XX.XXO.O",
+		"X.XX.XOOO",
+		"XX.XXXXO.",
+		"XXX.XXXXO",
+		".X.XXOOOO",
+		"XXXXXO.OO",
+		"X.X.XXO.O"};
 		administration.setup(diagram);
 		MoveStack<GoMove> moves = administration.getMoves();
 		for (int i=0; i<moves.size(); i++)

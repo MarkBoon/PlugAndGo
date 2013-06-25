@@ -3,12 +3,12 @@ package tesuji.games.go.search;
 import static tesuji.games.general.ColorConstant.BLACK;
 import static tesuji.games.general.ColorConstant.WHITE;
 import tesuji.core.util.ArrayStack;
+import tesuji.core.util.MersenneTwisterFast;
 import tesuji.games.general.ColorConstant;
 import tesuji.games.general.search.SearchResult;
 import tesuji.games.go.common.GoConstant;
 import tesuji.games.go.common.GoMove;
 import tesuji.games.go.common.GoMoveFactory;
-import tesuji.games.go.monte_carlo.MonteCarloAdministration;
 import tesuji.games.go.monte_carlo.MonteCarloPluginAdministration;
 import tesuji.games.go.util.GoArray;
 import tesuji.games.go.util.PointSet;
@@ -60,10 +60,14 @@ public class MonteCarloHashMapResult
 	
 	public void setPointSet(PointSet set, MonteCarloPluginAdministration administration)
 	{
+		MersenneTwisterFast random = administration.RANDOM;
 		_boardSize = administration.getBoardSize();
-		for (int i=0; i<set.getSize(); i++)
+		PointSet copy = PointSetFactory.createPointSet();
+		copy.copyFrom(set);
+		for (int size = copy.getSize(); size>0; size--)
 		{
-			int xy = set.get(i);
+			int xy = copy.get(random.nextInt(size));
+			copy.remove(xy);
 			if (administration.isLegal(xy) && !administration.isVerboten(xy))
 			{
 				_emptyPoints.add(xy);
@@ -71,6 +75,7 @@ public class MonteCarloHashMapResult
 				_virtualWins[xy] = 0;
 			}
 		}
+		copy.recycle();
 		if (administration.isGameAlmostFinished())
 		{
 			_virtualPlayouts[GoConstant.PASS] = 0;
@@ -234,7 +239,7 @@ public class MonteCarloHashMapResult
 	public int getBestVirtualMove()
 	{
 		int bestMove = GoConstant.PASS;
-		for (int i=_emptyPoints.getSize(); --i>0;)
+		for (int i=_emptyPoints.getSize(); --i>=0;)
 		{
 			int next = _emptyPoints.get(i);
 			if (isBetterVirtualMove(next,bestMove))
@@ -246,7 +251,7 @@ public class MonteCarloHashMapResult
 	public int getBestMove()
 	{
 		int bestMove = GoConstant.PASS;
-		for (int i=_emptyPoints.getSize(); --i>0;)
+		for (int i=_emptyPoints.getSize(); --i>=0;)
 		{
 			int next = _emptyPoints.get(i);
 			if (isBetterResultThan(next, bestMove))

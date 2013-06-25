@@ -68,13 +68,13 @@
 		  			<value>1</value>
 		  		</property>
 		  		<property name="minimumNrNodes">
-		  			<value>20000</value>
+		  			<value>2000</value>
 		  		</property>
 		  		<property name="useAMAF">
 		  			<value>true</value>
 		  		</property>
 		  		<property name="nrSimulationsBeforeExpansion">
-		  			<value>50000</value>
+		  			<value>1</value>
 		  		</property>
 		  		<property name="isTestVersion">
 		  			<value>false</value>
@@ -113,13 +113,13 @@
 		  			<value>1</value>
 		  		</property>
 		  		<property name="minimumNrNodes">
-		  			<value>20000</value>
+		  			<value>2000</value>
 		  		</property>
 		  		<property name="useAMAF">
 		  			<value>true</value>
 		  		</property>
 		  		<property name="nrSimulationsBeforeExpansion">
-		  			<value>50000</value>
+		  			<value>1</value>
 		  		</property>
 		  		<property name="isTestVersion">
 		  			<value>false</value>
