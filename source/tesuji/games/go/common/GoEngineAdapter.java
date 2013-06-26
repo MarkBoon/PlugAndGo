@@ -78,7 +78,7 @@ public abstract class GoEngineAdapter
     	_gameProperties.setProperty(propertyName, propertyValue);
     }
 
-    @Override
+//    @Override
 	public void setProperties(GameProperties properties)
     {
     	for (Enumeration<Object> e=properties.keys(); e.hasMoreElements();)

@@ -994,7 +994,7 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 		}
 	}
 
-	@Override
+//	@Override
     public boolean isGameFinished()
     {
 	    // TODO Auto-generated method stub

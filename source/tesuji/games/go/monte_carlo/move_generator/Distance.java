@@ -11,7 +11,7 @@ import tesuji.games.go.util.ProbabilityMap;
 
 public class Distance extends AbstractMoveGenerator
 {
-	@Override
+//	@Override
 	public int generate()
 	{
 		ProbabilityMap map = administration.getProbabilityMap();
@@ -78,7 +78,7 @@ public class Distance extends AbstractMoveGenerator
 		return UNDEFINED_COORDINATE;
 	}
 
-	@Override
+//	@Override
 	public MoveGenerator createClone()
 	{
 		return new Distance();

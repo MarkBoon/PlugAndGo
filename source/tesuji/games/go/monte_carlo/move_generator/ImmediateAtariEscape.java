@@ -11,7 +11,7 @@ public class ImmediateAtariEscape extends LadderMoveGenerator
 {
 	private BoardMarker _boardMarker = new BoardMarker();
 	
-	@Override
+//	@Override
 	public int generate()
 	{
 		Statistics.increment("-ImmediateEscape");
@@ -61,7 +61,7 @@ public class ImmediateAtariEscape extends LadderMoveGenerator
 		return UNDEFINED_COORDINATE;
 	}
 
-	@Override
+//	@Override
 	public MoveGenerator createClone()
 	{
 		return new ImmediateAtariEscape();

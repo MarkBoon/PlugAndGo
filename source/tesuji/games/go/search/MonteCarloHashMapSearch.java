@@ -8,6 +8,8 @@ import static tesuji.games.go.util.GoArray.createDoubles;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.cliffc.high_scale_lib.NonBlockingHashMapLong;
@@ -33,7 +35,10 @@ public class MonteCarloHashMapSearch
 	private static Logger _logger = Logger.getLogger(MonteCarloHashMapSearch.class);
 
 	protected MonteCarloAdministration<GoMove> _monteCarloAdministration;
-	private NonBlockingHashMapLong<MonteCarloHashMapResult> _hashMap = new NonBlockingHashMapLong<MonteCarloHashMapResult>();
+	private HashMap<Integer, MonteCarloHashMapResult> _hashMap = new HashMap<Integer, MonteCarloHashMapResult>();
+//	private ConcurrentHashMap<Integer, MonteCarloHashMapResult> _hashMap = new ConcurrentHashMap<Integer, MonteCarloHashMapResult>();
+//	private NonBlockingHashMapLong<MonteCarloHashMapResult> _hashMap = new NonBlockingHashMapLong<MonteCarloHashMapResult>();
+	private MonteCarloHashMapResult _rootResult;
 	private int _nrPlayouts;
 	private int _nrSimulationsBeforeExpansion = 1;
 	private int _nrSimulatedMoves = 0;
@@ -72,7 +77,7 @@ public class MonteCarloHashMapSearch
 		initRoot();
 	}
 
-	@Override
+//	@Override
     public void propertyChange(PropertyChangeEvent event)
     {
 		parseSearchProperties();
@@ -82,10 +87,27 @@ public class MonteCarloHashMapSearch
 	
 	private void initRoot()
 	{
+
 		_nrSets = 0;
 		for (MonteCarloHashMapResult r : _hashMap.values())
 			r.recycle();
 		_hashMap.clear();
+		
+		if (_monteCarloAdministration!=null)
+		{
+			int checksum = _monteCarloAdministration.getPositionalChecksum();
+			_rootResult = _hashMap.get(checksum);
+			if (_rootResult==null)
+			{
+				_rootResult = SearchResultFactory.createMonteCarloHashMapResult();
+				_rootResult.setPointSet(_monteCarloAdministration.getEmptyPoints(),(MonteCarloPluginAdministration)_monteCarloAdministration);
+				_rootResult.setMove(GoMoveFactory.getSingleton().createPassMove(opposite(_monteCarloAdministration.getColorToMove())));
+				_rootResult.setAge(_monteCarloAdministration.getMoveStack().getSize());
+				_rootResult.setChecksum(checksum);
+	
+				_hashMap.put(checksum,_rootResult);
+			}
+		}
 	}
 
 	/* (non-Javadoc)
@@ -98,7 +120,7 @@ public class MonteCarloHashMapSearch
 		setMinimumNrNodes(_searchProperties.getIntProperty(SearchProperties.NR_NODES));
 	}
 
-	@Override
+//	@Override
     public void setSearchProperties(SearchProperties properties)
     {
 		if (_searchProperties!=null)
@@ -109,27 +131,34 @@ public class MonteCarloHashMapSearch
 		parseSearchProperties();
     }
 
-	@Override
+//	@Override
     public SearchProperties getSearchProperties()
     {
 	    return _searchProperties;
     }
 
-	@Override
+//	@Override
     public void setSecondsPerMove(int seconds)
     {
 	   _secondsPerMove = seconds;
 		_searchProperties.setIntProperty(SearchProperties.TIME_PER_MOVE,_secondsPerMove);
     }
 
-	@Override
+//	@Override
     public void setMinimumNrNodes(int minimum)
     {
-		_minimumNrNodes = minimum;
-		_searchProperties.setIntProperty(SearchProperties.NR_NODES,minimum);
+		if (minimum>0 && minimum!=_minimumNrNodes)
+		{
+			_minimumNrNodes = minimum;
+//			SearchResultFactory.ensureMonteCarloHashMapResultCapacity(_minimumNrNodes*2);
+//			_hashMap = new ConcurrentHashMap<Integer, MonteCarloHashMapResult>(_minimumNrNodes*2);
+//			_hashMap = new NonBlockingHashMapLong<MonteCarloHashMapResult>(_minimumNrNodes*2, false);
+			_hashMap = new HashMap<Integer,MonteCarloHashMapResult>(_minimumNrNodes*2);
+			_searchProperties.setIntProperty(SearchProperties.NR_NODES,minimum);
+		}
     }
 
-	@Override
+//	@Override
     public void setNrProcessors(int nrProcessors)
     {
 		_nrThreads = nrProcessors;
@@ -138,13 +167,13 @@ public class MonteCarloHashMapSearch
 		_searchProperties.setIntProperty(SearchProperties.NR_PROCESSORS,_nrThreads);
     }
 
-	@Override
+//	@Override
     public void setIsTestVersion(boolean testVersion)
     {
 	    // TODO Auto-generated method stub	    
     }
 
-	@Override
+//	@Override
     public GoMove doSearch(byte startColor) throws Exception
     {
 		long time0 = System.currentTimeMillis();
@@ -159,14 +188,7 @@ public class MonteCarloHashMapSearch
 		
 		_nrGeneratedMoves++;
 
-		MonteCarloHashMapResult startNode = _hashMap.get(_monteCarloAdministration.getPositionalChecksum());
-		if (startNode==null)
-		{
-			startNode = SearchResultFactory.createMonteCarloHashMapResult();
-			startNode.setPointSet(_monteCarloAdministration.getEmptyPoints(),(MonteCarloPluginAdministration)_monteCarloAdministration);
-			startNode.setMove(GoMoveFactory.getSingleton().createPassMove(opposite(_monteCarloAdministration.getColorToMove())));
-			_hashMap.put(_monteCarloAdministration.getPositionalChecksum(),startNode);
-		}
+		initRoot();
 
 		long time1 = System.currentTimeMillis();
 		long time2;
@@ -221,10 +243,10 @@ public class MonteCarloHashMapSearch
 		_logger.info("Playout limit "+_nodeLimit + " - last score " + _lastScore);
 		_logger.info("Nr playouts "+_nrPlayouts);
 		_logger.info("Nr sets "+_nrSets);
-		_logger.info("Nr root visits "+startNode.getPlayouts());
+		_logger.info("Nr root visits "+_rootResult.getPlayouts());
 		_logger.info(""+((double)_nrPlayouts/(double)(time3-time0))+" kpos/sec");
 		
-		System.out.println(startNode.toString());
+//		System.out.println(startNode.toString());
 		
 //		if (isOptimizeNodeLimit())
 //		{
@@ -238,12 +260,12 @@ public class MonteCarloHashMapSearch
 		assert _monteCarloAdministration.isConsistent() : "Inconsistent Monte-Carlo administration at the end of the search.";
 //		fillOwnershipArray();
 		
-		int xy = startNode.getBestMove();
+		int xy = _rootResult.getBestMove();
 //		TreeNode<MonteCarloTreeSearchResult<MoveType>> secondBestNode = getSecondBestChildNode(_rootNode,bestNode);
 //		_logger.info("Second-best: "+secondBestNode.getContent());
 		if (xy==GoConstant.PASS)
 			_logger.info("PASS!");
-		_lastScore = startNode.getWinRatio(xy);
+		_lastScore = _rootResult.getWinRatio(xy);
 //		if (_lastScore<0.05)
 //			return GoMoveFactory.getSingleton().createResignMove(_monteCarloAdministration.getColorToMove());
 		
@@ -307,34 +329,34 @@ public class MonteCarloHashMapSearch
 		return nodeLimit;
 	}
 
-	@Override
+//	@Override
     public void playMove(GoMove move)
     {
 		_monteCarloAdministration.playMove(move);
 		initRoot();   
     }
 
-	@Override
+//	@Override
     public void takeBack()
     {
 	    // TODO Auto-generated method stub
 	    
     }
 
-	@Override
+//	@Override
     public void clear()
     {
 		_monteCarloAdministration.clear();    
 	}
     
-	@Override
+//	@Override
     public void getBestMovePath(ArrayStack<GoMove> moveList)
     {
 	    // TODO Auto-generated method stub
 	    
     }
 
-	@Override
+//	@Override
     public TreeNode<? extends SearchResult<GoMove>> getRootNode()
     {
 	    // TODO Auto-generated method stub
@@ -392,17 +414,19 @@ public class MonteCarloHashMapSearch
     	public void run()
     	{
     		running = true;
+    		int emptyRun = 0;
     		do
     		{
     			reset();
     			
     			MonteCarloHashMapResult node = getNodeToExpand();
    				
-	    		if (node != null)
+				setNrPlayouts(getNrPlayouts() + 1);
+
+				if (node != null)
 				{
 					boolean blackWins = _searchAdministration.playout();
 					setNrSimulatedMoves(getNrSimulatedMoves() + _searchAdministration.getNrSimulatedMoves());
-					setNrPlayouts(getNrPlayouts() + 1);
 			    	adjustTreeValue(blackWins);
 
 			    	if (_useAMAF)
@@ -423,8 +447,7 @@ public class MonteCarloHashMapSearch
 								_colorMap[moveXY] = color;
 								_weightMap[moveXY] = weight;
 							}
-							//if (_useEnhanced)
-								weight -= weightDelta;
+							weight -= weightDelta;
 							color = opposite(color);
 						}
 						
@@ -464,9 +487,11 @@ public class MonteCarloHashMapSearch
     	
     	private MonteCarloHashMapResult getNodeToExpand()
     	{
+    		MonteCarloHashMapResult node = _hashMap.get(_searchAdministration.getPositionalChecksum());
+    		if (node==null)
+    			throw new IllegalStateException();
     		while (_searchAdministration.getNrPasses()<2)
     		{
-	    		MonteCarloHashMapResult node = _hashMap.get(_searchAdministration.getPositionalChecksum());
 	    		if (node.getPlayouts()<_nrSimulationsBeforeExpansion)
 	    			return node;
 	
@@ -475,13 +500,25 @@ public class MonteCarloHashMapSearch
 	    		_moveStack.push(xy);
 	   			_searchAdministration.playExplorationMove(move);
 	
-	    		MonteCarloHashMapResult bestNode = _hashMap.get(_searchAdministration.getPositionalChecksum());
+	   			int checksum = _searchAdministration.getPositionalChecksum();
+	   			if (_searchAdministration.hasRepetition(checksum))
+	   			{
+	   				node.forbid(xy);
+	   				_moveStack.pop();
+	   				return null;
+	   			}
+
+	    		MonteCarloHashMapResult bestNode = _hashMap.get(checksum);
 	   			if (bestNode==null)
 	   			{
 	   				bestNode = SearchResultFactory.createMonteCarloHashMapResult();
 	   				bestNode.setMove(move);
+	   				bestNode.setAge(_searchAdministration.getMoveStack().getSize());
 	   				bestNode.setPointSet(_searchAdministration.getEmptyPoints(),(MonteCarloPluginAdministration)_searchAdministration);
+	   				bestNode.setChecksum(checksum);
+
 		    		_resultStack.push(bestNode);
+		    		_hashMap.put(checksum, bestNode);
 	   				return bestNode;
 	   			}
 	    		_resultStack.push(bestNode);
@@ -492,45 +529,6 @@ public class MonteCarloHashMapSearch
    			adjustTreeValue(win);
    			return null;
    		}
-/*
-    		
-    		MonteCarloHashMapResult node = _hashMap.get(_searchAdministration.getPositionalChecksum());
-    		while (_searchAdministration.getNrPasses()<2)
-    		{
-	    		int xy = node.getBestVirtualMove();
-	   			GoMove move = GoMoveFactory.getSingleton().createMove(xy, _searchAdministration.getColorToMove());
-	   			node.increasePlayouts(xy);
-	    		_resultStack.push(node);
-	    		_moveStack.push(xy);
-	   			_searchAdministration.playExplorationMove(move);
-	    		MonteCarloHashMapResult nextNode = _hashMap.get(_searchAdministration.getPositionalChecksum());
-	    		if (nextNode==null)
-	    		{
-	    			if (node.getPlayouts()<_nrSimulationsBeforeExpansion)
-	    			{
-	        			return node;
-	    			}
-	    			else
-	    			{
-	    				nextNode = SearchResultFactory.createMonteCarloHashMapResult();
-	    				nextNode.setMove(move);
-	    				nextNode.setPointSet(_searchAdministration.getEmptyPoints(),(MonteCarloPluginAdministration)_searchAdministration);
-	    				// Fill virtual playouts of all children with pattern-matcher.
-	    				//GoMove nextMove = _searchAdministration.selectSimulationMove(); // temporary
-	    				//_resultStack.push(nextNode);
-	    				//_moveStack.push(nextMove.getXY());
-	    	   			//_searchAdministration.playExplorationMove(nextMove);
-	    				return nextNode;
-	    			}
-	    		}
-	    		node = nextNode;
-    		}
-			boolean win = (_searchAdministration.getWinner()==BLACK);
-			assert (bestNode.getParent()==node); // node should be parent of bestNode
-			adjustTreeValue(bestNode, win);
-			return null;
-			
-   	}*/
     	
     	public void adjustTreeValue(boolean blackWins)
     	{
@@ -546,9 +544,24 @@ public class MonteCarloHashMapSearch
    				node.increaseWins(xy,blackWins);
     		}
     	}
-    }
 
-	@Override
+    	private boolean repeatsPosition(int checksum)
+        {
+    		// TODO - poor :(
+    		if (_resultStack.size()<8)
+    			return false;
+
+        	for (int i=0; i<8; i++)
+        	{
+        		if (_resultStack.peek(i).getChecksum()==checksum)
+        			return true;
+        	}
+        	return false;
+        }
+    }
+    
+
+//	@Override
     public boolean isGameFinished()
     {
 		return false;

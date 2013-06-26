@@ -1,5 +1,6 @@
 package tesuji.games.go.main;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.util.Date;
 import java.util.Hashtable;
@@ -11,7 +12,6 @@ import tesuji.core.util.LoggerConfigurator;
 import tesuji.games.general.ColorConstant;
 import tesuji.games.general.MoveStack;
 import tesuji.games.go.common.BasicGoMoveAdministration;
-import tesuji.games.go.common.GoConstant;
 import tesuji.games.go.common.GoEngine;
 import tesuji.games.go.common.GoMove;
 import tesuji.games.go.common.GoMoveFactory;
@@ -24,7 +24,7 @@ public class EngineTesterMain
 	private static GoGameProperties gameProperties;
 	private static int gameNr;
 	private static boolean alt = false;
-	private static String dataFile = "gtp/games/test/test.dat";
+	private static String dataFile = "gtp/games/testA";
 	
 	public static void main(String[] args)
 					throws Exception
@@ -80,16 +80,16 @@ public class EngineTesterMain
 			Console.getSingleton().setTitle(engine1.getEngineName()+" - "+engine1.getEngineVersion()+" vs. "+engine2.getEngineName()+" - "+engine2.getEngineVersion());
 
 			BasicGoMoveAdministration administration = new BasicGoMoveAdministration(gameProperties);
-//			writeResultHeader(administration, engine1, engine2);
+			writeResultHeader(administration, engine1, engine2);
 
 			while (true)
 			{
 				playGame(engine1,engine2);
 				
-//				GoEngine tmp = engine1;
-//				engine1 = engine2;
-//				engine2 = tmp;
-//				alt = !alt;
+				GoEngine tmp = engine1;
+				engine1 = engine2;
+				engine2 = tmp;
+				alt = !alt;
 				gameNr++;
 			}
 		}
@@ -104,16 +104,7 @@ public class EngineTesterMain
 		BasicGoMoveAdministration administration = new BasicGoMoveAdministration(gameProperties);
 		engine1.clearBoard();
 		engine2.clearBoard();
-		setup(administration,engine1,engine2,new String[]{
-		".XX.XXXX.",
-		"X.XXXOOOX",
-		".XX.XXO.O",
-		"X.XX.XOOO",
-		"XX.XXXXO.",
-		"XXX.XXXXO",
-		".X.XXOOOO",
-		"XXXXXO.OO",
-		"X.X.XXO.O"});
+//		setup(administration,engine1,engine2);
 		engine1.requestMove(ColorConstant.BLACK);
 		engine2.requestMove(ColorConstant.BLACK);
 		engine1.clearBoard();
@@ -130,11 +121,21 @@ public class EngineTesterMain
 			engine1.playMove(move);
 			engine2.playMove(move);
 		}
-//		writeResult(administration,engine1,engine2);
+		writeResult(administration,engine1,engine2);
 	}
 	
-	private static void setup(BasicGoMoveAdministration administration, GoEngine engine1, GoEngine engine2, String[] diagram)
+	private static void setup(BasicGoMoveAdministration administration, GoEngine engine1, GoEngine engine2)
 	{
+		String[] diagram = new String[]{
+						".XX.XXXX.",
+						"X.XXXOOOX",
+						".XX.XXO.O",
+						"X.XX.XOOO",
+						"XX.XXXXO.",
+						"XXX.XXXXO",
+						".X.XXOOOO",
+						"XXXXXO.OO",
+						"X.X.XXO.O"};
 		administration.setup(diagram);
 		MoveStack<GoMove> moves = administration.getMoves();
 		for (int i=0; i<moves.size(); i++)
@@ -149,10 +150,27 @@ public class EngineTesterMain
 	
 	private static void writeResultHeader(BasicGoMoveAdministration administration, GoEngine engine1, GoEngine engine2)
 	{
+		char c = 'B';
+		do
+		{
+			try
+			{
+				File f = new File(dataFile+".dat");
+				if	(!f.exists())
+					break; 
+				dataFile = dataFile+Character.toString(c);
+				c++;
+			}
+			catch (Exception exception)
+			{
+				break;
+			}
+		} while (true);
+	
 		Date date = new Date();
 		try
 		{
-			FileWriter writer = new FileWriter(dataFile,false);
+			FileWriter writer = new FileWriter(dataFile+".dat",false);
 
 			writer.write("#  Black: "+engine1.getEngineName()+"\n");
 			writer.write("#  BlackCommand: internal\n");
@@ -185,7 +203,7 @@ public class EngineTesterMain
 		String winner = (((score>0.0) ^ alt) ? "B+" : "W+")+Math.abs(score);
 		try
 		{
-			FileWriter writer = new FileWriter(dataFile,true);
+			FileWriter writer = new FileWriter(dataFile+".dat",true);
 
 			writer.write(""+gameNr+"\t");
 			writer.write(winner+"\t");

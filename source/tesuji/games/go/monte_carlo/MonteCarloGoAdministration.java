@@ -608,7 +608,7 @@ public class MonteCarloGoAdministration
 	 * (non-Javadoc)
 	 * @see tesuji.games.go.monte_carlo.MonteCarloAdministration#createClone()
 	 */
-	@Override
+//	@Override
 	public MonteCarloAdministration<GoMove> createClone()
 	{
 		MonteCarloGoAdministration clone = new MonteCarloGoAdministration(getBoardSize());
@@ -772,7 +772,7 @@ public class MonteCarloGoAdministration
 		return _colorToPlay;
 	}
 	
-	@Override
+//	@Override
     public boolean isGameFinished()
     {
 		if (!_moveStack.isEmpty() && _moveStack.peek() == PASS && _moveStack.peek(1) == PASS && _moveStack.peek(2) == PASS)

@@ -12,7 +12,7 @@ public class GlobalTactics extends LadderMoveGenerator
 {	
 	private BoardMarker _boardMarker = new BoardMarker();
 
-	@Override
+//	@Override
 	public int generate()
 	{
 		Statistics.increment("-ImmediateLadder");
@@ -77,7 +77,7 @@ public class GlobalTactics extends LadderMoveGenerator
 		return UNDEFINED_COORDINATE;
 	}
 
-	@Override
+//	@Override
 	public MoveGenerator createClone()
 	{
 		return new GlobalTactics();

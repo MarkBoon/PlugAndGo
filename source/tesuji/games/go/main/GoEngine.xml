@@ -23,7 +23,7 @@
 	<bean id="Bot1" class="tesuji.games.go.engine.TreeSearchEngine" singleton="false">
   		<property name="jar" value="TreeSearchEngine.jar"/>
   		<constructor-arg>
-			<bean class="tesuji.games.go.search.HashMapSearch" singleton="false">
+			<bean class="tesuji.games.go.search.MonteCarloHashMapSearch" singleton="false">
 				<property name="monteCarloAdministration">
 					<bean class="tesuji.games.go.monte_carlo.MonteCarloPluginAdministration" singleton="false">
 						<property name="simulationMoveFilterList">
@@ -74,7 +74,7 @@
 		  			<value>true</value>
 		  		</property>
 		  		<property name="nrSimulationsBeforeExpansion">
-		  			<value>50000</value>
+		  			<value>1</value>
 		  		</property>
 		  		<property name="isTestVersion">
 		  			<value>false</value>
@@ -119,7 +119,7 @@
 		  			<value>true</value>
 		  		</property>
 		  		<property name="nrSimulationsBeforeExpansion">
-		  			<value>50000</value>
+		  			<value>1</value>
 		  		</property>
 		  		<property name="isTestVersion">
 		  			<value>false</value>

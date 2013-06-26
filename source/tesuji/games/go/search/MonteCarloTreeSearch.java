@@ -935,7 +935,7 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 		}
 	}
 
-	@Override
+//	@Override
     public boolean isGameFinished()
     {
 		return (_monteCarloAdministration.isGameFinished());

@@ -3,12 +3,12 @@ package tesuji.games.go.search;
 import static tesuji.games.general.ColorConstant.BLACK;
 import static tesuji.games.general.ColorConstant.WHITE;
 import tesuji.core.util.ArrayStack;
+import tesuji.core.util.MersenneTwisterFast;
 import tesuji.games.general.ColorConstant;
 import tesuji.games.general.search.SearchResult;
 import tesuji.games.go.common.GoConstant;
 import tesuji.games.go.common.GoMove;
 import tesuji.games.go.common.GoMoveFactory;
-import tesuji.games.go.monte_carlo.MonteCarloAdministration;
 import tesuji.games.go.monte_carlo.MonteCarloPluginAdministration;
 import tesuji.games.go.util.GoArray;
 import tesuji.games.go.util.PointSet;
@@ -17,6 +17,7 @@ import tesuji.games.go.util.PointSetFactory;
 public class MonteCarloHashMapResult
 	implements SearchResult<GoMove>
 {
+	public static final int FORBIDDEN = 1000000;
 	public static final double MAX_SCORE = 1.0;
 	public static final double MIN_SCORE = 0.0;
 	public static final double HOPELESS = 0.05;
@@ -32,12 +33,15 @@ public class MonteCarloHashMapResult
 	private GoMove		_move;
 	private int			_totalPlayouts;
 	private int[]		_wins;
-	private int	[]		_playouts;
+	private int[]		_playouts;
 	private PointSet	_emptyPoints;
 	private float[]		_virtualWins;
 	private float[]		_virtualPlayouts;
+	private double[]	_results;
 	private double		_logNrPlayouts;
 	private double		_beta;
+	private int			_age;
+	private long		_checksum;
 	
 	private int _boardSize;
 	
@@ -56,14 +60,29 @@ public class MonteCarloHashMapResult
 		_playouts = GoArray.createIntegers();
 		_virtualWins = GoArray.createFloats();
 		_virtualPlayouts = GoArray.createFloats();
+		_results = GoArray.createDoubles();
 	}
 	
 	public void setPointSet(PointSet set, MonteCarloPluginAdministration administration)
 	{
+		MersenneTwisterFast random = administration.RANDOM;
 		_boardSize = administration.getBoardSize();
-		for (int i=0; i<set.getSize(); i++)
+//		for (int size = set.getSize(); size>0; size--)
+//		{
+//			int xy = set.get(size-1);
+//			if (administration.isLegal(xy) && !administration.isVerboten(xy))
+//			{
+//				_emptyPoints.add(xy);
+//				_virtualPlayouts[xy] = 0;
+//				_virtualWins[xy] = 0;
+//			}
+//		}
+		PointSet copy = PointSetFactory.createPointSet();
+		copy.copyFrom(set);
+		for (int size = copy.getSize(); size>0; size--)
 		{
-			int xy = set.get(i);
+			int xy = copy.get(random.nextInt(size));
+			copy.remove(xy);
 			if (administration.isLegal(xy) && !administration.isVerboten(xy))
 			{
 				_emptyPoints.add(xy);
@@ -71,6 +90,7 @@ public class MonteCarloHashMapResult
 				_virtualWins[xy] = 0;
 			}
 		}
+		copy.recycle();
 		if (administration.isGameAlmostFinished())
 		{
 			_virtualPlayouts[GoConstant.PASS] = 0;
@@ -90,9 +110,10 @@ public class MonteCarloHashMapResult
 		GoArray.clear(_wins);
 		GoArray.clear(_virtualWins);
 		GoArray.clear(_virtualPlayouts);
+		GoArray.clear(_results);
 	}
 
-	@Override
+//	@Override
     public void recycle()
     {
 		init();
@@ -103,13 +124,13 @@ public class MonteCarloHashMapResult
 		_owner.push(this);
     }
 
-	@Override
+//	@Override
     public GoMove getMove()
     {
 	    return _move;
     }
 	
-	@Override
+//	@Override
     public void setMove(GoMove move)
     {
 	    _move = move;
@@ -145,7 +166,7 @@ public class MonteCarloHashMapResult
 		return false;
     }
 
-	@Override
+//	@Override
     public boolean isHopeless()
     {
 		return false;
@@ -234,7 +255,7 @@ public class MonteCarloHashMapResult
 	public int getBestVirtualMove()
 	{
 		int bestMove = GoConstant.PASS;
-		for (int i=_emptyPoints.getSize(); --i>0;)
+		for (int i=_emptyPoints.getSize(); --i>=0;)
 		{
 			int next = _emptyPoints.get(i);
 			if (isBetterVirtualMove(next,bestMove))
@@ -246,7 +267,7 @@ public class MonteCarloHashMapResult
 	public int getBestMove()
 	{
 		int bestMove = GoConstant.PASS;
-		for (int i=_emptyPoints.getSize(); --i>0;)
+		for (int i=_emptyPoints.getSize(); --i>=0;)
 		{
 			int next = _emptyPoints.get(i);
 			if (isBetterResultThan(next, bestMove))
@@ -257,10 +278,13 @@ public class MonteCarloHashMapResult
 	
 	public double computeResult(int xy)
 	{
+		double virtualResult = getVirtualWinRatio(xy) + getRAVEValue(xy);
 		if (_playouts[xy]==0)
-			return (getVirtualWinRatio(xy) + getRAVEValue(xy));
+			return virtualResult;
 
-		return _beta * (getVirtualWinRatio(xy)+getRAVEValue(xy)) + (1.0-_beta) * (getWinRatio(xy)+getUCTValue(xy));		
+		double result = getWinRatio(xy)+getUCTValue(xy);
+		return _beta * virtualResult + (1.0-_beta) * result;
+		//return /*_beta **/ (getVirtualWinRatio(xy)+getRAVEValue(xy)) ;//+ (1.0-_beta) * (getWinRatio(xy)+getUCTValue(xy));		
 	}
 
 	private boolean isBetterVirtualMove(int xy1, int xy2)
@@ -268,6 +292,8 @@ public class MonteCarloHashMapResult
 		double virtualResult;
 		double compareResult;
 		
+//		virtualResult = _results[xy1];
+//		compareResult = _results[xy2];
 		virtualResult = computeResult(xy1);
 		compareResult = computeResult(xy2);
 		
@@ -318,12 +344,23 @@ public class MonteCarloHashMapResult
 		}
 		_playouts[xy]++;
 		_virtualPlayouts[xy]++;
+//		_results[xy] = computeResult(xy);
 	}
 
 	public void increaseVirtualPlayouts(int xy, double win_weight, double weight)
 	{
 		_virtualWins[xy] += win_weight;
 		_virtualPlayouts[xy] += weight;
+//		_results[xy] = computeResult(xy);
+	}
+	
+	public void forbid(int xy)
+	{
+		_wins[xy] = 0;
+		_virtualWins[xy] = 0;
+		_playouts[xy] =FORBIDDEN;
+		_virtualPlayouts[xy] = FORBIDDEN;
+//		_results[xy] = computeResult(xy);
 	}
 
 	public String toString()
@@ -385,10 +422,30 @@ public class MonteCarloHashMapResult
 		return out.toString();
 	}
 
-	@Override
+//	@Override
     public boolean isBetterResultThan(SearchResult<GoMove> compare)
     {
 	    // TODO Auto-generated method stub
 	    return false;
     }
+
+	public int getAge()
+	{
+		return _age;
+	}
+
+	public void setAge(int age)
+	{
+		_age = age;
+	}
+
+	public long getChecksum()
+	{
+		return _checksum;
+	}
+
+	public void setChecksum(long checksum)
+	{
+		_checksum = checksum;
+	}
 }

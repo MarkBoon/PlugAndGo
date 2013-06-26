@@ -475,7 +475,6 @@ public class MonteCarloPluginAdministration
 	{
 		int xy = selectSimulationMove(_emptyPoints);
 		playMove(xy);
-///		_checksumStack.push(getPositionalChecksum());
 		return xy;
 	}
 	
@@ -500,8 +499,8 @@ public class MonteCarloPluginAdministration
 	public void playMove(GoMove move)
 	{
 		setColorToMove(move.getColor());
-		playMove(move.getXY());
 		_checksumStack.push(getPositionalChecksum());
+		playMove(move.getXY());
 		update();
 	}
 	
@@ -520,6 +519,7 @@ public class MonteCarloPluginAdministration
 	public void playExplorationMove(GoMove move)
 	{
 		setColorToMove(move.getColor());
+		_checksumStack.push(getPositionalChecksum());
 		playMove(move.getXY());
 	}
 	
@@ -529,6 +529,7 @@ public class MonteCarloPluginAdministration
 	 */
 	public void playExplorationMove(int xy)
 	{
+		_checksumStack.push(getPositionalChecksum());
 		playMove(xy);
 	}
 	
@@ -556,7 +557,8 @@ public class MonteCarloPluginAdministration
 	 */
 	public boolean hasRepetition(int checksum)
 	{
-		for (int i=_checksumStack.getSize(); --i>=0;)
+		int count = 0;
+		for (int i=_checksumStack.getSize(); --i>=0 && count++<8;)
 		{
 			if (_checksumStack.get(i)==checksum)
 				return true;
@@ -706,7 +708,7 @@ public class MonteCarloPluginAdministration
 	 * (non-Javadoc)
 	 * @see tesuji.games.go.monte_carlo.MonteCarloAdministration#createClone()
 	 */
-	@Override
+//	@Override
 	public MonteCarloAdministration<GoMove> createClone()
 	{
 		MonteCarloPluginAdministration clone = new MonteCarloPluginAdministration(getBoardSize());
@@ -936,7 +938,7 @@ public class MonteCarloPluginAdministration
 		return _colorToPlay;
 	}
 	
-	@Override
+//	@Override
     public boolean isGameFinished()
     {
 		if (!_moveStack.isEmpty() && _moveStack.peek() == PASS && _moveStack.peek(1) == PASS && _moveStack.peek(2) == PASS)
@@ -1362,10 +1364,10 @@ public class MonteCarloPluginAdministration
 	 */
 	public int getPositionalChecksum()
 	{
-//		return _checksum.getValue();
-		if (_koPoint==UNDEFINED_COORDINATE)
-			return _checksum.getValue() + getNrPasses()*13;
-		return  _checksum.getValue() + _koPoint*17;
+		return _checksum.getValue();
+//		if (_koPoint==UNDEFINED_COORDINATE)
+//			return _checksum.getValue() + getNrPasses()*13;
+//		return  _checksum.getValue() + _koPoint*17;
 	}
 
 	/*

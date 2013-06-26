@@ -101,7 +101,7 @@ public class PointSet
 	
 	public final void recycle()
 	{
-		_nrPoints = 0;
+		reset();
 		_owner.push(this);
 	}
 	

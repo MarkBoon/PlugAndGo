@@ -16,10 +16,10 @@ public class EyeMoveFilter
 	
 	MonteCarloPluginAdministration _administration;
 	
-	@Override
+//	@Override
 	public void clear() {}
 	
-	@Override
+//	@Override
 	public void register(MonteCarloPluginAdministration administration)
 	{
 		_administration = administration;
@@ -36,7 +36,7 @@ public class EyeMoveFilter
 		_chain = administration.getChainArray();
 	}
 
-	@Override
+//	@Override
 	public boolean accept(int xy, byte color)
 	{
 		if (_liberties[_chain[left(xy)]]==1 || _liberties[_chain[right(xy)]]==1 || _liberties[_chain[above(xy)]]==1 || _liberties[_chain[below(xy)]]==1)
@@ -48,13 +48,13 @@ public class EyeMoveFilter
 			return (_whiteNeighbours[xy]==4 && _blackDiagonalNeighbours[xy]<_maxDiagonalsOccupied[xy]);
 	}
 
-	@Override
+//	@Override
     public MoveFilter createClone()
     {
 	    return new EyeMoveFilter();
     }
 
-	@Override
+//	@Override
     public void copyDataFrom(MoveFilter source)
     {
 		// NA

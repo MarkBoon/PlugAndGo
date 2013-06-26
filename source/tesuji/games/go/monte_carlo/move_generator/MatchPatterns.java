@@ -33,7 +33,7 @@ public class MatchPatterns extends AbstractMoveGenerator
 		administration.getBoardModel().addBoardModelListener(_patternMatcher);
     }
 
-	@Override
+//	@Override
     public int generate()
     {
 		_patternMatcher.updatePatternMatches();
@@ -52,7 +52,7 @@ public class MatchPatterns extends AbstractMoveGenerator
 		return UNDEFINED_COORDINATE;
     }
 
-	@Override
+//	@Override
     public MoveGenerator createClone()
     {
 	    return new MatchPatterns(_patternManager);

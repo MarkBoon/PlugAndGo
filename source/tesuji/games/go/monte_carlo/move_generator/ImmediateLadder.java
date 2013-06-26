@@ -7,7 +7,7 @@ import tesuji.games.go.util.Statistics;
 
 public class ImmediateLadder extends LadderMoveGenerator
 {	
-	@Override
+//	@Override
 	public int generate()
 	{
 		Statistics.increment("-ImmediateLadder");
@@ -47,7 +47,7 @@ public class ImmediateLadder extends LadderMoveGenerator
 		return UNDEFINED_COORDINATE;
 	}
 
-	@Override
+//	@Override
 	public MoveGenerator createClone()
 	{
 		return new ImmediateLadder();

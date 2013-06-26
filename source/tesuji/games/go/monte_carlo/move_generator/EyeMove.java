@@ -8,7 +8,7 @@ import tesuji.games.go.util.Statistics;
 
 public class EyeMove extends AbstractMoveGenerator
 {
-	@Override
+//	@Override
 	public int generate()
 	{
 		int xy = administration.getLastMove();
@@ -41,7 +41,7 @@ public class EyeMove extends AbstractMoveGenerator
 		return UNDEFINED_COORDINATE;
 	}
 
-	@Override
+//	@Override
 	public MoveGenerator createClone()
 	{
 		return new EyeMove();

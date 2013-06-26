@@ -7,7 +7,7 @@ import tesuji.games.go.util.Statistics;
 
 public class ImmediateCapture extends LadderMoveGenerator
 {	
-	@Override
+//	@Override
 	public int generate()
 	{
 		Statistics.increment("-ImmediateCapture");
@@ -43,7 +43,7 @@ public class ImmediateCapture extends LadderMoveGenerator
 		return UNDEFINED_COORDINATE;
 	}
 
-	@Override
+//	@Override
 	public MoveGenerator createClone()
 	{
 		return new ImmediateCapture();

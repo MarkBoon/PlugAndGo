@@ -9,31 +9,31 @@ public abstract class AbstractMoveGenerator implements MoveGenerator
 	private int _urgency;
 	private double _weight;
 
-	@Override
+//	@Override
 	public void register(MonteCarloPluginAdministration admin)
 	{
 		administration = admin;
 	}
 	
-	@Override
+//	@Override
 	public int getUrgency()
 	{
 		return _urgency;
 	}
 
-	@Override
+//	@Override
 	public void setUrgency(int urgency)
 	{
 		_urgency = urgency;
 	}
 
-	@Override
+//	@Override
 	public double getWeight()
 	{
 		return _weight;
 	}
 
-	@Override
+//	@Override
 	public void setWeight(double weight)
 	{
 		_weight = weight;
@@ -43,7 +43,7 @@ public abstract class AbstractMoveGenerator implements MoveGenerator
 	{
 	}
 	
-	@Override
+//	@Override
 	public void copyDataFrom(MoveGenerator source)
 	{
 		_urgency = source.getUrgency();

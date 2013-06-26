@@ -175,7 +175,7 @@ public class GameEngineToGTP<MoveType extends Move>
 		sendGTPCommand(propertyName+" "+propertyValue);
 	}
 
-    @Override
+//    @Override
 	public void setProperties(GameProperties properties)
     {
     	for (Enumeration<Object> e=properties.keys(); e.hasMoreElements();)

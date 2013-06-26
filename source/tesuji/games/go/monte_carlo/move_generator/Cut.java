@@ -12,7 +12,7 @@ import tesuji.games.go.util.FourCursor;
 
 public class Cut extends LadderMoveGenerator
 {
-	@Override
+//	@Override
 	public int generate()
 	{
 		int xy = administration.getLastMove();
@@ -59,7 +59,7 @@ public class Cut extends LadderMoveGenerator
 		return false;
 	}
 
-	@Override
+//	@Override
 	public MoveGenerator createClone()
 	{
 		return new Cut();

@@ -107,6 +107,18 @@ public class SearchResultFactory
         return newResult;
 	}
 	
+	public static void ensureMonteCarloHashMapResultCapacity(int capacity)
+	{
+		SearchResultFactory factory = getSingleton();
+		for (int i=0; i<capacity; i++)
+		{
+			MonteCarloHashMapResult result = new MonteCarloHashMapResult(factory.mchmResultPool);
+			result.init();
+			factory.mchmResultPool.push(result);
+        	nrResults++;
+		}
+	}
+	
 	public static MonteCarloHashMapResult createMonteCarloHashMapResult()
 	{
 		return getSingleton()._createMonteCarloHashMapResult();
@@ -120,7 +132,7 @@ public class SearchResultFactory
 	private MonteCarloHashMapResult _createMonteCarloHashMapResult()
 	{
 		MonteCarloHashMapResult newResult;
-        if (mctsResultPool.isEmpty())
+        if (mchmResultPool.isEmpty())
         {
         	newResult = new MonteCarloHashMapResult(mchmResultPool);
         	nrResults++;

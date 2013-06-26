@@ -19,7 +19,7 @@ public class FogOfWarFilter implements MoveFilter, BoardModelListener
 	{
 	}
 	
-	@Override
+//	@Override
 	public void clear() 
 	{
 		byte[] _row = createRowArray(_administration.getBoardSize());
@@ -32,7 +32,7 @@ public class FogOfWarFilter implements MoveFilter, BoardModelListener
 		}		
 	}
 	
-	@Override
+//	@Override
 	public void register(MonteCarloPluginAdministration administration)
 	{
 		_administration = administration;
@@ -40,26 +40,26 @@ public class FogOfWarFilter implements MoveFilter, BoardModelListener
 		clear();
 	}
 
-	@Override
+//	@Override
 	public boolean accept(int xy, byte color)
 	{
 		return (_fogOfWar[xy]!=0);
 	}
 
-	@Override
+//	@Override
 	public MoveFilter createClone()
 	{
 		return new FogOfWarFilter();
 	}
 
-	@Override
+//	@Override
 	public void copyDataFrom(MoveFilter source)
 	{
 		FogOfWarFilter sourceFilter = (FogOfWarFilter)source;
 		copy(sourceFilter._fogOfWar,_fogOfWar);		
 	}
 
-	@Override
+//	@Override
     public void changeBoard(BoardChange event)
     {
 		int xy = event.getXY();

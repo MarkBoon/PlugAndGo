@@ -840,7 +840,7 @@ public class HashMapSearch<MoveType extends Move>
 //		}
 	}
 
-	@Override
+//	@Override
     public boolean isGameFinished()
     {
 		return (_monteCarloAdministration.isGameFinished());
