@@ -40,7 +40,9 @@ import tesuji.games.model.BoardModel;
 public class GoArray
 {
 	/** Width of a 'row'. */
-	public static final int WIDTH = 20;
+	public static final int MAX_BOARD_SIZE = 19;
+	/** Width of a 'row'. */
+	public static final int WIDTH = MAX_BOARD_SIZE+1;
 	/** Width of a 'row'. */
 	public static final int DEFAULT_SIZE = WIDTH - 1;
 	/** Index of the first real point.*/
@@ -130,7 +132,7 @@ public class GoArray
 	 */
 	public static final void clear(double[] array)
 	{
-		Arrays.fill(array,0);
+		Arrays.fill(array,0.0);
 //		System.arraycopy(doubleZeros,0,array,0,MAX);
 	}
     
@@ -141,7 +143,7 @@ public class GoArray
 	 */
 	public static final void clear(float[] array)
 	{
-		Arrays.fill(array,0);
+		Arrays.fill(array,0.0f);
 //		System.arraycopy(doubleZeros,0,array,0,MAX);
 	}
     

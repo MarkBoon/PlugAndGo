@@ -11,6 +11,9 @@ import tesuji.games.model.BoardModelListener;
 
 public class FogOfWarFilter implements MoveFilter, BoardModelListener
 {
+	private static final int CLEAR = 0;
+	private static final int FOGGED = Byte.MAX_VALUE;
+	
 	private int id;
 	private byte[] _fogOfWar;
 	protected MonteCarloPluginAdministration _administration;
@@ -26,9 +29,9 @@ public class FogOfWarFilter implements MoveFilter, BoardModelListener
 		for (int i=FIRST; i<=LAST; i++)
 		{
 			if (_row[i]<3)
-				_fogOfWar[i] = Byte.MAX_VALUE;
+				_fogOfWar[i] = FOGGED;
 			else
-				_fogOfWar[i] = 0;
+				_fogOfWar[i] = CLEAR;
 		}		
 	}
 	
@@ -43,7 +46,7 @@ public class FogOfWarFilter implements MoveFilter, BoardModelListener
 //	@Override
 	public boolean accept(int xy, byte color)
 	{
-		return (_fogOfWar[xy]!=0);
+		return (_fogOfWar[xy]!=CLEAR);
 	}
 
 //	@Override
@@ -63,12 +66,12 @@ public class FogOfWarFilter implements MoveFilter, BoardModelListener
     public void changeBoard(BoardChange event)
     {
 		int xy = event.getXY();
-		_fogOfWar[xy] = 0;
+		_fogOfWar[xy] = CLEAR;
 		for (int n=12; --n>=0;)
 		{
 			int next = TwelveCursor.getNeighbour(xy, n);
 			if (next>=FIRST && next<=LAST)
-				_fogOfWar[next] = 0;
+				_fogOfWar[next] = CLEAR;
 		}
     }
 	

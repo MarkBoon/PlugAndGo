@@ -34,7 +34,9 @@
   			<value>GenTest</value>
   		</constructor-arg>
 	</bean>
+	
 	<bean id="eyeMoveFilter" class="tesuji.games.go.monte_carlo.EyeMoveFilter" singleton="false"/>
+	<bean id="fogOfWarFilter" class="tesuji.games.go.monte_carlo.FogOfWarFilter" singleton="false"/>
 	
 	<bean id="patternManager" class="tesuji.games.go.pattern.common.HibernatePatternManager" singleton="true">
 		<constructor-arg>
@@ -128,11 +130,13 @@
 				<property name="simulationMoveFilterList">
 					<list>
 						<ref bean="eyeMoveFilter"/>
+						<ref bean="fogOfWarFilter"/>
 					</list>
 				</property>
 				<property name="explorationMoveFilterList">
 					<list>
 						<ref bean="eyeMoveFilter"/>
+						<ref bean="fogOfWarFilter"/>
 					</list>
 				</property>
 				<property name="simulationMoveGeneratorList">
@@ -165,7 +169,7 @@
 			<value>0</value>
 		</property>
 		<property name="nrSimulationsBeforeExpansion">
-			<value>1</value>
+			<value>64</value>
 		</property>
 		<property name="isTestVersion">
 			<value>false</value>

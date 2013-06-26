@@ -35,9 +35,9 @@ public class MonteCarloHashMapSearch
 	private static Logger _logger = Logger.getLogger(MonteCarloHashMapSearch.class);
 
 	protected MonteCarloAdministration<GoMove> _monteCarloAdministration;
-	private HashMap<Integer, MonteCarloHashMapResult> _hashMap = new HashMap<Integer, MonteCarloHashMapResult>();
+//	private HashMap<Integer, MonteCarloHashMapResult> _hashMap = new HashMap<Integer, MonteCarloHashMapResult>();
 //	private ConcurrentHashMap<Integer, MonteCarloHashMapResult> _hashMap = new ConcurrentHashMap<Integer, MonteCarloHashMapResult>();
-//	private NonBlockingHashMapLong<MonteCarloHashMapResult> _hashMap = new NonBlockingHashMapLong<MonteCarloHashMapResult>();
+	private NonBlockingHashMapLong<MonteCarloHashMapResult> _hashMap = new NonBlockingHashMapLong<MonteCarloHashMapResult>();
 	private MonteCarloHashMapResult _rootResult;
 	private int _nrPlayouts;
 	private int _nrSimulationsBeforeExpansion = 1;
@@ -101,7 +101,8 @@ public class MonteCarloHashMapSearch
 			{
 				_rootResult = SearchResultFactory.createMonteCarloHashMapResult();
 				_rootResult.setPointSet(_monteCarloAdministration.getEmptyPoints(),(MonteCarloPluginAdministration)_monteCarloAdministration);
-				_rootResult.setMove(GoMoveFactory.getSingleton().createPassMove(opposite(_monteCarloAdministration.getColorToMove())));
+				_rootResult.setXY(GoConstant.PASS);
+				_rootResult.setColor(opposite(_monteCarloAdministration.getColorToMove()));
 				_rootResult.setAge(_monteCarloAdministration.getMoveStack().getSize());
 				_rootResult.setChecksum(checksum);
 	
@@ -152,8 +153,8 @@ public class MonteCarloHashMapSearch
 			_minimumNrNodes = minimum;
 //			SearchResultFactory.ensureMonteCarloHashMapResultCapacity(_minimumNrNodes*2);
 //			_hashMap = new ConcurrentHashMap<Integer, MonteCarloHashMapResult>(_minimumNrNodes*2);
-//			_hashMap = new NonBlockingHashMapLong<MonteCarloHashMapResult>(_minimumNrNodes*2, false);
-			_hashMap = new HashMap<Integer,MonteCarloHashMapResult>(_minimumNrNodes*2);
+			_hashMap = new NonBlockingHashMapLong<MonteCarloHashMapResult>(_minimumNrNodes*2, false);
+//			_hashMap = new HashMap<Integer,MonteCarloHashMapResult>(_minimumNrNodes*2);
 			_searchProperties.setIntProperty(SearchProperties.NR_NODES,minimum);
 		}
     }
@@ -203,7 +204,7 @@ public class MonteCarloHashMapSearch
 		Runnable[] searchProcesses = new Runnable[_nrThreads];
 		for (int t=0; t<_nrThreads; t++)
 		{
-			searchProcesses[t] = new SearchProcess(startColor,_monteCarloAdministration);
+			searchProcesses[t] = new SearchProcess(startColor,(MonteCarloPluginAdministration)_monteCarloAdministration);
 			threads[t] = new Thread(searchProcesses[t]);
 			threads[t].start();
 		}
@@ -372,27 +373,27 @@ public class MonteCarloHashMapSearch
     {
     	byte _startColor;
     	private boolean running;
-		private MonteCarloAdministration<GoMove> _newAdministration;
-		private MonteCarloAdministration<GoMove> _initAdministration;
-		private MonteCarloAdministration<GoMove> _searchAdministration;
+		private MonteCarloPluginAdministration _newAdministration;
+		private MonteCarloPluginAdministration _initAdministration;
+		private MonteCarloPluginAdministration _searchAdministration;
 		private double[] _weightMap;
 		private byte[] _colorMap;
 		private IntStack _moveStack;
 		private ArrayStack<MonteCarloHashMapResult> _resultStack;
     	
-    	public SearchProcess(byte startColor, MonteCarloAdministration<GoMove> admin)
+    	public SearchProcess(byte startColor, MonteCarloPluginAdministration admin)
     	{
     		_startColor = startColor;
     		running = false;
-    		_initAdministration = (MonteCarloAdministration<GoMove>) admin.createClone();
-    		_searchAdministration = (MonteCarloAdministration<GoMove>) admin.createClone();
+    		_initAdministration = (MonteCarloPluginAdministration)admin.createClone();
+    		_searchAdministration = (MonteCarloPluginAdministration) admin.createClone();
     		_weightMap = createDoubles();
     		_colorMap = createBytes();
     		_moveStack = new IntStack(GoArray.LAST, null);
     		_resultStack = new ArrayStack<MonteCarloHashMapResult>();
     	}
     	
-    	public void updateAdministration(MonteCarloAdministration<GoMove> admin)
+    	public void updateAdministration(MonteCarloPluginAdministration admin)
     	{
     		_newAdministration = admin;
     	}
@@ -414,7 +415,6 @@ public class MonteCarloHashMapSearch
     	public void run()
     	{
     		running = true;
-    		int emptyRun = 0;
     		do
     		{
     			reset();
@@ -454,7 +454,7 @@ public class MonteCarloHashMapSearch
 						for (int i=0; i<_resultStack.size(); i++)
 						{
 							MonteCarloHashMapResult playoutNode = _resultStack.peek(i);
-					    	color = opposite(playoutNode.getMove().getColor());
+					    	color = opposite(playoutNode.getColor());
 							boolean playerWins = (blackWins && color==BLACK) || (!blackWins && color==WHITE);
 							double score = playerWins ? MonteCarloTreeSearchResult.MAX_SCORE : MonteCarloTreeSearchResult.MIN_SCORE;
 							PointSet points = playoutNode.getEmptyPoints();
@@ -492,13 +492,15 @@ public class MonteCarloHashMapSearch
     			throw new IllegalStateException();
     		while (_searchAdministration.getNrPasses()<2)
     		{
+    			node.increasePlayouts();
 	    		if (node.getPlayouts()<_nrSimulationsBeforeExpansion)
 	    			return node;
 	
 	    		int xy = node.getBestVirtualMove();
-	   			GoMove move = GoMoveFactory.getSingleton().createMove(xy, _searchAdministration.getColorToMove());
+	    		byte color = _searchAdministration.getColorToMove();
+//	   			GoMove move = GoMoveFactory.getSingleton().createMove(xy, _searchAdministration.getColorToMove());
 	    		_moveStack.push(xy);
-	   			_searchAdministration.playExplorationMove(move);
+	   			_searchAdministration.playExplorationMove(xy);
 	
 	   			int checksum = _searchAdministration.getPositionalChecksum();
 	   			if (_searchAdministration.hasRepetition(checksum))
@@ -512,7 +514,8 @@ public class MonteCarloHashMapSearch
 	   			if (bestNode==null)
 	   			{
 	   				bestNode = SearchResultFactory.createMonteCarloHashMapResult();
-	   				bestNode.setMove(move);
+	   				bestNode.setXY(xy);
+	   				bestNode.setColor(color);
 	   				bestNode.setAge(_searchAdministration.getMoveStack().getSize());
 	   				bestNode.setPointSet(_searchAdministration.getEmptyPoints(),(MonteCarloPluginAdministration)_searchAdministration);
 	   				bestNode.setChecksum(checksum);
@@ -532,11 +535,11 @@ public class MonteCarloHashMapSearch
     	
     	public void adjustTreeValue(boolean blackWins)
     	{
-    		for (int i=0; i<_resultStack.size(); i++)
-    		{
-    			MonteCarloHashMapResult node = _resultStack.peek(i);
-   				node.increasePlayouts();
-    		}
+//    		for (int i=0; i<_resultStack.size(); i++)
+//    		{
+//    			MonteCarloHashMapResult node = _resultStack.peek(i);
+//   				node.increasePlayouts();
+//    		}
     		for (int i=0; i<_moveStack.getSize(); i++)
     		{
     			int xy = _moveStack.peek(i);
@@ -544,20 +547,6 @@ public class MonteCarloHashMapSearch
    				node.increaseWins(xy,blackWins);
     		}
     	}
-
-    	private boolean repeatsPosition(int checksum)
-        {
-    		// TODO - poor :(
-    		if (_resultStack.size()<8)
-    			return false;
-
-        	for (int i=0; i<8; i++)
-        	{
-        		if (_resultStack.peek(i).getChecksum()==checksum)
-        			return true;
-        	}
-        	return false;
-        }
     }
     
 

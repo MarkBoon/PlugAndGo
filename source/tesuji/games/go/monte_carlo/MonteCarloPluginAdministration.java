@@ -73,7 +73,7 @@ public class MonteCarloPluginAdministration
 	
 	public final MersenneTwisterFast RANDOM = new MersenneTwisterFast();
 	
-	protected int		_boardSize;
+	protected int		_boardSize = 9;
 	protected double	_komi = 7.5;
 	protected int		_intKomi = 7;
 	protected byte		_colorToPlay;
@@ -1133,6 +1133,29 @@ public class MonteCarloPluginAdministration
 		for (int i=0; i<size; i++)
 		{
 			MoveFilter filter = _simulationMoveFilterList.get(i);
+			if (filter.accept(xy, getColorToMove()))
+				return true;
+		}
+		
+		return false;
+		
+		// Check for standard 'eye' definition.
+//		return (_ownNeighbours[xy]==4 && _otherDiagonalNeighbours[xy]<_maxDiagonalsOccupied[xy]);
+	}
+
+	/**
+	 * Check if a move is not allowed, not because it's illegal but because it's undesirable.
+	 * This typically will not allow a side to fill its own eyes.
+	 * 
+	 * @param xy - coordinate of the move
+	 * @return whether allowed or not
+	 */
+	public boolean isVerbotenExploration(int xy)
+	{
+		int size = _explorationMoveFilterList.size();
+		for (int i=0; i<size; i++)
+		{
+			MoveFilter filter = _explorationMoveFilterList.get(i);
 			if (filter.accept(xy, getColorToMove()))
 				return true;
 		}

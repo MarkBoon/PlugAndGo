@@ -131,7 +131,8 @@ public class HashMapSearch<MoveType extends Move>
 
 		_hashMap.put(_monteCarloAdministration.getPositionalChecksum(),_rootResult);
 //		_rootResult.setExplorationFactor(_explorationFactor);
-		_rootResult.setMove((GoMove)_monteCarloAdministration.getMoveFactory().createDummyMove(opposite(_monteCarloAdministration.getColorToMove())));
+		_rootResult.setXY(GoConstant.PASS);
+		_rootResult.setColor(opposite(_monteCarloAdministration.getColorToMove()));
 		}
 //		_rootNode = (TreeNode<MonteCarloTreeSearchResult<MoveType>>) TreeNodeFactory.getSingleton().createTreeNode();
 //		MonteCarloTreeSearchResult<MoveType> rootResult = 
@@ -728,7 +729,7 @@ public class HashMapSearch<MoveType extends Move>
 						for (int i=0; i<_resultStack.size(); i++)
 						{
 							MonteCarloHashMapResult playoutNode = _resultStack.peek(i);
-					    	color = opposite(playoutNode.getMove().getColor());
+					    	color = opposite(playoutNode.getColor());
 							boolean playerWins = (blackWins && color==BLACK) || (!blackWins && color==WHITE);
 							double score = playerWins ? MonteCarloTreeSearchResult.MAX_SCORE : MonteCarloTreeSearchResult.MIN_SCORE;
 							PointSet points = playoutNode.getEmptyPoints();
@@ -782,16 +783,17 @@ public class HashMapSearch<MoveType extends Move>
     			return node;
 
     		int xy = node.getBestVirtualMove();
-    		GoMove bestMove = GoMoveFactory.getSingleton().createMove(xy, searchAdministration.getColorToMove());
+    		byte color = searchAdministration.getColorToMove();
     		_moveStack.push(xy);
-    		searchAdministration.playExplorationMove((MoveType)bestMove);
+ //   		searchAdministration.playExplorationMove(xy);
 //    		if (bestNode.hashCode()==Checksum.UNINITIALIZED)
 //    			bestNode.setChecksum(searchAdministration.getPositionalChecksum());
     		MonteCarloHashMapResult bestNode = _hashMap.get(searchAdministration.getPositionalChecksum());
    			if (bestNode==null)
    			{
    				bestNode = SearchResultFactory.createMonteCarloHashMapResult();
-   				bestNode.setMove(bestMove);
+   				bestNode.setXY(xy);
+   				bestNode.setColor(color);
    				bestNode.setPointSet(_searchAdministration.getEmptyPoints(),(MonteCarloPluginAdministration)_searchAdministration);
 	    		_resultStack.push(bestNode);
    				return bestNode;

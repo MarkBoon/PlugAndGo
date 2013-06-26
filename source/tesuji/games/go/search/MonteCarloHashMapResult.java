@@ -15,7 +15,7 @@ import tesuji.games.go.util.PointSet;
 import tesuji.games.go.util.PointSetFactory;
 
 public class MonteCarloHashMapResult
-	implements SearchResult<GoMove>
+//	implements SearchResult<GoMove>
 {
 	public static final int FORBIDDEN = 1000000;
 	public static final double MAX_SCORE = 1.0;
@@ -30,14 +30,16 @@ public class MonteCarloHashMapResult
 	 */
 	private static final double _explorationFactor = Math.sqrt(0.2);
 
-	private GoMove		_move;
+//	private GoMove		_move;
+	private int			_xy;
+	private byte		_color;
 	private int			_totalPlayouts;
 	private int[]		_wins;
 	private int[]		_playouts;
 	private PointSet	_emptyPoints;
 	private float[]		_virtualWins;
 	private float[]		_virtualPlayouts;
-	private double[]	_results;
+//	private double[]	_results;
 	private double		_logNrPlayouts;
 	private double		_beta;
 	private int			_age;
@@ -60,7 +62,7 @@ public class MonteCarloHashMapResult
 		_playouts = GoArray.createIntegers();
 		_virtualWins = GoArray.createFloats();
 		_virtualPlayouts = GoArray.createFloats();
-		_results = GoArray.createDoubles();
+//		_results = GoArray.createDoubles();
 	}
 	
 	public void setPointSet(PointSet set, MonteCarloPluginAdministration administration)
@@ -101,6 +103,7 @@ public class MonteCarloHashMapResult
 	
 	void init()
 	{
+		_xy = GoConstant.UNDEFINED_COORDINATE;
 		_logNrPlayouts = 0.0;
 		_beta = 0.0;
 		_totalPlayouts = 0;
@@ -110,31 +113,31 @@ public class MonteCarloHashMapResult
 		GoArray.clear(_wins);
 		GoArray.clear(_virtualWins);
 		GoArray.clear(_virtualPlayouts);
-		GoArray.clear(_results);
+//		GoArray.clear(_results);
 	}
 
 //	@Override
     public void recycle()
     {
 		init();
-		if (_move!=null)
-			_move.recycle();
-		_move = null;
+//		if (_move!=null)
+//			_move.recycle();
+//		_move = null;
 
 		_owner.push(this);
     }
 
 //	@Override
-    public GoMove getMove()
-    {
-	    return _move;
-    }
+//    public GoMove getMove()
+//    {
+//	    return _move;
+//    }
 	
 //	@Override
-    public void setMove(GoMove move)
-    {
-	    _move = move;
-    }
+//    public void setMove(GoMove move)
+//    {
+//	    _move = move;
+//    }
 	
 	public PointSet getEmptyPoints()
 	{
@@ -292,12 +295,12 @@ public class MonteCarloHashMapResult
 		double virtualResult;
 		double compareResult;
 		
-		virtualResult = _results[xy1];
-		compareResult = _results[xy2];
-		if (virtualResult==Double.MIN_VALUE)
-			virtualResult =  _results[xy1] = computeResult(xy1);
-		if (compareResult==Double.MIN_VALUE)
-		compareResult =  _results[xy2] = computeResult(xy2);
+//		virtualResult = _results[xy1];
+//		compareResult = _results[xy2];
+//		if (virtualResult<0)
+			virtualResult = computeResult(xy1);
+//		if (compareResult<0)
+			compareResult = computeResult(xy2);
 		
 		assert virtualResult!=Double.NaN : "Calculation error for the virtual result-value.";
 		assert compareResult!=Double.NaN : "Calculation error for the virtual compare-value.";
@@ -336,7 +339,7 @@ public class MonteCarloHashMapResult
 
 	public void increaseWins(int xy, boolean blackWins)
 	{		
-		byte color = ColorConstant.opposite(_move.getColor());
+		byte color = ColorConstant.opposite(_color);
 		boolean playerWins = (blackWins && color==BLACK) || (!blackWins && color==WHITE);
 		
 		if (playerWins)
@@ -346,14 +349,14 @@ public class MonteCarloHashMapResult
 		}
 		_playouts[xy]++;
 		_virtualPlayouts[xy]++;
-		_results[xy] = Double.MIN_VALUE;
+//		_results[xy] = Double.MIN_VALUE;
 	}
 
 	public void increaseVirtualPlayouts(int xy, double win_weight, double weight)
 	{
 		_virtualWins[xy] += win_weight;
 		_virtualPlayouts[xy] += weight;
-		_results[xy] = Double.MIN_VALUE;
+//		_results[xy] = Double.MIN_VALUE;
 	}
 	
 	public void forbid(int xy)
@@ -362,7 +365,7 @@ public class MonteCarloHashMapResult
 		_virtualWins[xy] = 0;
 		_playouts[xy] =FORBIDDEN;
 		_virtualPlayouts[xy] = FORBIDDEN;
-		_results[xy] = Double.MIN_VALUE;
+//		_results[xy] = Double.MIN_VALUE;
 	}
 
 	public String toString()
@@ -370,7 +373,7 @@ public class MonteCarloHashMapResult
 		StringBuilder out = new StringBuilder();
 		
 		out.append("\nHashMapSearch\n");
-		GoMove move = GoMoveFactory.getSingleton().createMove(getBestMove(), ColorConstant.opposite(_move.getColor()));
+		GoMove move = GoMoveFactory.getSingleton().createMove(getBestMove(), ColorConstant.opposite(_color));
 		out.append(move.toString()+"\n");
 		for (int row=1; row<=_boardSize; row++)
 		{
@@ -450,4 +453,24 @@ public class MonteCarloHashMapResult
 	{
 		_checksum = checksum;
 	}
+
+	public int getXY()
+    {
+    	return _xy;
+    }
+
+	public void setXY(int xy)
+    {
+    	_xy = xy;
+    }
+
+	public byte getColor()
+    {
+    	return _color;
+    }
+
+	public void setColor(byte color)
+    {
+    	_color = color;
+    }
 }
