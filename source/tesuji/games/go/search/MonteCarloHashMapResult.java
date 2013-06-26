@@ -284,7 +284,7 @@ public class MonteCarloHashMapResult
 
 		double result = getWinRatio(xy)+getUCTValue(xy);
 		return _beta * virtualResult + (1.0-_beta) * result;
-		//return /*_beta **/ (getVirtualWinRatio(xy)+getRAVEValue(xy)) ;//+ (1.0-_beta) * (getWinRatio(xy)+getUCTValue(xy));		
+		//return _beta * (getVirtualWinRatio(xy)+getRAVEValue(xy)) + (1.0-_beta) * (getWinRatio(xy)+getUCTValue(xy));	// Java barfed on this expression, hence the 'spelling out' above.	
 	}
 
 	private boolean isBetterVirtualMove(int xy1, int xy2)
@@ -292,10 +292,12 @@ public class MonteCarloHashMapResult
 		double virtualResult;
 		double compareResult;
 		
-//		virtualResult = _results[xy1];
-//		compareResult = _results[xy2];
-		virtualResult = computeResult(xy1);
-		compareResult = computeResult(xy2);
+		virtualResult = _results[xy1];
+		compareResult = _results[xy2];
+		if (virtualResult==Double.MIN_VALUE)
+			virtualResult =  _results[xy1] = computeResult(xy1);
+		if (compareResult==Double.MIN_VALUE)
+		compareResult =  _results[xy2] = computeResult(xy2);
 		
 		assert virtualResult!=Double.NaN : "Calculation error for the virtual result-value.";
 		assert compareResult!=Double.NaN : "Calculation error for the virtual compare-value.";
@@ -344,14 +346,14 @@ public class MonteCarloHashMapResult
 		}
 		_playouts[xy]++;
 		_virtualPlayouts[xy]++;
-//		_results[xy] = computeResult(xy);
+		_results[xy] = Double.MIN_VALUE;
 	}
 
 	public void increaseVirtualPlayouts(int xy, double win_weight, double weight)
 	{
 		_virtualWins[xy] += win_weight;
 		_virtualPlayouts[xy] += weight;
-//		_results[xy] = computeResult(xy);
+		_results[xy] = Double.MIN_VALUE;
 	}
 	
 	public void forbid(int xy)
@@ -360,7 +362,7 @@ public class MonteCarloHashMapResult
 		_virtualWins[xy] = 0;
 		_playouts[xy] =FORBIDDEN;
 		_virtualPlayouts[xy] = FORBIDDEN;
-//		_results[xy] = computeResult(xy);
+		_results[xy] = Double.MIN_VALUE;
 	}
 
 	public String toString()
