@@ -85,14 +85,21 @@ public class MonteCarloHashMapSearch
 	private void initRoot()
 	{
 
-		_nrSets = 0;
-		for (MonteCarloHashMapResult r : _hashMap.values())
-			r.recycle();
-		_hashMap.clear();
-		
 		if (_monteCarloAdministration!=null)
 		{
-			int checksum = _monteCarloAdministration.getPositionalChecksum();
+			_nrSets = 0;
+			int age = _monteCarloAdministration.getMoveStack().getSize();
+			for (MonteCarloHashMapResult r : _hashMap.values())
+			{
+				if (r.getAge()<age)
+				{
+					_hashMap.remove(r.getChecksum());
+					r.recycle();
+				}
+			}
+			//_hashMap.clear();
+			
+			long checksum = _monteCarloAdministration.getPositionalChecksum();
 			_rootResult = _hashMap.get(checksum);
 			if (_rootResult==null)
 			{
@@ -264,8 +271,8 @@ public class MonteCarloHashMapSearch
 		if (xy==GoConstant.PASS)
 			_logger.info("PASS!");
 		_lastScore = _rootResult.getWinRatio(xy);
-//		if (_lastScore<0.05)
-//			return GoMoveFactory.getSingleton().createResignMove(_monteCarloAdministration.getColorToMove());
+		if (_lastScore<0.05)
+			return GoMoveFactory.getSingleton().createResignMove(_monteCarloAdministration.getColorToMove());
 		
 		assert _monteCarloAdministration.isConsistent() : "Inconsistent Monte-Carlo administration at the end of the search.";
 
@@ -497,9 +504,10 @@ public class MonteCarloHashMapSearch
 	    		byte color = _searchAdministration.getColorToMove();
 //	   			GoMove move = GoMoveFactory.getSingleton().createMove(xy, _searchAdministration.getColorToMove());
 	    		_moveStack.push(xy);
+	    		assert(_searchAdministration.isLegal(xy));
 	   			_searchAdministration.playExplorationMove(xy);
 	
-	   			int checksum = _searchAdministration.getPositionalChecksum();
+	   			long checksum = _searchAdministration.getPositionalChecksum();
 	   			if (_searchAdministration.hasRepetition(checksum))
 	   			{
 	   				node.forbid(xy);

@@ -33,11 +33,11 @@ import static tesuji.games.general.ColorConstant.*;
  */
 public class Checksum
 {
-	public static final int UNINITIALIZED = -1;
+	public static final long UNINITIALIZED = -1;
 	
-	private int _checksum;
+	private long _checksum;
 	
-	private static final int[] _randomChecksums = new int[]
+	private static final long[] _randomChecksums = new long[]
 	{
 		-1928908068,-1513723866,1416845399,-1573363490,-1557687521,1956467968,
 		-193677260,1122802245,-78153116,814096112,704047048,-574951599,
@@ -113,6 +113,11 @@ public class Checksum
 		1250793355,506921875,99060458,-1282503152,264704004,-1345926069,
 		352391872,-1415813601,-2137663665,-1061937037
 	};
+	static
+	{
+		for (int i=0; i<_randomChecksums.length; i++)
+			_randomChecksums[i] *= _randomChecksums[(i+113)%_randomChecksums.length];
+	}
 	
 	public Checksum()
 	{
@@ -124,12 +129,12 @@ public class Checksum
 		_checksum = 0;
 	}
 	
-	public final int getValue()
+	public final long getValue()
 	{
 		return _checksum;
 	}
 	
-	public final void setValue(int checksum)
+	public final void setValue(long checksum)
 	{
 		_checksum = checksum;
 	}

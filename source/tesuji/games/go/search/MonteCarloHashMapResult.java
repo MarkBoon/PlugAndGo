@@ -49,6 +49,8 @@ public class MonteCarloHashMapResult
 
 	private int _boardSize;
 	
+	private byte[] _board;
+	
 	private SynchronizedArrayStack<MonteCarloHashMapResult> _owner;
 
 	MonteCarloHashMapResult(SynchronizedArrayStack<MonteCarloHashMapResult> owner)
@@ -65,12 +67,15 @@ public class MonteCarloHashMapResult
 		_virtualWins = GoArray.createFloats();
 		_virtualPlayouts = GoArray.createFloats();
 //		_results = GoArray.createDoubles();
+		_board = GoArray.createBytes();
 	}
 	
 	public void setPointSet(PointSet set, MonteCarloPluginAdministration administration)
 	{
 		MersenneTwisterFast random = administration.RANDOM;
 		_boardSize = administration.getBoardSize();
+		if (administration.getBoardArray()!=null)
+			GoArray.copy(administration.getBoardArray(), _board);
 //		for (int size = set.getSize(); size>0; size--)
 //		{
 //			int xy = set.get(size-1);
@@ -109,6 +114,8 @@ public class MonteCarloHashMapResult
 		_logNrPlayouts = 0.0;
 		_beta = 0.0;
 		_totalPlayouts = 0;
+		_bestMove = GoConstant.PASS;
+		_bestResult = -1.0;
 		
 		_emptyPoints.clear();
 		GoArray.clear(_playouts);
@@ -261,7 +268,7 @@ public class MonteCarloHashMapResult
 	{
 		int bestMove = GoConstant.PASS;
 		double bestResult = computeResult(_bestMove);
-		if (bestResult>_bestResult)
+		if (_bestMove!=GoConstant.PASS && bestResult>_bestResult)
 		{
 			// What was previously the best move, most likely still is as it only got better.
 			_bestResult = bestResult;
@@ -397,6 +404,7 @@ public class MonteCarloHashMapResult
 		StringBuilder out = new StringBuilder();
 		
 		out.append("\nHashMapSearch\n");
+		out.append(GoArray.toString(_board));
 		GoMove move = GoMoveFactory.getSingleton().createMove(getBestMove(), ColorConstant.opposite(_color));
 		out.append(move.toString()+"\n");
 		for (int row=1; row<=_boardSize; row++)

@@ -47,7 +47,7 @@ public class TreeNode<NodeContentType extends FlyWeight>
 	private TreeNode<NodeContentType> _parent;
 	private ArrayList<TreeNode<NodeContentType>> _children;
 	private NodeContentType _content;
-	private int _checksum = Checksum.UNINITIALIZED;
+	private long _checksum = Checksum.UNINITIALIZED;
 	
 	TreeNode()
 	{
@@ -286,7 +286,7 @@ public class TreeNode<NodeContentType extends FlyWeight>
 			return "<empty>";
 	}
 	
-	public void setChecksum(int checksum)
+	public void setChecksum(long checksum)
 	{
 		_checksum = checksum;
 	}
@@ -294,7 +294,7 @@ public class TreeNode<NodeContentType extends FlyWeight>
 	@Override
 	public int hashCode()
 	{
-		return _checksum;
+		return (int)_checksum;
 	}
 	
 	@Override

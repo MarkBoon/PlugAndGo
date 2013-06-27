@@ -44,6 +44,7 @@ import tesuji.games.go.util.DiagonalCursor;
 import tesuji.games.go.util.FourCursor;
 import tesuji.games.go.util.GoArray;
 import tesuji.games.go.util.IntStack;
+import tesuji.games.go.util.LongStack;
 import tesuji.games.go.util.PointSet;
 import tesuji.games.go.util.PointSetFactory;
 import tesuji.games.go.util.SGFUtil;
@@ -190,7 +191,7 @@ public abstract class AbstractMonteCarloAdministration
 	/**
 	 * A list of checksums computed after each move. It's used to check for super-ko.
 	 */
-	protected IntStack _checksumStack;
+	protected LongStack _checksumStack;
 	
 	/**
 	 * The checksum of the current position. Note that this is the checksum of the board-position
@@ -239,7 +240,7 @@ public abstract class AbstractMonteCarloAdministration
 		_checksum = new Checksum();
 
 		_moveStack = ArrayFactory.createLargeIntStack();
-		_checksumStack = ArrayFactory.createLargeIntStack();
+		_checksumStack = ArrayFactory.createLargeLongStack();
 		_priorityMoveStack = ArrayFactory.createIntStack();
 		_urgencyStack = ArrayFactory.createIntStack();
 		_visitStack = ArrayFactory.createIntStack();
@@ -455,7 +456,7 @@ public abstract class AbstractMonteCarloAdministration
 	 * (non-Javadoc)
 	 * @see tesuji.games.go.monte_carlo.MonteCarloAdministration#hasRepetition()
 	 */
-	public boolean hasRepetition(int checksum)
+	public boolean hasRepetition(long checksum)
 	{
 		for (int i=_checksumStack.getSize(); --i>=0;)
 		{
@@ -748,7 +749,7 @@ public abstract class AbstractMonteCarloAdministration
 	 * (non-Javadoc)
 	 * @see tesuji.games.go.monte_carlo.MonteCarloAdministration#getPositionalChecksum()
 	 */
-	public int getPositionalChecksum()
+	public long getPositionalChecksum()
 	{
 		return _checksum.getValue();
 //		if (_koPoint==UNDEFINED_COORDINATE)

@@ -69,7 +69,7 @@
 		  			<value>1</value>
 		  		</property>
 		  		<property name="minimumNrNodes">
-		  			<value>1000</value>
+		  			<value>20000</value>
 		  		</property>
 		  		<property name="useAMAF">
 		  			<value>true</value>
@@ -114,7 +114,7 @@
 		  			<value>1</value>
 		  		</property>
 		  		<property name="minimumNrNodes">
-		  			<value>1000</value>
+		  			<value>20000</value>
 		  		</property>
 		  		<property name="useAMAF">
 		  			<value>true</value>

@@ -167,7 +167,7 @@
 			<value>0</value>
 		</property>
 		<property name="nrSimulationsBeforeExpansion">
-			<value>1</value>
+			<value>64</value>
 		</property>
 		<property name="isTestVersion">
 			<value>false</value>

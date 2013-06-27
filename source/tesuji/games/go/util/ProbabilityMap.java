@@ -125,7 +125,7 @@ public class ProbabilityMap
 		double total = 0.0;
 		double rowTotal = 0.0;
 		
-		for (int i=GoArray.FIRST; i<GoArray.LAST; i++)
+		for (int i=GoArray.FIRST; i<=GoArray.LAST; i++)
 		{
 			total += _weights[i];
 			assert(_weights[i]>=0.0);

@@ -48,6 +48,7 @@ import tesuji.games.go.util.DiagonalCursor;
 import tesuji.games.go.util.FourCursor;
 import tesuji.games.go.util.GoArray;
 import tesuji.games.go.util.IntStack;
+import tesuji.games.go.util.LongStack;
 import tesuji.games.go.util.PointSet;
 import tesuji.games.go.util.PointSetFactory;
 import tesuji.games.go.util.ProbabilityMap;
@@ -202,7 +203,7 @@ public class MonteCarloPluginAdministration
 	/**
 	 * A list of checksums computed after each move. It's used to check for super-ko.
 	 */
-	protected IntStack _checksumStack;
+	protected LongStack _checksumStack;
 	
 	/**
 	 * The checksum of the current position. Note that this is the checksum of the board-position
@@ -266,7 +267,7 @@ public class MonteCarloPluginAdministration
 
 		_illegalStack = ArrayFactory.createIntStack();
 		_moveStack = ArrayFactory.createLargeIntStack();
-		_checksumStack = ArrayFactory.createLargeIntStack();
+		_checksumStack = ArrayFactory.createLargeLongStack();
 		_priorityMoveStack = ArrayFactory.createIntStack();
 		_urgencyStack = ArrayFactory.createIntStack();
 //		_visitStack = ArrayFactory.createIntStack();
@@ -554,7 +555,7 @@ public class MonteCarloPluginAdministration
 	 * (non-Javadoc)
 	 * @see tesuji.games.go.monte_carlo.MonteCarloAdministration#hasRepetition()
 	 */
-	public boolean hasRepetition(int checksum)
+	public boolean hasRepetition(long checksum)
 	{
 		int count = 0;
 		for (int i=_checksumStack.getSize(); --i>=0 && count++<8;)
@@ -801,6 +802,7 @@ public class MonteCarloPluginAdministration
 		byte[] board = _boardModel.getSingleArray();
 		
 		int stoneXY = xy;
+		int runnerXY = xy;
 		do
 		{
 			assert stoneXY!=0 : "Coordinate 0 cannot be part of a chain";
@@ -834,6 +836,7 @@ public class MonteCarloPluginAdministration
 			}
 			
 			stoneXY = _chainNext[stoneXY];
+			assert(stoneXY==xy || stoneXY != (runnerXY = _chainNext[_chainNext[runnerXY]])); // Detect loop.
 		}
 		while (stoneXY!=xy);
 
@@ -963,7 +966,7 @@ public class MonteCarloPluginAdministration
 		//if (priorityMove!=UNDEFINED_COORDINATE && priorityMove!=PASS && isLegal(priorityMove))
 		//	return priorityMove;
 		
-		//return selectRandomMoveCoordinate(emptyPoints, _simulationMoveFilterList);
+		return selectRandomMoveCoordinate(emptyPoints, _simulationMoveFilterList);
 //		for (int i=_priorityMoveStack.getSize(); --i>=0;)
 //		{
 //			int xy = _priorityMoveStack.get(i);
@@ -973,7 +976,7 @@ public class MonteCarloPluginAdministration
 //			if (weight!=0.0)
 //				_probabilityMap.add(xy,weight);
 //		}
-		return selectWeightedMoveCoordinate(emptyPoints, _simulationMoveFilterList);
+		//return selectWeightedMoveCoordinate(emptyPoints, _simulationMoveFilterList);
 	}
 	
 	/**
@@ -1384,7 +1387,7 @@ public class MonteCarloPluginAdministration
 	 * (non-Javadoc)
 	 * @see tesuji.games.go.monte_carlo.MonteCarloAdministration#getPositionalChecksum()
 	 */
-	public int getPositionalChecksum()
+	public long getPositionalChecksum()
 	{
 		return _checksum.getValue();
 //		if (_koPoint==UNDEFINED_COORDINATE)

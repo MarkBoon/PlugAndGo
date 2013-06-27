@@ -237,6 +237,8 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 		
 		assert _monteCarloAdministration.isConsistent() : "Inconsistent Monte-Carlo administration at the end of the search.";
 
+		if (bestNode.getContent().isHopeless())
+			return _monteCarloAdministration.getMoveFactory().createResignMove(_monteCarloAdministration.getColorToMove());
 		return bestNode.getContent().getMove();
 	}
 	

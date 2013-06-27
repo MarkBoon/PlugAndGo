@@ -144,12 +144,12 @@ public interface MonteCarloAdministration<MoveType extends Move>
 	 * @return the checksum used as a hash-code to find equal positions. This
 	 * number takes into account any possible ko-captures.
 	 */
-	public int getPositionalChecksum();
+	public long getPositionalChecksum();
 	
 	/**
 	 * @return whether the current position is a repetition of a previous position.
 	 */
-	public boolean hasRepetition(int checksum);
+	public boolean hasRepetition(long checksum);
 
 	/**
 	 * @return the number of moves played until the end of the game.

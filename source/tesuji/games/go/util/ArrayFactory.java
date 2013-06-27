@@ -66,6 +66,7 @@ public class ArrayFactory
 	private SynchronizedArrayStack<IntStack> intStackPool =			new SynchronizedArrayStack<IntStack>();
 	private SynchronizedArrayStack<IntStack> smallIntStackPool =	new SynchronizedArrayStack<IntStack>();
 	private SynchronizedArrayStack<IntStack> largeIntStackPool =	new SynchronizedArrayStack<IntStack>();
+	private SynchronizedArrayStack<LongStack> largeLongStackPool =	new SynchronizedArrayStack<LongStack>();
 	private SynchronizedArrayStack<UniqueList> uniqueListPool =		new SynchronizedArrayStack<UniqueList>();
 
 	public static ArrayFactory getSingleton()
@@ -233,6 +234,24 @@ public class ArrayFactory
 		}
 	}
 
+	public static LongStack createLargeLongStack()
+	{
+		return getSingleton()._createLargeLongStack();
+	}
+	private LongStack _createLargeLongStack()
+	{
+		synchronized(largeIntStackPool)
+		{
+			if (largeIntStackPool.isEmpty())
+			{
+				nrlargeIntStacks++;
+				return new LongStack(LARGE_LIST_SIZE, largeLongStackPool);
+			}
+	
+			LongStack longStack = largeLongStackPool.pop();
+			return longStack;
+		}
+	}
 	/**
 	 * Allocate an UniqueList. Instead of allocating new objects each time, the
 	 * objects created through this method can be 'recycled' and then reused.
