@@ -8,8 +8,6 @@ import static tesuji.games.go.util.GoArray.createDoubles;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.HashMap;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.cliffc.high_scale_lib.NonBlockingHashMapLong;
@@ -22,7 +20,6 @@ import tesuji.games.general.search.SearchResult;
 import tesuji.games.go.common.GoConstant;
 import tesuji.games.go.common.GoMove;
 import tesuji.games.go.common.GoMoveFactory;
-//import tesuji.games.go.monte_carlo.MCTacticsAdministration;
 import tesuji.games.go.monte_carlo.MonteCarloAdministration;
 import tesuji.games.go.monte_carlo.MonteCarloPluginAdministration;
 import tesuji.games.go.util.GoArray;
@@ -535,11 +532,6 @@ public class MonteCarloHashMapSearch
     	
     	public void adjustTreeValue(boolean blackWins)
     	{
-//    		for (int i=0; i<_resultStack.size(); i++)
-//    		{
-//    			MonteCarloHashMapResult node = _resultStack.peek(i);
-//   				node.increasePlayouts();
-//    		}
     		for (int i=0; i<_moveStack.getSize(); i++)
     		{
     			int xy = _moveStack.peek(i);

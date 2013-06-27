@@ -21,7 +21,7 @@ public class EyeMove extends AbstractMoveGenerator
 				if (board[next]==EMPTY)
 				{
 					int eyeXY = administration.getDiagonalHalfEye(next);
-					if (eyeXY!=0 && !administration.isAutoAtari(eyeXY))
+					if (eyeXY!=0 && !administration.isAutoAtari(eyeXY,administration.getColorToMove()))
 					{
 						Statistics.increment("EyeMove");
 						administration.addPriorityMove(eyeXY, getUrgency());

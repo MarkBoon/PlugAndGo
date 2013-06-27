@@ -1182,7 +1182,7 @@ public abstract class AbstractMonteCarloAdministration
 		
 		public void recycle()
 		{
-			_emptyPoints.recycle();
+//			_emptyPoints.recycle();
 			_iteratorPool.push(this);
 		}
 	}

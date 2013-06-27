@@ -130,13 +130,11 @@
 				<property name="simulationMoveFilterList">
 					<list>
 						<ref bean="eyeMoveFilter"/>
-						<ref bean="fogOfWarFilter"/>
 					</list>
 				</property>
 				<property name="explorationMoveFilterList">
 					<list>
 						<ref bean="eyeMoveFilter"/>
-						<ref bean="fogOfWarFilter"/>
 					</list>
 				</property>
 				<property name="simulationMoveGeneratorList">
@@ -169,7 +167,7 @@
 			<value>0</value>
 		</property>
 		<property name="nrSimulationsBeforeExpansion">
-			<value>64</value>
+			<value>1</value>
 		</property>
 		<property name="isTestVersion">
 			<value>false</value>

@@ -52,7 +52,6 @@ import tesuji.games.go.util.PointSet;
 import tesuji.games.go.util.PointSetFactory;
 import tesuji.games.go.util.ProbabilityMap;
 import tesuji.games.go.util.SGFUtil;
-import tesuji.games.go.util.Statistics;
 import tesuji.games.gtp.GTPCommand;
 import tesuji.games.model.BoardChangeSupport;
 import tesuji.games.model.BoardModel;
@@ -69,7 +68,7 @@ import static tesuji.games.go.common.GoConstant.*;
 public class MonteCarloPluginAdministration
 	implements MonteCarloAdministration<GoMove>
 {
-	public static final boolean USE_MERCY_RULE = false;
+	public static final boolean USE_MERCY_RULE = true;
 	
 	public final MersenneTwisterFast RANDOM = new MersenneTwisterFast();
 	
@@ -964,7 +963,7 @@ public class MonteCarloPluginAdministration
 		//if (priorityMove!=UNDEFINED_COORDINATE && priorityMove!=PASS && isLegal(priorityMove))
 		//	return priorityMove;
 		
-		return selectRandomMoveCoordinate(emptyPoints, _simulationMoveFilterList);
+		//return selectRandomMoveCoordinate(emptyPoints, _simulationMoveFilterList);
 //		for (int i=_priorityMoveStack.getSize(); --i>=0;)
 //		{
 //			int xy = _priorityMoveStack.get(i);
@@ -974,7 +973,7 @@ public class MonteCarloPluginAdministration
 //			if (weight!=0.0)
 //				_probabilityMap.add(xy,weight);
 //		}
-		//return selectWeightedMoveCoordinate(emptyPoints, _simulationMoveFilterList);
+		return selectWeightedMoveCoordinate(emptyPoints, _simulationMoveFilterList);
 	}
 	
 	/**
@@ -1908,7 +1907,7 @@ public class MonteCarloPluginAdministration
 		
 		public void recycle()
 		{
-			_emptyPoints.recycle();
+//			_emptyPoints.recycle();
 			_iteratorPool.push(this);
 		}
 	}
@@ -2091,28 +2090,28 @@ public class MonteCarloPluginAdministration
 		return nrStones;
  	}    
 
-	public boolean isAutoAtari(int xy)
+	public boolean isAutoAtari(int xy, byte color)
 	{
-		if (_koPoint!=UNDEFINED_COORDINATE && _liberties[_chain[_previousMove]]==1)
-			return false;
-		
 //		if (!isPrehistoric(_chain[left(xy)]) && !isPrehistoric(_chain[right(xy)])
 //				&& !isPrehistoric(_chain[above(xy)]) && !isPrehistoric(_chain[below(xy)]))
 //			return false;
 		
 		int nLib = 4-_neighbours[xy];
+		if (nLib>1)
+			return false;
 		int nStones = 0;
 		boolean hasAtari = false;
 		boolean hasCapture = false;
 		int libertyLocation = UNDEFINED_COORDINATE;
+		byte otherColor = opposite(color);
 		
-		boolean hasFalsePoint = isFalsePoint(xy,_oppositeColor);
+		boolean hasFalsePoint = isFalsePoint(xy,otherColor);
 
 		for (int n=4; --n>=0;)
 		{
 			int next = FourCursor.getNeighbour(xy, n);
 			byte boardValue = _boardModel.get(next);
-			if (boardValue==_colorToPlay)
+			if (boardValue==color)
 			{
 				int stone = next;
 				do
@@ -2147,14 +2146,14 @@ public class MonteCarloPluginAdministration
 						libertyLocation = below;
 					}
 					
-					if (!hasFalsePoint && isFalsePoint(stone,_oppositeColor))
+					if (!hasFalsePoint && isFalsePoint(stone,otherColor))
 						hasFalsePoint = true;					
 
 					stone = _chainNext[stone];
 				}
 				while (stone!=next);
 			}
-			else if (boardValue==_oppositeColor)
+			else if (boardValue==otherColor)
 			{
 				if (!hasAtari && _liberties[_chain[next]]==2 && getNrStones(next)>1)
 					hasAtari = true;
@@ -2176,11 +2175,22 @@ public class MonteCarloPluginAdministration
 				nStones-=2;
 			if (nStones>5)
 				return true;
-			if (nStones==1 && libertyLocation!=UNDEFINED_COORDINATE
-					&& _otherNeighbours[xy]==3 && _ownNeighbours[libertyLocation]>=3)
-				return true;
-			if (_neighbours[xy]==4 && !hasCapture && !hasAtari && _otherNeighbours[xy]==3)
-				return true;
+			if (color==BLACK)
+			{
+				if (nStones==1 && libertyLocation!=UNDEFINED_COORDINATE
+						&& _whiteNeighbours[xy]==3 && _blackNeighbours[libertyLocation]>=3)
+					return true;
+				if (_neighbours[xy]==4 && !hasCapture && !hasAtari && _whiteNeighbours[xy]==3)
+					return true;
+			}
+			else
+			{
+				if (nStones==1 && libertyLocation!=UNDEFINED_COORDINATE
+								&& _blackNeighbours[xy]==3 && _whiteNeighbours[libertyLocation]>=3)
+					return true;
+				if (_neighbours[xy]==4 && !hasCapture && !hasAtari && _blackNeighbours[xy]==3)
+					return true;
+			}
 		}
 		
 		return false;

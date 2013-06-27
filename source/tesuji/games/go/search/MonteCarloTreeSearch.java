@@ -785,7 +785,7 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 				{
 	    			if (node.getChildCount()==0)
 	    			{
-	    				synchronized (node)
+//	    				synchronized (node)
                         {
 							expandNode(node,_searchAdministration);
                         }

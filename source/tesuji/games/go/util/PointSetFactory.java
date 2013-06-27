@@ -26,76 +26,21 @@
 
 package tesuji.games.go.util;
 
-import tesuji.core.util.Factory;
-import tesuji.core.util.FactoryReport;
 import tesuji.core.util.SynchronizedArrayStack;
 
 /**
  * 
  */
 public class PointSetFactory
-	implements Factory
 {
-	private static int nrPointSets = 0;
-	
-	/**
-	 * This helper-class ensures there's a unique factory for each thread.
-	 */
-	static class LocalAllocationHelper
-		extends ThreadLocal<PointSetFactory>
-	{
-		@Override
-		public PointSetFactory initialValue()
-		{
-			return new PointSetFactory();
-		}
-	}
-
-	private static LocalAllocationHelper _singleton;
-
-	public static PointSetFactory getSingleton()
-	{
-		if (_singleton==null)
-		{
-			_singleton = new LocalAllocationHelper();
-			FactoryReport.addFactory(_singleton.get());
-		}
-		
-		return _singleton.get();
-	}
-	
-	public String getFactoryName()
-	{
-		return "PointSetFactory";
-	}
-	
-	public String getFactoryReport()
-	{
-		return "Number of PointSet objects:\t\t\t"+nrPointSets;
-	}
-	
-	private SynchronizedArrayStack<PointSet> _pool =	new SynchronizedArrayStack<PointSet>();
-
+	private static SynchronizedArrayStack<PointSet> _pool =	new SynchronizedArrayStack<PointSet>();
 
 	public static PointSet createPointSet()
-	{
-	
-		return getSingleton()._createPointSet();
-	}
-	private PointSet _createPointSet()
-	{
-    	synchronized (_pool)
-        {
-    		PointSet newPointSet;
-	        if (_pool.isEmpty())
-	        {
-	        	newPointSet = new PointSet(_pool);
-	        	nrPointSets++;
-	        }
-	        else
-	        	newPointSet = _pool.pop();
-	        
-	        return newPointSet;
-        }	
+	{	
+		PointSet newPointSet = _pool.testAndPop();
+        if (newPointSet==null)
+        	newPointSet = new PointSet(_pool);
+        
+        return newPointSet;
 	}
 }

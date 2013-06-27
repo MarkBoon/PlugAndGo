@@ -28,6 +28,7 @@ package tesuji.games.go.search;
 import tesuji.core.util.ArrayStack;
 import tesuji.core.util.Factory;
 import tesuji.core.util.FactoryReport;
+import tesuji.core.util.SynchronizedArrayStack;
 
 import tesuji.games.go.common.GoMove;
 
@@ -56,8 +57,8 @@ public class SearchResultFactory
 	private ArrayStack<MonteCarloTreeSearchResult<GoMove>> mctsResultPool =
 		new ArrayStack<MonteCarloTreeSearchResult<GoMove>>();
 	
-	private ArrayStack<MonteCarloHashMapResult> mchmResultPool =
-		new ArrayStack<MonteCarloHashMapResult>();
+	private static SynchronizedArrayStack<MonteCarloHashMapResult> mchmResultPool =
+		new SynchronizedArrayStack<MonteCarloHashMapResult>();
 	
 	public static SearchResultFactory getSingleton()
 	{
@@ -107,40 +108,13 @@ public class SearchResultFactory
         return newResult;
 	}
 	
-	public static void ensureMonteCarloHashMapResultCapacity(int capacity)
-	{
-		SearchResultFactory factory = getSingleton();
-		for (int i=0; i<capacity; i++)
-		{
-			MonteCarloHashMapResult result = new MonteCarloHashMapResult(factory.mchmResultPool);
-			result.init();
-			factory.mchmResultPool.push(result);
-        	nrResults++;
-		}
-	}
-	
 	public static MonteCarloHashMapResult createMonteCarloHashMapResult()
 	{
-		return getSingleton()._createMonteCarloHashMapResult();
-	}
-	
-	public static void recycle(MonteCarloHashMapResult o)
-	{
-		getSingleton().mchmResultPool.push(o);
-	}
-	
-	private MonteCarloHashMapResult _createMonteCarloHashMapResult()
-	{
-		MonteCarloHashMapResult newResult;
-        if (mchmResultPool.isEmpty())
-        {
-        	newResult = new MonteCarloHashMapResult(mchmResultPool);
-        	nrResults++;
-        }
-        else
-        	newResult = mchmResultPool.pop();
-        
-        newResult.init();
-        return newResult;
-	}
+		MonteCarloHashMapResult newResult = mchmResultPool.testAndPop();
+		if (newResult==null)
+			newResult = new MonteCarloHashMapResult(mchmResultPool);
+		
+		newResult.init();
+		return newResult;
+	}	
 }

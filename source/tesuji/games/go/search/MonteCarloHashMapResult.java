@@ -2,8 +2,8 @@ package tesuji.games.go.search;
 
 import static tesuji.games.general.ColorConstant.BLACK;
 import static tesuji.games.general.ColorConstant.WHITE;
-import tesuji.core.util.ArrayStack;
 import tesuji.core.util.MersenneTwisterFast;
+import tesuji.core.util.SynchronizedArrayStack;
 import tesuji.games.general.ColorConstant;
 import tesuji.games.general.search.SearchResult;
 import tesuji.games.go.common.GoConstant;
@@ -44,12 +44,14 @@ public class MonteCarloHashMapResult
 	private double		_beta;
 	private int			_age;
 	private long		_checksum;
-	
+	private int			_bestMove;
+	private double		_bestResult;
+
 	private int _boardSize;
 	
-	private ArrayStack<MonteCarloHashMapResult> _owner;
+	private SynchronizedArrayStack<MonteCarloHashMapResult> _owner;
 
-	MonteCarloHashMapResult(ArrayStack<MonteCarloHashMapResult> owner)
+	MonteCarloHashMapResult(SynchronizedArrayStack<MonteCarloHashMapResult> owner)
 	{
 		this();
 		_owner = owner;
@@ -119,7 +121,7 @@ public class MonteCarloHashMapResult
 //	@Override
     public void recycle()
     {
-		init();
+//		init();
 //		if (_move!=null)
 //			_move.recycle();
 //		_move = null;
@@ -258,12 +260,34 @@ public class MonteCarloHashMapResult
 	public int getBestVirtualMove()
 	{
 		int bestMove = GoConstant.PASS;
+		double bestResult = computeResult(_bestMove);
+		if (bestResult>_bestResult)
+		{
+			// What was previously the best move, most likely still is as it only got better.
+			_bestResult = bestResult;
+			return _bestMove;
+		}
+
 		for (int i=_emptyPoints.getSize(); --i>=0;)
 		{
 			int next = _emptyPoints.get(i);
-			if (isBetterVirtualMove(next,bestMove))
+			double result = computeResult(next);
+			boolean better;
+			if (result>bestResult)
+				better = true;
+			else if (result==bestResult)
+				better = (bestMove==GoConstant.PASS || _playouts[next] > _playouts[bestMove]);	// TODO: check '<' instead of '>', see which plays better.
+			else
+				better = false;
+			
+			if (better)
+			{
 				bestMove = next;
+				bestResult = result;
+			}
 		}
+		_bestMove = bestMove;
+		_bestResult = bestResult;
 		return bestMove;
 	}
 	
@@ -290,32 +314,32 @@ public class MonteCarloHashMapResult
 		//return _beta * (getVirtualWinRatio(xy)+getRAVEValue(xy)) + (1.0-_beta) * (getWinRatio(xy)+getUCTValue(xy));	// Java barfed on this expression, hence the 'spelling out' above.	
 	}
 
-	private boolean isBetterVirtualMove(int xy1, int xy2)
-	{
-		double virtualResult;
-		double compareResult;
-		
-//		virtualResult = _results[xy1];
-//		compareResult = _results[xy2];
-//		if (virtualResult<0)
-			virtualResult = computeResult(xy1);
-//		if (compareResult<0)
-			compareResult = computeResult(xy2);
-		
-		assert virtualResult!=Double.NaN : "Calculation error for the virtual result-value.";
-		assert compareResult!=Double.NaN : "Calculation error for the virtual compare-value.";
-
-		if (virtualResult>compareResult)
-			return true;
-		
-		// Trust the most visited node more. I don't know if it's all that relevant.
-		// I could probably just as easily argue it should be the other way around.
-		if (virtualResult==compareResult)
-			return (xy2==GoConstant.PASS || _playouts[xy1] > _playouts[xy2]);	// TODO: check '<' instead of '>', see which plays better.
-		
-		return false;
-		
-	}
+//	private boolean isBetterVirtualMove(int xy1, int xy2)
+//	{
+//		double virtualResult;
+//		double compareResult;
+//		
+////		virtualResult = _results[xy1];
+////		compareResult = _results[xy2];
+////		if (virtualResult<0)
+//			virtualResult = computeResult(xy1);
+////		if (compareResult<0)
+//			compareResult = computeResult(xy2);
+//		
+//		assert virtualResult!=Double.NaN : "Calculation error for the virtual result-value.";
+//		assert compareResult!=Double.NaN : "Calculation error for the virtual compare-value.";
+//
+//		if (virtualResult>compareResult)
+//			return true;
+//		
+//		// Trust the most visited node more. I don't know if it's all that relevant.
+//		// I could probably just as easily argue it should be the other way around.
+//		if (virtualResult==compareResult)
+//			return (xy2==GoConstant.PASS || _playouts[xy1] > _playouts[xy2]);	// TODO: check '<' instead of '>', see which plays better.
+//		
+//		return false;
+//		
+//	}
 
 	public void increasePlayouts()
 	{

@@ -1551,7 +1551,7 @@ public class MonteCarloGoAdministration
 		
 		public void recycle()
 		{
-			_emptyPoints.recycle();
+//			_emptyPoints.recycle();
 			_iteratorPool.push(this);
 		}
 	}

@@ -84,7 +84,8 @@
   	</bean>
 
 	<bean id="eyeMoveFilter" class="tesuji.games.go.monte_carlo.EyeMoveFilter" singleton="false"/>
-	<bean id="fogOfWarFilter" class="tesuji.games.go.monte_carlo.FogOfWarFilter" singleton="true"/>
+	<bean id="fogOfWarFilter" class="tesuji.games.go.monte_carlo.FogOfWarFilter" singleton="false"/>
+	<bean id="autoAtariFilter" class="tesuji.games.go.monte_carlo.AutoAtariFilter" singleton="false"/>
 
 	<bean id="Bot3" class="tesuji.games.go.engine.TreeSearchEngine" singleton="false">
   		<property name="jar" value="TreeSearchEngine.jar"/>
@@ -95,13 +96,13 @@
 						<property name="simulationMoveFilterList">
 							<list>
 								<ref bean="eyeMoveFilter"/>
-								<ref bean="fogOfWarFilter"/>
+								<ref bean="autoAtariFilter"/>
 							</list>
 						</property>
 						<property name="explorationMoveFilterList">
 							<list>
 								<ref bean="eyeMoveFilter"/>
-								<ref bean="fogOfWarFilter"/>
+								<!--<ref bean="fogOfWarFilter"/>-->
 							</list>
 						</property>
 						<property name="simulationMoveGeneratorList">
