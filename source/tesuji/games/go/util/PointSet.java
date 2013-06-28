@@ -42,6 +42,8 @@ public class PointSet
 	private short[] _pointIndex;
 	private short _nrPoints;
 	
+	private boolean _frozen = false;
+	
 	private SynchronizedArrayStack<PointSet> _owner;
 	
 	PointSet(SynchronizedArrayStack<PointSet> owner)
@@ -49,11 +51,12 @@ public class PointSet
 		_owner = owner;
 		_pointList = createShorts();
 		_pointIndex = createShorts();
-		_nrPoints = 0;
+		reset();
 	}
 	
 	public final void add(int xy)
 	{
+		assert(!_frozen);
 		_pointList[_nrPoints] = (short)xy;
 		_pointIndex[xy] = _nrPoints;
 		_nrPoints++;	
@@ -61,6 +64,7 @@ public class PointSet
 	
 	public final void remove(int xy)
 	{
+		assert(!_frozen);
 		short pointIndex = _pointIndex[xy];
 //		if (pointIndex<0)
 //			return;
@@ -82,6 +86,7 @@ public class PointSet
 	
 	public final void copyFrom(PointSet source)
 	{
+		assert(!_frozen);
 		copy(source._pointList, _pointList);
 		copy(source._pointIndex,_pointIndex);
 		_nrPoints = (short)source.getSize();
@@ -91,16 +96,18 @@ public class PointSet
 	{
 		GoArray.clear(_pointList);
 		GoArray.clear(_pointIndex);
-		_nrPoints = 0;
+		reset();
 	}
 	
 	public final void reset()
 	{
+		assert(!_frozen);
 		_nrPoints = 0;
 	}
 	
 	public final void recycle()
 	{
+		assert(!(_frozen = false));
 		reset();
 		_owner.push(this);
 	}
@@ -110,6 +117,36 @@ public class PointSet
     	for (int i=getSize(); --i>=0;)
     		assert board[get(i)]==EMPTY : "\n" + GoArray.toString(board) + "\n";    		
     	
+    	return true;
+	}
+	
+	public boolean freeze()
+	{
+		return (_frozen = true);
+	}
+	
+	public boolean unfreeze()
+	{
+		return !(_frozen = false);
+	}
+	
+	public boolean hasPoint(int xy)
+	{
+		return (_pointIndex[xy]<_nrPoints && _pointList[_pointIndex[xy]]==xy);
+	}
+	
+	public boolean isSameSet(PointSet compare)
+	{
+    	for (int i=getSize(); --i>=0;)
+    	{
+    		if (!compare.hasPoint(get(i)))
+    			return false;
+    	}
+    	for (int i=compare.getSize(); --i>=0;)
+    	{
+    		if (!hasPoint(compare.get(i)))
+    			return false;
+    	}
     	return true;
 	}
 }

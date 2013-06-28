@@ -609,6 +609,7 @@ public class MonteCarloPluginAdministration
 			
 			_chain[xy] = xy;
 			_chainNext[xy] = xy;
+			assert(isChainConsistent(xy));
 			_stoneAge[xy] = _moveStack.getSize();
 			
 			addStone(xy);
@@ -624,21 +625,25 @@ public class MonteCarloPluginAdministration
 						_chain[xy] = _chain[next];
 						_chainNext[xy] = _chainNext[next];
 						_chainNext[next] = xy;
+						assert(isChainConsistent(xy));
 					}
 					else if (_chain[next]!=_chain[xy])
 					{
 						merged = true;
 						int mergeLocation = next;
+						int runner = next;
 						int chain = _chain[xy];
 						do
 						{
 							_chain[mergeLocation] = chain;
 							mergeLocation = _chainNext[mergeLocation];
+							assert( mergeLocation==next || mergeLocation!= (runner = _chainNext[_chainNext[runner]]));
 						}
 						while (mergeLocation!=next);
 						int temp = _chainNext[xy];
 						_chainNext[xy] = _chainNext[next];
 						_chainNext[next] = temp;
+						assert(isChainConsistent(xy));
 					}
 				}
 			}
@@ -696,10 +701,12 @@ public class MonteCarloPluginAdministration
 	private void addAtari(int xy, int lib)
 	{
 		int stone = xy;
+		int runner = xy;
 		do
 		{
 			_probabilityMap.add(lib);
 			stone = _chainNext[stone];
+			assert(stone==xy || (stone != (runner=_chainNext[_chainNext[runner]])));
 		}
 		while (stone!=xy);		
 	}
@@ -842,12 +849,27 @@ public class MonteCarloPluginAdministration
 
 		return nrLiberties;
 	}
+	
+	private boolean isChainConsistent(int chainXY)
+	{
+		int stoneXY = chainXY;
+		int runnerXY = chainXY;
+		do
+		{
+			stoneXY = _chainNext[stoneXY];
+			if (!(stoneXY==chainXY || stoneXY != (runnerXY = _chainNext[_chainNext[runnerXY]])))
+				return false; // Detect loop.
+		}
+		while (stoneXY!=chainXY);
+		return true;
+	}
 
 	private void removeCapturedChain(int xy)
 	{
 		assert !hasLiberty(xy) : SGFUtil.createSGF(getMoveStack());
 
 		int captive = xy;
+		int runner = xy;
 		do
 		{
 //			assert _board[captive]==_oppositeColor : SGFUtil.createSGF(getMoveStack());
@@ -858,6 +880,7 @@ public class MonteCarloPluginAdministration
 			removeStone(captive);
 			
 			captive = _chainNext[captive];
+			assert( captive==xy || captive != (runner = _chainNext[_chainNext[runner]]));
 		}
 		while (captive!=xy);		
 	}
@@ -890,6 +913,7 @@ public class MonteCarloPluginAdministration
 	{
 		byte[] board = _boardModel.getSingleArray();
 		int stone = xy;
+		int runner = xy;
 		do
 		{
 			if (board[left(stone)]==EMPTY)
@@ -902,6 +926,7 @@ public class MonteCarloPluginAdministration
 				return below(stone);
 			
 			stone = _chainNext[stone];
+			assert(stone==xy || stone!= (runner = _chainNext[_chainNext[runner]]));
 		}
 		while (stone!=xy);
  	
@@ -1389,7 +1414,7 @@ public class MonteCarloPluginAdministration
 	 */
 	public long getPositionalChecksum()
 	{
-		return _checksum.getValue();
+		return _checksum.getValue() + 13*_colorToPlay + (_koPoint==UNDEFINED_COORDINATE? 0:_koPoint*1313);
 //		if (_koPoint==UNDEFINED_COORDINATE)
 //			return _checksum.getValue() + getNrPasses()*13;
 //		return  _checksum.getValue() + _koPoint*17;
@@ -1795,6 +1820,7 @@ public class MonteCarloPluginAdministration
     protected boolean hasLiberty(int xy)
     {
 		int stone = xy;
+		int runner = xy;
 		do
 		{
 			// Note the checks are redundant, if everything is correct...
@@ -1815,6 +1841,7 @@ public class MonteCarloPluginAdministration
 				return true;
 			
 			stone = _chainNext[stone];
+			assert(stone==xy || stone != (runner = _chainNext[_chainNext[runner]]));
 		}
 		while (stone!=xy);
     	
@@ -2083,10 +2110,12 @@ public class MonteCarloPluginAdministration
 	{
 		int nrStones = 0;
 		int stone = xy;
+		int runner = xy;
 		do
 		{
 			nrStones++;
 			stone = _chainNext[stone];
+			assert(stone==xy || stone!= (runner = _chainNext[_chainNext[runner]]));
 		}
 		while (stone!=xy);
  	
@@ -2117,6 +2146,7 @@ public class MonteCarloPluginAdministration
 			if (boardValue==color)
 			{
 				int stone = next;
+				int runner = next;
 				do
 				{
 					nStones++;
@@ -2153,6 +2183,7 @@ public class MonteCarloPluginAdministration
 						hasFalsePoint = true;					
 
 					stone = _chainNext[stone];
+					assert(stone==next || stone != (runner = _chainNext[_chainNext[runner]]));
 				}
 				while (stone!=next);
 			}

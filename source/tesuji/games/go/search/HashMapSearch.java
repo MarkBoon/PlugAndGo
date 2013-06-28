@@ -127,7 +127,7 @@ public class HashMapSearch<MoveType extends Move>
 		if (_monteCarloAdministration!=null)
 		{
 		_rootResult = SearchResultFactory.createMonteCarloHashMapResult();
-		_rootResult.setPointSet(_monteCarloAdministration.getEmptyPoints(),(MonteCarloPluginAdministration)_monteCarloAdministration);
+		_rootResult.setPointSet((MonteCarloPluginAdministration)_monteCarloAdministration);
 
 		_hashMap.put(_monteCarloAdministration.getPositionalChecksum(),_rootResult);
 //		_rootResult.setExplorationFactor(_explorationFactor);
@@ -794,7 +794,7 @@ public class HashMapSearch<MoveType extends Move>
    				bestNode = SearchResultFactory.createMonteCarloHashMapResult();
    				bestNode.setXY(xy);
    				bestNode.setColor(color);
-   				bestNode.setPointSet(_searchAdministration.getEmptyPoints(),(MonteCarloPluginAdministration)_searchAdministration);
+   				bestNode.setPointSet((MonteCarloPluginAdministration)_searchAdministration);
 	    		_resultStack.push(bestNode);
    				return bestNode;
    			}

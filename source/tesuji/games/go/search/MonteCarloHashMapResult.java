@@ -10,7 +10,9 @@ import tesuji.games.go.common.GoConstant;
 import tesuji.games.go.common.GoMove;
 import tesuji.games.go.common.GoMoveFactory;
 import tesuji.games.go.monte_carlo.MonteCarloPluginAdministration;
+import tesuji.games.go.util.ArrayFactory;
 import tesuji.games.go.util.GoArray;
+import tesuji.games.go.util.IntStack;
 import tesuji.games.go.util.PointSet;
 import tesuji.games.go.util.PointSetFactory;
 
@@ -33,23 +35,25 @@ public class MonteCarloHashMapResult
 //	private GoMove		_move;
 	private int			_xy;
 	private byte		_color;
+//	private int			_koPoint;
 	private int			_totalPlayouts;
 	private int[]		_wins;
 	private int[]		_playouts;
 	private PointSet	_emptyPoints;
 	private float[]		_virtualWins;
 	private float[]		_virtualPlayouts;
-//	private double[]	_results;
 	private double		_logNrPlayouts;
 	private double		_beta;
 	private int			_age;
 	private long		_checksum;
 	private int			_bestMove;
 	private double		_bestResult;
-
+	public boolean		usedLastBest;
+	
 	private int _boardSize;
 	
-	private byte[] _board;
+//	private byte[] _board;
+//	private IntStack _moves;
 	
 	private SynchronizedArrayStack<MonteCarloHashMapResult> _owner;
 
@@ -66,28 +70,26 @@ public class MonteCarloHashMapResult
 		_playouts = GoArray.createIntegers();
 		_virtualWins = GoArray.createFloats();
 		_virtualPlayouts = GoArray.createFloats();
-//		_results = GoArray.createDoubles();
-		_board = GoArray.createBytes();
+//		_board = GoArray.createBytes();
+//		_moves = new ArrayFactory().createIntStack();
 	}
 	
-	public void setPointSet(PointSet set, MonteCarloPluginAdministration administration)
+	public void setPointSet(MonteCarloPluginAdministration administration)
 	{
 		MersenneTwisterFast random = administration.RANDOM;
 		_boardSize = administration.getBoardSize();
-		if (administration.getBoardArray()!=null)
-			GoArray.copy(administration.getBoardArray(), _board);
-//		for (int size = set.getSize(); size>0; size--)
+
+//		_koPoint = administration.getKoPoint();
+//
+//		if (administration.getBoardArray()!=null)
 //		{
-//			int xy = set.get(size-1);
-//			if (administration.isLegal(xy) && !administration.isVerboten(xy))
-//			{
-//				_emptyPoints.add(xy);
-//				_virtualPlayouts[xy] = 0;
-//				_virtualWins[xy] = 0;
-//			}
+//			GoArray.copy(administration.getBoardArray(), _board);
+//			_moves.copyFrom(administration.getMoveStack());
 //		}
+
+		assert(_emptyPoints.getSize()==0);
 		PointSet copy = PointSetFactory.createPointSet();
-		copy.copyFrom(set);
+		copy.copyFrom(administration.getEmptyPoints());
 		for (int size = copy.getSize(); size>0; size--)
 		{
 			int xy = copy.get(random.nextInt(size));
@@ -106,9 +108,10 @@ public class MonteCarloHashMapResult
 			_virtualWins[GoConstant.PASS] = 0;
 			_emptyPoints.add(GoConstant.PASS);
 		}
+		assert(_emptyPoints.freeze());
 	}
 	
-	void init()
+	protected void init()
 	{
 		_xy = GoConstant.UNDEFINED_COORDINATE;
 		_logNrPlayouts = 0.0;
@@ -116,6 +119,7 @@ public class MonteCarloHashMapResult
 		_totalPlayouts = 0;
 		_bestMove = GoConstant.PASS;
 		_bestResult = -1.0;
+		usedLastBest = false;
 		
 		_emptyPoints.clear();
 		GoArray.clear(_playouts);
@@ -133,6 +137,7 @@ public class MonteCarloHashMapResult
 //			_move.recycle();
 //		_move = null;
 
+    	assert(_emptyPoints.unfreeze());
 		_owner.push(this);
     }
 
@@ -270,10 +275,13 @@ public class MonteCarloHashMapResult
 		double bestResult = computeResult(_bestMove);
 		if (_bestMove!=GoConstant.PASS && bestResult>_bestResult)
 		{
+			assert(bestResult>0.0);
+			usedLastBest = true;
 			// What was previously the best move, most likely still is as it only got better.
 			_bestResult = bestResult;
 			return _bestMove;
 		}
+		usedLastBest = false;
 
 		for (int i=_emptyPoints.getSize(); --i>=0;)
 		{
@@ -295,6 +303,7 @@ public class MonteCarloHashMapResult
 		}
 		_bestMove = bestMove;
 		_bestResult = bestResult;
+		assert(bestResult>=0.0);
 		return bestMove;
 	}
 	
@@ -404,7 +413,7 @@ public class MonteCarloHashMapResult
 		StringBuilder out = new StringBuilder();
 		
 		out.append("\nHashMapSearch\n");
-		out.append(GoArray.toString(_board));
+//		out.append(GoArray.toString(_board));
 		GoMove move = GoMoveFactory.getSingleton().createMove(getBestMove(), ColorConstant.opposite(_color));
 		out.append(move.toString()+"\n");
 		for (int row=1; row<=_boardSize; row++)

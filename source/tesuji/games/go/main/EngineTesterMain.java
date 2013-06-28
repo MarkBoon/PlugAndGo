@@ -12,6 +12,7 @@ import tesuji.core.util.LoggerConfigurator;
 import tesuji.games.general.ColorConstant;
 import tesuji.games.general.MoveStack;
 import tesuji.games.go.common.BasicGoMoveAdministration;
+import tesuji.games.go.common.GoConstant;
 import tesuji.games.go.common.GoEngine;
 import tesuji.games.go.common.GoMove;
 import tesuji.games.go.common.GoMoveFactory;
@@ -110,7 +111,7 @@ public class EngineTesterMain
 		engine1.clearBoard();
 		engine2.clearBoard();
 		
-		GoMove move;
+		GoMove move = null;
 		while (!administration.isGameFinished())
 		{
 			if (administration.getColorToMove()==ColorConstant.BLACK)
@@ -118,6 +119,8 @@ public class EngineTesterMain
 			else
 				move = engine2.requestMove(ColorConstant.WHITE);
 			administration.playMove(move);
+			if (move.getXY()==GoConstant.RESIGN)
+				break;
 			engine1.playMove(move);
 			engine2.playMove(move);
 		}
@@ -201,6 +204,9 @@ public class EngineTesterMain
 	{
 		double score = administration.getScore();
 		String winner = (((score>0.0) ^ alt) ? "B+" : "W+")+Math.abs(score);
+		if (administration.getLastMove().isResignation())
+			winner = (administration.getColorToMove()==ColorConstant.BLACK ? "B+R" : "W+R");
+
 		try
 		{
 			FileWriter writer = new FileWriter(dataFile+".dat",true);

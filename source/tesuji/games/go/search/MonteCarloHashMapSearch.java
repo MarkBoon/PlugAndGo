@@ -34,7 +34,7 @@ public class MonteCarloHashMapSearch
 	protected MonteCarloAdministration<GoMove> _monteCarloAdministration;
 //	private HashMap<Integer, MonteCarloHashMapResult> _hashMap = new HashMap<Integer, MonteCarloHashMapResult>();
 //	private ConcurrentHashMap<Integer, MonteCarloHashMapResult> _hashMap = new ConcurrentHashMap<Integer, MonteCarloHashMapResult>();
-	private NonBlockingHashMapLong<MonteCarloHashMapResult> _hashMap = new NonBlockingHashMapLong<MonteCarloHashMapResult>();
+	private NonBlockingHashMapLong<MonteCarloHashMapResult> _hashMap = new NonBlockingHashMapLong<MonteCarloHashMapResult>(false);
 	private MonteCarloHashMapResult _rootResult;
 	private int _nrPlayouts;
 	private int _nrSimulationsBeforeExpansion = 1;
@@ -104,7 +104,7 @@ public class MonteCarloHashMapSearch
 			if (_rootResult==null)
 			{
 				_rootResult = SearchResultFactory.createMonteCarloHashMapResult();
-				_rootResult.setPointSet(_monteCarloAdministration.getEmptyPoints(),(MonteCarloPluginAdministration)_monteCarloAdministration);
+				_rootResult.setPointSet((MonteCarloPluginAdministration)_monteCarloAdministration);
 				_rootResult.setXY(GoConstant.PASS);
 				_rootResult.setColor(opposite(_monteCarloAdministration.getColorToMove()));
 				_rootResult.setAge(_monteCarloAdministration.getMoveStack().getSize());
@@ -198,9 +198,9 @@ public class MonteCarloHashMapSearch
 		long time1 = System.currentTimeMillis();
 		long time2;
 		long timeLimit = calculateTimeLimit();
-//		if (isOptimizeNodeLimit())
-//			_nodeLimit = calculateNodeLimit();
-//		else
+		if (isOptimizeNodeLimit())
+			_nodeLimit = calculateNodeLimit();
+		else
 			_nodeLimit = _minimumNrNodes;
 		
 		// Create a thread for each available processor and start a search in it.
@@ -504,7 +504,7 @@ public class MonteCarloHashMapSearch
 	    		byte color = _searchAdministration.getColorToMove();
 //	   			GoMove move = GoMoveFactory.getSingleton().createMove(xy, _searchAdministration.getColorToMove());
 	    		_moveStack.push(xy);
-	    		assert(_searchAdministration.isLegal(xy));
+	    		assert(xy==GoConstant.PASS || _searchAdministration.isLegal(xy));
 	   			_searchAdministration.playExplorationMove(xy);
 	
 	   			long checksum = _searchAdministration.getPositionalChecksum();
@@ -522,7 +522,7 @@ public class MonteCarloHashMapSearch
 	   				bestNode.setXY(xy);
 	   				bestNode.setColor(color);
 	   				bestNode.setAge(_searchAdministration.getMoveStack().getSize());
-	   				bestNode.setPointSet(_searchAdministration.getEmptyPoints(),(MonteCarloPluginAdministration)_searchAdministration);
+	   				bestNode.setPointSet((MonteCarloPluginAdministration)_searchAdministration);
 	   				bestNode.setChecksum(checksum);
 
 		    		_resultStack.push(bestNode);
@@ -595,4 +595,14 @@ public class MonteCarloHashMapSearch
 		_useAMAF = useAMAF;
 	}
 
+
+	public boolean isOptimizeNodeLimit()
+	{
+		return _optimizeNodeLimit;
+	}
+
+	public void setOptimizeNodeLimit(boolean optimizeNodeLimit)
+	{
+		_optimizeNodeLimit = optimizeNodeLimit;
+	}
 }
