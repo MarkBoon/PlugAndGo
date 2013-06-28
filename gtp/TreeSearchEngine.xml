@@ -96,7 +96,7 @@
 						<property name="simulationMoveFilterList">
 							<list>
 								<ref bean="eyeMoveFilter"/>
-								<ref bean="autoAtariFilter"/>
+								<!--<ref bean="autoAtariFilter"/>-->
 							</list>
 						</property>
 						<property name="explorationMoveFilterList">
@@ -117,6 +117,9 @@
 						</property>
 						<property name="explorationMoveGeneratorList">
 							<list>
+								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"><property name="urgency"><value>10</value></property></bean>
+								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"><property name="urgency"><value>8</value></property></bean>
+								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"><property name="urgency"><value>6</value></property></bean>
 								<!--<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"><property name="urgency"><value>5</value></property></bean>
 								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"><property name="urgency"><value>5</value></property></bean>
 								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"><property name="urgency"><value>5</value></property></bean>
@@ -135,13 +138,13 @@
 		  			<value>1</value>
 		  		</property>
 		  		<property name="minimumNrNodes">
-		  			<value>2000</value>
+		  			<value>20000</value>
 		  		</property>
 		  		<property name="useAMAF">
 		  			<value>true</value>
 		  		</property>
 		  		<property name="nrSimulationsBeforeExpansion">
-		  			<value>1</value>
+		  			<value>4</value>
 		  		</property>
 		  		<property name="isTestVersion">
 		  			<value>false</value>
@@ -228,13 +231,13 @@
 		  			<value>1</value>
 		  		</property>
 		  		<property name="minimumNrNodes">
-		  			<value>2000</value>
+		  			<value>20000</value>
 		  		</property>
 		  		<property name="useAMAF">
 		  			<value>true</value>
 		  		</property>
 		  		<property name="nrSimulationsBeforeExpansion">
-		  			<value>1</value>
+		  			<value>4</value>
 		  		</property>
 		  		<property name="isTestVersion">
 		  			<value>false</value>

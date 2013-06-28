@@ -1117,7 +1117,10 @@ public class MonteCarloPluginAdministration
 				MoveGenerator generator = moveGeneratorList.get(i);
 				int xy = generator.generate();
 				if (xy!=UNDEFINED_COORDINATE)
-					return xy;
+				{
+					_probabilityMap.add(xy,generator.getWeight());
+//					return xy;
+				}
 			}
 		}
 		
@@ -1983,6 +1986,11 @@ public class MonteCarloPluginAdministration
 				_simulationMoveSupport.addBoardModelListener((BoardModelListener)generator);
 			generator.register(this);
     	}
+    }
+    
+    public List<MoveGenerator> getExplorationMoveGeneratorList()
+    {
+    	return _explorationMoveGeneratorList;
     }
     
     public void setExplorationMoveGeneratorList(List<MoveGenerator> list)

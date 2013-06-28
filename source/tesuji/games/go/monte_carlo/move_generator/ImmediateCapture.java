@@ -2,6 +2,7 @@ package tesuji.games.go.monte_carlo.move_generator;
 
 import static tesuji.games.go.common.GoConstant.PASS;
 import static tesuji.games.go.common.GoConstant.UNDEFINED_COORDINATE;
+import tesuji.games.go.search.MonteCarloHashMapResult;
 import tesuji.games.go.tactics.TacticsConstant;
 import tesuji.games.go.util.Statistics;
 
@@ -34,8 +35,8 @@ public class ImmediateCapture extends LadderMoveGenerator
 				int captureXY = administration.getLiberty(previousMove);
 				if (administration.isLegal(captureXY))
 				{
-					administration.getProbabilityMap().add(captureXY, 0.4);
-//					return captureXY;
+					//administration.getProbabilityMap().add(captureXY, 0.4);
+					return captureXY;
 				}
 			}
 		}
