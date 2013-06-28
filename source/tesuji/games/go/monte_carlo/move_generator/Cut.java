@@ -23,7 +23,7 @@ public class Cut extends LadderMoveGenerator
 			{
 				int neighbour = FourCursor.getNeighbour(xy, n);
 				if (isCut(neighbour,color) && isSafeToMove(neighbour))
-					administration.getProbabilityMap().add(neighbour, getWeight());
+					return neighbour;
 			}
 		}
 		
@@ -42,9 +42,23 @@ public class Cut extends LadderMoveGenerator
 			return false;
 		
 		byte otherColor = opposite(color);
-		if (board[left(xy)]==otherColor && board[above(xy)]==otherColor
-				&& board[left(above(xy))]==color && liberties[chain[left(above(xy))]]!=1
-				&& (board[right(xy)]==color || board[below(xy)]==color))
+		if (board[left(xy)]==otherColor && board[above(xy)]==otherColor && board[left(above(xy))]==color
+			&& liberties[chain[left(above(xy))]]!=1 && (board[right(xy)]==color || board[below(xy)]==color))
+			return true;
+		if (board[left(xy)]==otherColor && board[below(xy)]==otherColor && board[left(below(xy))]==color
+			&& liberties[chain[left(below(xy))]]!=1 && (board[right(xy)]==color || board[above(xy)]==color))
+			return true;
+		if (board[right(xy)]==otherColor && board[above(xy)]==otherColor && board[right(above(xy))]==color
+			&& liberties[chain[right(above(xy))]]!=1 && (board[left(xy)]==color || board[below(xy)]==color))
+			return true;
+		if (board[right(xy)]==otherColor && board[below(xy)]==otherColor && board[right(below(xy))]==color
+			&& liberties[chain[right(below(xy))]]!=1 && (board[left(xy)]==color || board[above(xy)]==color))
+			return true;
+		
+		otherColor = color;
+		color = opposite(color);
+		if (board[left(xy)]==otherColor && board[above(xy)]==otherColor && board[left(above(xy))]==color
+			&& liberties[chain[left(above(xy))]]!=1 && (board[right(xy)]==color || board[below(xy)]==color))
 			return true;
 		if (board[left(xy)]==otherColor && board[below(xy)]==otherColor && board[left(below(xy))]==color
 			&& liberties[chain[left(below(xy))]]!=1 && (board[right(xy)]==color || board[above(xy)]==color))

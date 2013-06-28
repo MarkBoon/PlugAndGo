@@ -432,7 +432,10 @@ public class MonteCarloHashMapSearch
 
 				if (node != null)
 				{
+					int bestXY = node.getBestVirtualMove();
+					_searchAdministration.playMove(bestXY);
 					boolean blackWins = _searchAdministration.playout();
+					node.increaseWins(bestXY, blackWins);
 					setNrSimulatedMoves(getNrSimulatedMoves() + _searchAdministration.getNrSimulatedMoves());
 			    	adjustTreeValue(blackWins);
 

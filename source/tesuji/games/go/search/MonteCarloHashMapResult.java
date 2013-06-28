@@ -299,7 +299,7 @@ public class MonteCarloHashMapResult
 			if (result>bestResult)
 				better = true;
 			else if (result==bestResult)
-				better = (bestMove==GoConstant.PASS || _playouts[next] > _playouts[bestMove]);	// TODO: check '<' instead of '>', see which plays better.
+				better = (bestMove==GoConstant.PASS || _virtualPlayouts[next] > _virtualPlayouts[bestMove]);
 			else
 				better = false;
 			

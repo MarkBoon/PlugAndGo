@@ -23,7 +23,7 @@ public class Connect extends LadderMoveGenerator
 			{
 				int neighbour = EightCursor.getNeighbour(xy, n);
 				if (isConnection(neighbour,oppositeColor) && isSafeToMove(neighbour))
-					administration.getProbabilityMap().add(neighbour, getWeight());
+					return neighbour;
 			}
 		}
 		

@@ -478,7 +478,7 @@ public class MonteCarloPluginAdministration
 		return xy;
 	}
 	
-	private void playMove(int xy)
+	public void playMove(int xy)
 	{
 		_moveStack.push(xy);		
 		play(xy);

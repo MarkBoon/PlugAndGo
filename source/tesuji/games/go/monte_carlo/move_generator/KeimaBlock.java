@@ -22,7 +22,7 @@ public class KeimaBlock extends LadderMoveGenerator
 			{
 				int neighbour = FourCursor.getNeighbour(xy, n);
 				if ((isKeimaBlock(neighbour,ColorConstant.BLACK) || isKeimaBlock(neighbour,ColorConstant.WHITE)) && isSafeToMove(neighbour))
-					administration.getProbabilityMap().add(neighbour, getWeight());
+					return neighbour;
 			}
 		}
 		
