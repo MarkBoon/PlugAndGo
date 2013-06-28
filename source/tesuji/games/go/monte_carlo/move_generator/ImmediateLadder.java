@@ -38,8 +38,8 @@ public class ImmediateLadder extends LadderMoveGenerator
 				int ladderXY = _ladderReader.getLastLadderMove();
 				if (administration.isLegal(ladderXY))
 				{
-					administration.getProbabilityMap().add(ladderXY, 0.3);
-					//return ladderXY;
+					//administration.getProbabilityMap().add(ladderXY, 0.3);
+					return ladderXY;
 				}
 			}
 		}

@@ -10,6 +10,7 @@ import tesuji.games.go.common.GoConstant;
 import tesuji.games.go.common.GoMove;
 import tesuji.games.go.common.GoMoveFactory;
 import tesuji.games.go.monte_carlo.MonteCarloPluginAdministration;
+import tesuji.games.go.monte_carlo.move_generator.MoveGenerator;
 import tesuji.games.go.util.ArrayFactory;
 import tesuji.games.go.util.GoArray;
 import tesuji.games.go.util.IntStack;
@@ -107,6 +108,13 @@ public class MonteCarloHashMapResult
 			_virtualPlayouts[GoConstant.PASS] = 0;
 			_virtualWins[GoConstant.PASS] = 0;
 			_emptyPoints.add(GoConstant.PASS);
+		}
+		
+		for (MoveGenerator generator : administration.getExplorationMoveGeneratorList())
+		{
+			int xy = generator.generate();
+			if (xy!=GoConstant.UNDEFINED_COORDINATE)
+				increaseVirtualPlayouts(xy, generator.getUrgency(), generator.getUrgency());
 		}
 		assert(_emptyPoints.freeze());
 	}
