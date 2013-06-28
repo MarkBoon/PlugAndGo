@@ -352,6 +352,9 @@ public class MonteCarloHashMapSearch
     public void clear()
     {
 		_monteCarloAdministration.clear();    
+		for (MonteCarloHashMapResult r : _hashMap.values())
+				r.recycle();
+		_hashMap.clear();
 	}
     
 //	@Override

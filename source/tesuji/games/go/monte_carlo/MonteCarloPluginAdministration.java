@@ -751,7 +751,7 @@ public class MonteCarloPluginAdministration
 			clone._explorationMoveGeneratorList.add(clonedGenerator);
 			clonedGenerator.register(clone);
 			if (clonedGenerator instanceof BoardModelListener)
-				clone._simulationMoveSupport.addBoardModelListener((BoardModelListener)clonedGenerator);
+				clone._explorationMoveSupport.addBoardModelListener((BoardModelListener)clonedGenerator);
 		}
 		
 		clone.copyDataFrom(this);
