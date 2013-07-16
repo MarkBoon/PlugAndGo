@@ -41,6 +41,17 @@ public class Cut extends LadderMoveGenerator
 		if (board[xy]!=ColorConstant.EMPTY || blackNeighbours[xy]==0 || whiteNeighbours[xy]==0)
 			return false;
 		
+		if (administration.isFirstRow(xy))
+		{
+			if (blackNeighbours[xy]>=2 && whiteNeighbours[xy]>=2 && (board[left(xy)]==board[right(xy)] || board[below(xy)]==board[above(xy)]))
+				return true;
+		}
+		else
+		{
+			if (blackNeighbours[xy]==2 && whiteNeighbours[xy]==2 && board[left(xy)]==board[right(xy)])
+				return true;
+		}
+		
 		byte otherColor = opposite(color);
 		if (board[left(xy)]==otherColor && board[above(xy)]==otherColor && board[left(above(xy))]==color
 			&& liberties[chain[left(above(xy))]]!=1 && (board[right(xy)]==color || board[below(xy)]==color))
