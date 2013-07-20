@@ -2300,6 +2300,16 @@ public class MonteCarloPluginAdministration
     	return _maxDiagonalsOccupied;
     }
     
+    public byte[] getOwnNeighbourAray()
+    {
+    	return _ownNeighbours;
+    }
+    
+    public byte[] getOtherNeighbourAray()
+    {
+    	return _otherNeighbours;
+    }    
+    
     public byte[] getOwnDiagonalAray()
     {
     	return _ownDiagonalNeighbours;

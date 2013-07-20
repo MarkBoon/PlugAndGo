@@ -4,8 +4,6 @@ import static tesuji.games.go.common.GoConstant.UNDEFINED_COORDINATE;
 import tesuji.core.util.ArrayList;
 import tesuji.games.general.ColorConstant;
 import tesuji.games.go.monte_carlo.MonteCarloPluginAdministration;
-import tesuji.games.go.pattern.common.HibernatePatternManager;
-import tesuji.games.go.pattern.common.PatternGroup;
 import tesuji.games.go.pattern.common.PatternManager;
 import tesuji.games.go.pattern.incremental.IncrementalPatternMatcher;
 import tesuji.games.go.pattern.incremental.PatternMatch;

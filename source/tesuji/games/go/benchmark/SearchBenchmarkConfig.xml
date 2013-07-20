@@ -139,8 +139,9 @@
 				</property>
 				<property name="simulationMoveGeneratorList">
 					<list>
-						<!--<bean class="tesuji.games.go.monte_carlo.move_generator.TobiBlock" singleton="false"/>
-						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"/>
+						<bean class="tesuji.games.go.monte_carlo.move_generator.FirstLineAtari" singleton="false"/>
+						<bean class="tesuji.games.go.monte_carlo.move_generator.FirstLineBlock" singleton="false"/>
+						<!--<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"/>
 						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"/>
 						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"/>
 						<ref bean="patternMatcher"/>-->
