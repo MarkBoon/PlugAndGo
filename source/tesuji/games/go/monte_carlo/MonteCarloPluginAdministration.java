@@ -383,6 +383,11 @@ public class MonteCarloPluginAdministration
 		return _maxDiagonalsOccupied[xy]==1;
 	}
 	
+	public boolean isSecondRow(int xy)
+	{
+		return _maxDiagonalsOccupied[xy]==2;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see tesuji.games.go.monte_carlo.MonteCarloAdministration#copyDataFrom(tesuji.games.go.monte_carlo.MonteCarloAdministration)

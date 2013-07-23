@@ -127,7 +127,7 @@ public class EngineTesterMain
 		writeResult(administration,engine1,engine2);
 	}
 	
-	private static void setup(BasicGoMoveAdministration administration, GoEngine engine1, GoEngine engine2)
+	static void setup(BasicGoMoveAdministration administration, GoEngine engine1, GoEngine engine2)
 	{
 		String[] diagram = new String[]{
 						".XX.XXXX.",
@@ -233,7 +233,7 @@ public class EngineTesterMain
 		}
 	}
 	
-	private static void writeGameRecord(BasicGoMoveAdministration administration, double score, GoEngine engine1, GoEngine engine2)
+	static void writeGameRecord(BasicGoMoveAdministration administration, double score, GoEngine engine1, GoEngine engine2)
 	{
 		Date date = new Date();
 		String winner = (((score>0.0) ^ !alt) ? "B" : "W");

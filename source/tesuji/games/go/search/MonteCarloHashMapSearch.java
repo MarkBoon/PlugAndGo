@@ -52,7 +52,9 @@ public class MonteCarloHashMapSearch
 	
 	private static long _nrGeneratedMoves;
 	private static long _totalNrPlayouts;
-	private static int _averagePlayouts;
+	
+	@SuppressWarnings("unused")
+    private static int _averagePlayouts;
 
 	private SearchProperties _searchProperties;
 

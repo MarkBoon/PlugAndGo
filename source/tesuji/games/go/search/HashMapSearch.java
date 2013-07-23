@@ -34,7 +34,6 @@ import org.cliffc.high_scale_lib.NonBlockingHashMapLong;
 
 import tesuji.core.util.ArrayStack;
 
-import tesuji.games.general.Checksum;
 import tesuji.games.general.Move;
 import tesuji.games.general.MoveIterator;
 import tesuji.games.general.TreeNode;
@@ -48,7 +47,6 @@ import tesuji.games.go.monte_carlo.MonteCarloAdministration;
 import tesuji.games.go.monte_carlo.MonteCarloPluginAdministration;
 
 import tesuji.games.go.common.GoConstant;
-import tesuji.games.go.common.GoMove;
 import tesuji.games.go.common.GoMoveFactory;
 import tesuji.games.go.util.DefaultDoubleArrayProvider;
 import tesuji.games.go.util.GoArray;
@@ -121,7 +119,6 @@ public class HashMapSearch<MoveType extends Move>
 		GoArray.clear(_ownershipArray);
 	}
 	
-	@SuppressWarnings("unchecked")
 	protected void initRoot()
 	{
 		if (_monteCarloAdministration!=null)
@@ -436,7 +433,8 @@ public class HashMapSearch<MoveType extends Move>
 	/* (non-Javadoc)
 	 * @see tesuji.games.general.search.Search#playMove(java.lang.Object)
 	 */
-	public void playMove(MoveType move)
+	@SuppressWarnings("unchecked")
+    public void playMove(MoveType move)
 	{
 		_monteCarloAdministration.playMove((MoveType)move.cloneMove());
 

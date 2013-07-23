@@ -11,9 +11,7 @@ import tesuji.games.go.common.GoMove;
 import tesuji.games.go.common.GoMoveFactory;
 import tesuji.games.go.monte_carlo.MonteCarloPluginAdministration;
 import tesuji.games.go.monte_carlo.move_generator.MoveGenerator;
-import tesuji.games.go.util.ArrayFactory;
 import tesuji.games.go.util.GoArray;
-import tesuji.games.go.util.IntStack;
 import tesuji.games.go.util.PointSet;
 import tesuji.games.go.util.PointSetFactory;
 

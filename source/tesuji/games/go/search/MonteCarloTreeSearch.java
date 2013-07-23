@@ -242,7 +242,7 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 		return bestNode.getContent().getMove();
 	}
 	
-	private void dump()
+	void dump()
 	{
 		int[] wins = GoArray.createIntegers();
 		int[] playouts = GoArray.createIntegers();
@@ -540,7 +540,8 @@ public class MonteCarloTreeSearch<MoveType extends Move>
 	/* (non-Javadoc)
 	 * @see tesuji.games.general.search.Search#playMove(java.lang.Object)
 	 */
-	public void playMove(MoveType move)
+	@SuppressWarnings("unchecked")
+    public void playMove(MoveType move)
 	{
 		_monteCarloAdministration.playMove((MoveType)move.cloneMove());
 

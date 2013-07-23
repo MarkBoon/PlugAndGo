@@ -35,7 +35,6 @@ import tesuji.core.util.LoggerConfigurator;
 import tesuji.games.general.ColorConstant;
 import tesuji.games.general.search.Search;
 import tesuji.games.general.search.SearchProperties;
-import tesuji.games.general.search.SearchResult;
 import tesuji.games.go.common.GoMove;
 import tesuji.games.go.util.GoGameProperties;
 
