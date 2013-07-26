@@ -20,6 +20,8 @@ import tesuji.games.general.search.SearchResult;
 import tesuji.games.go.common.GoConstant;
 import tesuji.games.go.common.GoMove;
 import tesuji.games.go.common.GoMoveFactory;
+import tesuji.games.go.joseki.MCBook;
+import tesuji.games.go.joseki.MCJosekiEntry;
 import tesuji.games.go.monte_carlo.MonteCarloAdministration;
 import tesuji.games.go.monte_carlo.MonteCarloPluginAdministration;
 import tesuji.games.go.util.GoArray;
@@ -58,6 +60,8 @@ public class MonteCarloHashMapSearch
 
 	private SearchProperties _searchProperties;
 
+	private MCBook _book;
+	
 	public MonteCarloHashMapSearch()
 	{	
 		initRoot();
@@ -86,7 +90,6 @@ public class MonteCarloHashMapSearch
 	
 	private void initRoot()
 	{
-
 		if (_monteCarloAdministration!=null)
 		{
 			_nrSets = 0;
@@ -113,6 +116,39 @@ public class MonteCarloHashMapSearch
 				_rootResult.setChecksum(checksum);
 	
 				_hashMap.put(checksum,_rootResult);
+			}
+			
+			if (_book==null)
+			{
+				if (_monteCarloAdministration.getMoveStack().getSize()<10)
+				{
+					if (_monteCarloAdministration.getBoardSize()==9)
+					{
+						try
+						{
+							_book = new MCBook("Joseki9x9.txt");
+							_book.read();
+						}
+						catch (Exception ex)
+						{
+							System.err.println(ex.getMessage());
+						}
+					}
+				}
+			}
+			if (_book!=null)
+			{
+				MCJosekiEntry entry = _book.get(checksum);
+				if (entry!=null)
+				{
+					for (int i=0; i<entry.xy.length; i++)
+						_rootResult.increaseVirtualPlayouts(entry.xy[i], entry.wins[i], entry.played[i]);
+				}
+				if (_monteCarloAdministration.getMoveStack().getSize()>10)
+				{
+					_book.save();
+					_book = null;
+				}
 			}
 		}
 	}
@@ -268,6 +304,38 @@ public class MonteCarloHashMapSearch
 //		fillOwnershipArray();
 		
 		int xy = _rootResult.getBestMove();
+		
+		if (_book!=null)
+		{
+			MCJosekiEntry entry = _book.get(_rootResult.getChecksum());
+			if (entry==null && _monteCarloAdministration.getMoveStack().getSize()<10)
+			{
+				entry = new MCJosekiEntry();
+				entry.setChecksum(_rootResult.getChecksum());
+				entry.setTimestamp(System.currentTimeMillis());
+				int nrPoints = _rootResult.getEmptyPoints().getSize();
+				entry.xy = new int[nrPoints];
+				entry.wins = new long[nrPoints];
+				entry.played = new long[nrPoints];
+				for (int i=0; i<nrPoints; i++)
+				{
+					int entryXY = _rootResult.getEmptyPoints().get(i);
+					entry.xy[i] = entryXY;
+				}
+				_book.put(entry);
+			}
+			
+			if (entry!=null)
+			{
+				for (int i=0; i<entry.xy.length; i++)
+				{
+					int entryXY = entry.xy[i];
+					entry.wins[i] +=_rootResult.getWins(entryXY);
+					entry.played[i] +=_rootResult.getPlayouts(entryXY);
+					entry.setOccurences(entry.getOccurences()+1);
+				}
+			}
+		}
 //		TreeNode<MonteCarloTreeSearchResult<MoveType>> secondBestNode = getSecondBestChildNode(_rootNode,bestNode);
 //		_logger.info("Second-best: "+secondBestNode.getContent());
 		if (xy==GoConstant.PASS)
@@ -533,6 +601,16 @@ public class MonteCarloHashMapSearch
 	   				bestNode.setPointSet((MonteCarloPluginAdministration)_searchAdministration);
 	   				bestNode.setChecksum(checksum);
 
+	   				if (_book!=null)
+	   				{
+	   					MCJosekiEntry entry = _book.get(checksum);
+	   					if (entry!=null)
+	   					{
+	   						for (int i=0; i<entry.xy.length; i++)
+	   							bestNode.increaseVirtualPlayouts(entry.xy[i], entry.wins[i], entry.played[i]);
+	   					}
+	   				}
+	   				
 		    		_resultStack.push(bestNode);
 		    		_hashMap.put(checksum, bestNode);
 	   				return bestNode;

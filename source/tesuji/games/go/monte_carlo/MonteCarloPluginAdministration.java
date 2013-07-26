@@ -682,7 +682,24 @@ public class MonteCarloPluginAdministration
 //						addAtari(next,lib);
 //					}
 				}
+//				if (board[next]==EMPTY)
+//				{
+//					if (_blackNeighbours[next]==0 || _whiteNeighbours[next]==0)
+//						_probabilityMap.subtract(next,ProbabilityMap.DEFAULT/8.0);
+//					else
+//						resetNeighbourValue(next);
+//				}
 			}
+			
+//			if (board[left(above(xy))]==EMPTY)
+//				subtractNeighbourValue(left(above(xy)),ProbabilityMap.DEFAULT/8.0);
+//			if (board[left(below(xy))]==EMPTY)
+//				subtractNeighbourValue(left(below(xy)),ProbabilityMap.DEFAULT/8.0);
+//			if (board[right(above(xy))]==EMPTY)
+//				subtractNeighbourValue(right(above(xy)),ProbabilityMap.DEFAULT/8.0);
+//			if (board[right(below(xy))]==EMPTY)
+//				subtractNeighbourValue(right(below(xy)),ProbabilityMap.DEFAULT/8.0);
+
 //			if (_liberties[_chain[xy]]==1)
 //			{
 //				int lib = getLiberty(xy);
@@ -701,6 +718,17 @@ public class MonteCarloPluginAdministration
 		assert _probabilityMap.isConsistent();
 		assert isLibertiesConsistent() : toString();
 		assert isProbabilityMapConsistent() : toString();
+	}
+	
+	private void subtractNeighbourValue(int xy, double value)
+	{
+		if (_blackNeighbours[xy]==0 || _whiteNeighbours[xy]==0)
+			_probabilityMap.subtract(xy, value);
+	}
+	
+	private void resetNeighbourValue(int xy)
+	{
+		_probabilityMap.add(xy, ProbabilityMap.DEFAULT*(double)(_ownNeighbours[xy]-1)+ProbabilityMap.DEFAULT*(double)_ownDiagonalNeighbours[xy]);
 	}
 	
 	private void addAtari(int xy, int lib)

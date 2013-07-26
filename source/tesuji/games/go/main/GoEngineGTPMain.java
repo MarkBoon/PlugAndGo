@@ -63,6 +63,7 @@ public class GoEngineGTPMain
 		{
 			engineName = args[0];
 			engineNameSet = true;
+			logger.info("with engine '"+engineName+"'");
 		}
 		
 		GoEngine engine = null;

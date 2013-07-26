@@ -211,6 +211,16 @@ public class MonteCarloHashMapResult
 //	    _playouts = playouts;
 //    }
 
+	public int getWins(int xy)
+    {
+	    return _wins[xy];
+    }
+
+	public int getPlayouts(int xy)
+    {
+	    return _playouts[xy];
+    }
+	
 	public int getPlayouts()
     {
 	    return _totalPlayouts;

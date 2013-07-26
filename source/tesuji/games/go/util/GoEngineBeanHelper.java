@@ -83,6 +83,8 @@ public class GoEngineBeanHelper
 						{
 							logger.debug("Loading bean "+bean);
 							BeanDefinition beanDefinition = factory.getBeanDefinition(bean);
+							if (beanDefinition==null)
+								throw new Exception("Couldn't find '"+bean+"' definition in XML files.");
 							MutablePropertyValues properties = beanDefinition.getPropertyValues();
 							PropertyValue value = properties.getPropertyValue("jar");
 							if (value!=null)
