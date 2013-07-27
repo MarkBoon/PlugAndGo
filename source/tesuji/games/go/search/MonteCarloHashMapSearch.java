@@ -354,7 +354,7 @@ public class MonteCarloHashMapSearch
 			}
 		}
 
-		if (entry==null && _monteCarloAdministration.getMoveStack().getSize()<10)
+		if (entry==null && _monteCarloAdministration.getMoveStack().getSize()<MCBook.MAX_MOVE)
 		{
 			entry = _book.load(_rootResult.getChecksum());
 			if (entry==null)

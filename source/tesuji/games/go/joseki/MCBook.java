@@ -5,6 +5,8 @@ import java.util.List;
 
 public class MCBook
 {
+	public static final int MAX_MOVE = 16;
+	
 	private HashMap<Long,MCJosekiEntry> _map;
 	
 	
