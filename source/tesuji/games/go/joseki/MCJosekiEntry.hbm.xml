@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+          "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+  <class name="tesuji.games.go.joseki.MCJosekiEntry" table="joseki">
+    <meta attribute="class-description">
+      Represents a Go opening pattern.
+      @author Mark Boon
+    </meta>
+
+    <id name="checksum" 			type="long"/>
+    <property name="timestamp" 		type="long"/>
+    <property name="occurrences" 	type="int"/>
+    <property name="stats" 			type="string"/>
+    
+  </class>
+</hibernate-mapping>

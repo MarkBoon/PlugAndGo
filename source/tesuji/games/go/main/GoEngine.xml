@@ -80,6 +80,9 @@
 		  		<property name="isTestVersion">
 		  			<value>false</value>
 		  		</property>
+				<property name="book">
+					<bean class="tesuji.games.go.joseki.MCBook" singleton="false"/>
+				</property>
 			</bean>
   		</constructor-arg>
   		<property name="isTestVersion">

@@ -1,73 +1,46 @@
 package tesuji.games.go.joseki;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.util.HashMap;
+import java.util.List;
 
 public class MCBook
-	implements Runnable
 {
-	private String _fileName;
 	private HashMap<Long,MCJosekiEntry> _map;
 	
 	
-	public MCBook(String fileName)
+	public MCBook()
 	{
-		_fileName = fileName;
 		_map = new HashMap<Long, MCJosekiEntry>();
 	}
 	
 	public void read()
 	{
-		try
-        {
-	        BufferedReader reader = new BufferedReader(new FileReader(_fileName));
-	        
-	        String line;
-	        while ((line=reader.readLine())!=null)
-	        {
-	        	MCJosekiEntry entry = MCJosekiEntry.parse(line);
-	        	_map.put(entry.getChecksum(), entry);
-	        }
-	        reader.close();
-        }
-        catch (Exception exception)
-        {
-	        exception.printStackTrace();
-        }
-	}
-	
-	public void save()
-	{
-		Thread t = new Thread(this);
-		t.start();
-	}
-	
-	public void run()
-	{
-		try
-        {
-	        BufferedWriter writer = new BufferedWriter(new FileWriter(_fileName));
-	        
-	        for (MCJosekiEntry entry : _map.values())
-	        {
-	        	writer.write(entry.toString());
-	        	writer.write("\n");
-	        }
-	        writer.flush();
-	        writer.close();
-        }
-        catch (Exception exception)
-        {
-	        exception.printStackTrace();
-        }
+		List<MCJosekiEntry> list = JosekiManager.getSingleton().getJosekiEntries();
+		for (MCJosekiEntry entry : list)
+			_map.put(entry.getChecksum(), entry);
 	}
 	
 	public MCJosekiEntry get(long checksum)
 	{
 		return _map.get(checksum);
+	}
+	
+	public MCJosekiEntry load(long checksum)
+	{
+		MCJosekiEntry entry =  _map.get(checksum);
+		if (entry!=null)
+		{
+			entry = JosekiManager.getSingleton().getJosekiEntry(checksum);
+			if (entry==null)
+			{
+				System.err.println("No entry found with checksum "+checksum);
+			}
+			else if (entry.getChecksum()!=checksum)
+			{
+				System.err.println("Inconsistent entry found with checksum "+checksum+" vs. entry.checksum "+entry.getChecksum());
+			}
+		}
+		return entry;
 	}
 	
 	public void put(MCJosekiEntry entry)

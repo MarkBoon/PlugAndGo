@@ -28,6 +28,10 @@ package tesuji.games.general;
 
 import static tesuji.games.general.ColorConstant.*;
 
+import tesuji.games.go.pattern.util.PatternUtil;
+import tesuji.games.go.util.GoArray;
+import tesuji.games.util.Point;
+
 /**
  * 
  */
@@ -35,7 +39,7 @@ public class Checksum
 {
 	public static final long UNINITIALIZED = -1;
 	
-	private long _checksum;
+	private long[] _checksum = new long[8];
 	
 	private static final long[] _randomChecksums = new long[]
 	{
@@ -114,45 +118,79 @@ public class Checksum
 		352391872,-1415813601,-2137663665,-1061937037
 	};
 
+	private static final long[][] _checksums = new long[8][_randomChecksums.length];			
+
 	static
 	{
 		for (int i=0; i<_randomChecksums.length; i++)
-			_randomChecksums[i] *= _randomChecksums[(i+113)%_randomChecksums.length];
+			_checksums[0][i] = _randomChecksums[i] * _randomChecksums[(i+113)%_randomChecksums.length];	
 	}
 	
 	public Checksum()
 	{
 		clear();
+		init(9);
+	}
+	
+	public void init(int boardSize)
+	{
+		int mid = (boardSize+1)/2;
+		Point p = new Point(0,0);
+		for (int orientation=1; orientation<8; orientation++)
+		{
+			for (int col=1; col<=boardSize; col++)
+			{
+				for (int row=1; row<=boardSize; row++)
+				{
+					int xy = GoArray.toXY(col, row);
+					int x = col - mid;
+					int y = row - mid;
+					PatternUtil.adjustOrientation(x, y, orientation, p);
+					_checksums[orientation][GoArray.toXY(p.x+mid, p.y+mid)] = _checksums[0][xy];
+				}
+			}
+		}		
 	}
 	
 	public final void clear()
 	{
-		_checksum = 0;
+		for (int i=0; i<8; i++)
+			_checksum[i] = 0;
 	}
 	
 	public final long getValue()
 	{
-		return _checksum;
+		return _checksum[0];
 	}
 	
-	public final void setValue(long checksum)
+	public final long getValue(int orientation)
 	{
-		_checksum = checksum;
+		return _checksum[orientation];
 	}
 	
 	public void add(int xy, byte color)
 	{
 		if (color==BLACK)
-			_checksum += _randomChecksums[xy];
+			for (int i=0; i<8; i++)
+				_checksum[i] += _checksums[i][xy];
 		else
-			_checksum -= _randomChecksums[xy];
+			for (int i=0; i<8; i++)
+				_checksum[i] -= _checksums[i][xy];
 	}
 	
 	public void remove(int xy, byte color)
 	{
 		if (color==BLACK)
-			_checksum -= _randomChecksums[xy];
+			for (int i=0; i<8; i++)
+				_checksum[i] -= _checksums[i][xy];
 		else
-			_checksum += _randomChecksums[xy];
+			for (int i=0; i<8; i++)
+				_checksum[i] += _checksums[i][xy];
+	}
+	
+	public void copyFrom(Checksum source)
+	{
+		for (int i=0; i<8; i++)
+			_checksum[i] = source._checksum[i];
 	}
 }

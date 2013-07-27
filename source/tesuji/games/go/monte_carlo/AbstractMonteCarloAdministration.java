@@ -349,7 +349,7 @@ public abstract class AbstractMonteCarloAdministration
 		
 		_emptyPoints.copyFrom(source._emptyPoints);
 		
-		_checksum.setValue(source._checksum.getValue());
+		_checksum.copyFrom(source._checksum);
 		
 		copy(source._boardModel.getSingleArray(),_boardModel.getSingleArray());
 		
@@ -752,6 +752,17 @@ public abstract class AbstractMonteCarloAdministration
 	public long getPositionalChecksum()
 	{
 		return _checksum.getValue();
+//		if (_koPoint==UNDEFINED_COORDINATE)
+//			return _checksum.getValue();
+//		return  _checksum.getValue() + _koPoint;
+	}
+	/*
+	 * (non-Javadoc)
+	 * @see tesuji.games.go.monte_carlo.MonteCarloAdministration#getPositionalChecksum()
+	 */
+	public long getPositionalChecksum(int orientation)
+	{
+		return _checksum.getValue(orientation);
 //		if (_koPoint==UNDEFINED_COORDINATE)
 //			return _checksum.getValue();
 //		return  _checksum.getValue() + _koPoint;

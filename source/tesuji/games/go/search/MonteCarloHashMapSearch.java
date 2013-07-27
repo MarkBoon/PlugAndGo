@@ -20,13 +20,16 @@ import tesuji.games.general.search.SearchResult;
 import tesuji.games.go.common.GoConstant;
 import tesuji.games.go.common.GoMove;
 import tesuji.games.go.common.GoMoveFactory;
+import tesuji.games.go.joseki.JosekiManager;
 import tesuji.games.go.joseki.MCBook;
 import tesuji.games.go.joseki.MCJosekiEntry;
 import tesuji.games.go.monte_carlo.MonteCarloAdministration;
 import tesuji.games.go.monte_carlo.MonteCarloPluginAdministration;
+import tesuji.games.go.pattern.util.PatternUtil;
 import tesuji.games.go.util.GoArray;
 import tesuji.games.go.util.IntStack;
 import tesuji.games.go.util.PointSet;
+import tesuji.games.util.Point;
 
 public class MonteCarloHashMapSearch
 	implements Search<GoMove>, PropertyChangeListener
@@ -60,6 +63,8 @@ public class MonteCarloHashMapSearch
 
 	private SearchProperties _searchProperties;
 
+	Point p = new Point();
+	
 	private MCBook _book;
 	
 	public MonteCarloHashMapSearch()
@@ -86,6 +91,16 @@ public class MonteCarloHashMapSearch
 		parseSearchProperties();
 		if (_monteCarloAdministration!=null)
 			_monteCarloAdministration.set(event.getPropertyName(),event.getNewValue().toString());
+    }
+    
+    public MCBook getBook()
+    {
+    	return _book;
+    }
+    public void setBook(MCBook book)
+    {
+    	_book = book;
+    	_book.read();
     }
 	
 	private void initRoot()
@@ -118,36 +133,25 @@ public class MonteCarloHashMapSearch
 				_hashMap.put(checksum,_rootResult);
 			}
 			
-			if (_book==null)
-			{
-				if (_monteCarloAdministration.getMoveStack().getSize()<10)
-				{
-					if (_monteCarloAdministration.getBoardSize()==9)
-					{
-						try
-						{
-							_book = new MCBook("Joseki9x9.txt");
-							_book.read();
-						}
-						catch (Exception ex)
-						{
-							System.err.println(ex.getMessage());
-						}
-					}
-				}
-			}
 			if (_book!=null)
 			{
-				MCJosekiEntry entry = _book.get(checksum);
-				if (entry!=null)
+				int mid = (_monteCarloAdministration.getBoardSize()+1)/2;
+				Point p = new Point();
+				for (int orientation=0; orientation<8; orientation++)
 				{
-					for (int i=0; i<entry.xy.length; i++)
-						_rootResult.increaseVirtualPlayouts(entry.xy[i], entry.wins[i], entry.played[i]);
-				}
-				if (_monteCarloAdministration.getMoveStack().getSize()>10)
-				{
-					_book.save();
-					_book = null;
+					MCJosekiEntry entry = _book.get(_monteCarloAdministration.getPositionalChecksum(orientation));
+					if (entry!=null)
+					{
+						for (int i=0; i<entry.xy.length; i++)
+						{
+							int x = GoArray.getX(entry.xy[i]) - mid;
+							int y = GoArray.getY(entry.xy[i]) - mid;
+							PatternUtil.adjustOrientation(x, y, orientation, p);
+							int entryXY = GoArray.toXY(p.x+mid, p.y+mid);
+							_rootResult.increaseVirtualPlayouts(entryXY, entry.wins[i], entry.played[i]);
+						}
+						break;
+					}
 				}
 			}
 		}
@@ -307,34 +311,7 @@ public class MonteCarloHashMapSearch
 		
 		if (_book!=null)
 		{
-			MCJosekiEntry entry = _book.get(_rootResult.getChecksum());
-			if (entry==null && _monteCarloAdministration.getMoveStack().getSize()<10)
-			{
-				entry = new MCJosekiEntry();
-				entry.setChecksum(_rootResult.getChecksum());
-				entry.setTimestamp(System.currentTimeMillis());
-				int nrPoints = _rootResult.getEmptyPoints().getSize();
-				entry.xy = new int[nrPoints];
-				entry.wins = new long[nrPoints];
-				entry.played = new long[nrPoints];
-				for (int i=0; i<nrPoints; i++)
-				{
-					int entryXY = _rootResult.getEmptyPoints().get(i);
-					entry.xy[i] = entryXY;
-				}
-				_book.put(entry);
-			}
-			
-			if (entry!=null)
-			{
-				for (int i=0; i<entry.xy.length; i++)
-				{
-					int entryXY = entry.xy[i];
-					entry.wins[i] +=_rootResult.getWins(entryXY);
-					entry.played[i] +=_rootResult.getPlayouts(entryXY);
-					entry.setOccurences(entry.getOccurences()+1);
-				}
-			}
+			recordJoseki();
 		}
 //		TreeNode<MonteCarloTreeSearchResult<MoveType>> secondBestNode = getSecondBestChildNode(_rootNode,bestNode);
 //		_logger.info("Second-best: "+secondBestNode.getContent());
@@ -349,6 +326,76 @@ public class MonteCarloHashMapSearch
 		return GoMoveFactory.getSingleton().createMove(xy, _monteCarloAdministration.getColorToMove());
     }
 
+    private void recordJoseki()
+    {
+		int mid = (_monteCarloAdministration.getBoardSize()+1)/2;
+		MCJosekiEntry entry = null;
+		
+		for (int orientation=0; orientation<8; orientation++)
+		{
+			entry = _book.load(_monteCarloAdministration.getPositionalChecksum(orientation));
+			if (entry!=null)
+			{
+			    for (int i=0; i<entry.xy.length; i++)
+			    {
+			    	int entryXY = entry.xy[i];
+			    	int x = GoArray.getX(entry.xy[i]) - mid;
+			    	int y = GoArray.getY(entry.xy[i]) - mid;
+			    	PatternUtil.adjustOrientation(x, y, orientation, p);
+			    	entryXY = GoArray.toXY(p.x+mid, p.y+mid);
+			    	entry.wins[i] +=_rootResult.getWins(entryXY);
+			    	entry.played[i] +=_rootResult.getPlayouts(entryXY);
+			    }
+			    entry.setOccurrences(entry.getOccurrences()+1);
+			    entry.setTimestamp(System.currentTimeMillis());
+			    JosekiManager.getSingleton().updateJosekiEntry(entry);
+			    _book.put(entry);
+				break;
+			}
+		}
+
+		if (entry==null && _monteCarloAdministration.getMoveStack().getSize()<10)
+		{
+			entry = _book.load(_rootResult.getChecksum());
+			if (entry==null)
+			{
+				entry = new MCJosekiEntry();
+				entry.setChecksum(_rootResult.getChecksum());
+				entry.setTimestamp(System.currentTimeMillis());
+				int nrPoints = _rootResult.getEmptyPoints().getSize();
+				entry.xy = new int[nrPoints];
+				entry.wins = new long[nrPoints];
+				entry.played = new long[nrPoints];
+				for (int i=0; i<nrPoints; i++)
+				{
+					int entryXY = _rootResult.getEmptyPoints().get(i);
+					entry.xy[i] = entryXY;
+				}
+				for (int i=0; i<entry.xy.length; i++)
+				{
+					int entryXY = entry.xy[i];
+					entry.wins[i] +=_rootResult.getWins(entryXY);
+					entry.played[i] +=_rootResult.getPlayouts(entryXY);
+				}
+				entry.setOccurrences(1);
+				_book.put(entry);
+				JosekiManager.getSingleton().createJosekiEntry(entry);
+			}
+			else
+			{
+			    for (int i=0; i<entry.xy.length; i++)
+			    {
+			    	entry.wins[i] +=_rootResult.getWins(entry.xy[i]);
+			    	entry.played[i] +=_rootResult.getPlayouts(entry.xy[i]);
+			    }
+			    entry.setOccurrences(entry.getOccurrences()+1);
+			    entry.setTimestamp(System.currentTimeMillis());
+			    JosekiManager.getSingleton().updateJosekiEntry(entry);
+			    _book.put(entry);
+			}
+		}    	
+    }
+    
 	protected long calculateTimeLimit()
 	{
 		if (_secondsPerMove==0)

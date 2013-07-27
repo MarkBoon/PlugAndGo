@@ -145,6 +145,7 @@ public interface MonteCarloAdministration<MoveType extends Move>
 	 * number takes into account any possible ko-captures.
 	 */
 	public long getPositionalChecksum();
+	public long getPositionalChecksum(int orientation);
 	
 	/**
 	 * @return whether the current position is a repetition of a previous position.

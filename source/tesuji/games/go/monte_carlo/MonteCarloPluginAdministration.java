@@ -41,6 +41,7 @@ import tesuji.games.go.common.GoMoveFactory;
 import tesuji.games.go.common.Util;
 
 import tesuji.games.go.monte_carlo.move_generator.MoveGenerator;
+import tesuji.games.go.pattern.util.PatternUtil;
 import tesuji.games.go.util.ArrayFactory;
 import tesuji.games.go.util.BoardMarker;
 import tesuji.games.go.util.DefaultBoardModel;
@@ -57,6 +58,7 @@ import tesuji.games.gtp.GTPCommand;
 import tesuji.games.model.BoardChangeSupport;
 import tesuji.games.model.BoardModel;
 import tesuji.games.model.BoardModelListener;
+import tesuji.games.util.Point;
 
 import static tesuji.games.general.ColorConstant.*;
 import static tesuji.games.go.util.GoArray.*;
@@ -178,6 +180,7 @@ public class MonteCarloPluginAdministration
 	 * had four opposing neighbours. Otherwise it's set to UNDEFINED_COORDINATE.
 	 */
 	protected int _koPoint;
+	protected Point _koPt = new Point();
 	
 	/**
 	 * A stack with the move-coordinates.
@@ -413,7 +416,7 @@ public class MonteCarloPluginAdministration
 		
 		_emptyPoints.copyFrom(source._emptyPoints);
 		
-		_checksum.setValue(source._checksum.getValue());
+		_checksum.copyFrom(source._checksum);
 		
 		_boardModel.setBoardSize(source.getBoardModel().getBoardSize());
 		//copy(source._board,_board);
@@ -1454,6 +1457,19 @@ public class MonteCarloPluginAdministration
 //		if (_koPoint==UNDEFINED_COORDINATE)
 //			return _checksum.getValue() + getNrPasses()*13;
 //		return  _checksum.getValue() + _koPoint*17;
+	}
+	/*
+	 * (non-Javadoc)
+	 * @see tesuji.games.go.monte_carlo.MonteCarloAdministration#getPositionalChecksum()
+	 */
+	public long getPositionalChecksum(int orientation)
+	{
+		int mid = (_boardSize+1)/2;
+		int x = GoArray.getX(_koPoint) - mid;
+		int y = GoArray.getY(_koPoint) - mid;
+		PatternUtil.adjustOrientation(x, y, orientation, _koPt);
+		int koPoint = GoArray.toXY(_koPt.x+mid, _koPt.y+mid);
+		return _checksum.getValue(orientation) + 13*_colorToPlay + (koPoint==UNDEFINED_COORDINATE? 0:koPoint*1313);
 	}
 
 	/*
