@@ -150,7 +150,7 @@ public class MonteCarloHashMapSearch
 							int y = GoArray.getY(entry.xy[i]) - mid;
 							PatternUtil.adjustInversedOrientation(x, y, orientation, p);
 							int entryXY = GoArray.toXY(p.x+mid, p.y+mid);
-							_rootResult.increasePlayouts(entryXY, entry.wins[i], entry.played[i]);
+							//_rootResult.increasePlayouts(entryXY, entry.wins[i], entry.played[i]);
 							_rootResult.increaseVirtualPlayouts(entryXY, entry.wins[i], entry.played[i]);
 						}
 						break;
@@ -665,7 +665,7 @@ public class MonteCarloHashMapSearch
 	   								int y = GoArray.getY(entry.xy[i]) - mid;
 	   								PatternUtil.adjustInversedOrientation(x, y, orientation, p);
 	   								int entryXY = GoArray.toXY(p.x+mid, p.y+mid);
-	   								_rootResult.increasePlayouts(entryXY, entry.wins[i], entry.played[i]);
+	   								//_rootResult.increasePlayouts(entryXY, entry.wins[i], entry.played[i]);
 	   								_rootResult.increaseVirtualPlayouts(entryXY, entry.wins[i], entry.played[i]);
 	   							}
 	   							break;
