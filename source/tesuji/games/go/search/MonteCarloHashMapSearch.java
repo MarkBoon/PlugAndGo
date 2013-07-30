@@ -346,8 +346,8 @@ public class MonteCarloHashMapSearch
 			    	int y = GoArray.getY(entry.xy[i]) - mid;
 			    	PatternUtil.adjustOrientation(x, y, orientation, p);
 			    	entryXY = GoArray.toXY(p.x+mid, p.y+mid);
-			    	entry.wins[i] =_rootResult.getWins(entryXY);
-			    	entry.played[i] =_rootResult.getPlayouts(entryXY);
+			    	entry.wins[i] +=_rootResult.getWins(entryXY);
+			    	entry.played[i] +=_rootResult.getPlayouts(entryXY);
 			    }
 			    entry.setOccurrences(entry.getOccurrences()+1);
 			    entry.setTimestamp(System.currentTimeMillis());
@@ -388,8 +388,8 @@ public class MonteCarloHashMapSearch
 			{
 			    for (int i=0; i<entry.xy.length; i++)
 			    {
-			    	entry.wins[i] =_rootResult.getWins(entry.xy[i]);
-			    	entry.played[i] =_rootResult.getPlayouts(entry.xy[i]);
+			    	entry.wins[i] +=_rootResult.getWins(entry.xy[i]);
+			    	entry.played[i] +=_rootResult.getPlayouts(entry.xy[i]);
 			    }
 			    entry.setOccurrences(entry.getOccurrences()+1);
 			    entry.setTimestamp(System.currentTimeMillis());
@@ -653,11 +653,23 @@ public class MonteCarloHashMapSearch
 
 	   				if (_book!=null)
 	   				{
-	   					MCJosekiEntry entry = _book.get(checksum);
-	   					if (entry!=null)
+	   					int mid = (_searchAdministration.getBoardSize()+1) / 2;
+	   					for (int orientation=0; orientation<8; orientation++)
 	   					{
-	   						for (int i=0; i<entry.xy.length; i++)
-	   							bestNode.increaseVirtualPlayouts(entry.xy[i], entry.wins[i], entry.played[i]);
+	   						MCJosekiEntry entry = _book.get(_monteCarloAdministration.getPositionalChecksum(orientation));
+	   						if (entry!=null)
+	   						{
+	   							for (int i=0; i<entry.xy.length; i++)
+	   							{
+	   								int x = GoArray.getX(entry.xy[i]) - mid;
+	   								int y = GoArray.getY(entry.xy[i]) - mid;
+	   								PatternUtil.adjustInversedOrientation(x, y, orientation, p);
+	   								int entryXY = GoArray.toXY(p.x+mid, p.y+mid);
+	   								_rootResult.increasePlayouts(entryXY, entry.wins[i], entry.played[i]);
+	   								_rootResult.increaseVirtualPlayouts(entryXY, entry.wins[i], entry.played[i]);
+	   							}
+	   							break;
+	   						}
 	   					}
 	   				}
 	   				
