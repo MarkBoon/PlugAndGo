@@ -128,12 +128,12 @@ public class Checksum
 	
 	public Checksum()
 	{
-		clear();
 		init(9);
 	}
 	
 	public void init(int boardSize)
 	{
+		clear();
 		int mid = (boardSize+1)/2;
 		Point p = new Point(0,0);
 		for (int orientation=1; orientation<8; orientation++)

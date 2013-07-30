@@ -8,8 +8,8 @@ public class MCJosekiEntry
 {
 	private long checksum;
 	public int[] xy;
-	public long[] wins;
-	public long[] played;
+	public int[] wins;
+	public int[] played;
 	private long timestamp;
 	private int occurrences;
 	private String stats;
@@ -79,15 +79,15 @@ public class MCJosekiEntry
 			throw new ParseException("Error while parsing input",0);
 		int nrPoints = (parts.length-3)/4;
 		int[] xyArray = new int[nrPoints];
-		long[] wins = new long[nrPoints];
-		long[] played = new long[nrPoints];
+		int[] wins = new int[nrPoints];
+		int[] played = new int[nrPoints];
 		int index = 0;
 		for (int i=3; i<parts.length; i+=4)
 		{
 			int x = Integer.parseInt(parts[i]);
 			int y = Integer.parseInt(parts[i+1]);
-			long nrWins = Long.parseLong(parts[i+2]);
-			long nrPlayed = Long.parseLong(parts[i+3]);
+			int nrWins = Integer.parseInt(parts[i+2]);
+			int nrPlayed = Integer.parseInt(parts[i+3]);
 			xyArray[index] = GoArray.toXY(x, y);
 			wins[index] = nrWins;
 			played[index] = nrPlayed;
@@ -128,15 +128,15 @@ public class MCJosekiEntry
 //			throw new ParseException("Error while parsing input",0);
 		int nrPoints = parts.length/4;
 		int[] xy = new int[nrPoints];
-		long[] wins = new long[nrPoints];
-		long[] played = new long[nrPoints];
+		int[] wins = new int[nrPoints];
+		int[] played = new int[nrPoints];
 		int index = 0;
 		for (int i=0; i<parts.length; i+=4)
 		{
 			int x = Integer.parseInt(parts[i]);
 			int y = Integer.parseInt(parts[i+1]);
-			long nrWins = Long.parseLong(parts[i+2]);
-			long nrPlayed = Long.parseLong(parts[i+3]);
+			int nrWins = Integer.parseInt(parts[i+2]);
+			int nrPlayed = Integer.parseInt(parts[i+3]);
 			xy[index] = GoArray.toXY(x, y);
 			wins[index] = nrWins;
 			played[index] = nrPlayed;

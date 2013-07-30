@@ -408,6 +408,13 @@ public class MonteCarloHashMapResult
 //		_results[xy] = Double.MIN_VALUE;
 	}
 
+	public void increasePlayouts(int xy, int wins, int played)
+	{
+		_wins[xy] += wins;
+		_playouts[xy] += played;
+//		_results[xy] = Double.MIN_VALUE;
+	}
+	
 	public void increaseVirtualPlayouts(int xy, double win_weight, double weight)
 	{
 		_virtualWins[xy] += win_weight;

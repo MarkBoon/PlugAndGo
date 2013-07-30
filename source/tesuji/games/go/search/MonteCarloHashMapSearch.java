@@ -34,6 +34,8 @@ import tesuji.games.util.Point;
 public class MonteCarloHashMapSearch
 	implements Search<GoMove>, PropertyChangeListener
 {
+	public static boolean testVersion = false;
+	
 	private static Logger _logger = Logger.getLogger(MonteCarloHashMapSearch.class);
 
 	protected MonteCarloAdministration<GoMove> _monteCarloAdministration;
@@ -84,7 +86,7 @@ public class MonteCarloHashMapSearch
 		_monteCarloAdministration = administration;
 		initRoot();
 	}
-
+	
 //	@Override
     public void propertyChange(PropertyChangeEvent event)
     {
@@ -146,8 +148,9 @@ public class MonteCarloHashMapSearch
 						{
 							int x = GoArray.getX(entry.xy[i]) - mid;
 							int y = GoArray.getY(entry.xy[i]) - mid;
-							PatternUtil.adjustOrientation(x, y, orientation, p);
+							PatternUtil.adjustInversedOrientation(x, y, orientation, p);
 							int entryXY = GoArray.toXY(p.x+mid, p.y+mid);
+							_rootResult.increasePlayouts(entryXY, entry.wins[i], entry.played[i]);
 							_rootResult.increaseVirtualPlayouts(entryXY, entry.wins[i], entry.played[i]);
 						}
 						break;
@@ -217,7 +220,7 @@ public class MonteCarloHashMapSearch
 //	@Override
     public void setIsTestVersion(boolean testVersion)
     {
-	    // TODO Auto-generated method stub	    
+    	MonteCarloHashMapSearch.testVersion = testVersion;
     }
 
 //	@Override
@@ -343,8 +346,8 @@ public class MonteCarloHashMapSearch
 			    	int y = GoArray.getY(entry.xy[i]) - mid;
 			    	PatternUtil.adjustOrientation(x, y, orientation, p);
 			    	entryXY = GoArray.toXY(p.x+mid, p.y+mid);
-			    	entry.wins[i] +=_rootResult.getWins(entryXY);
-			    	entry.played[i] +=_rootResult.getPlayouts(entryXY);
+			    	entry.wins[i] =_rootResult.getWins(entryXY);
+			    	entry.played[i] =_rootResult.getPlayouts(entryXY);
 			    }
 			    entry.setOccurrences(entry.getOccurrences()+1);
 			    entry.setTimestamp(System.currentTimeMillis());
@@ -364,8 +367,8 @@ public class MonteCarloHashMapSearch
 				entry.setTimestamp(System.currentTimeMillis());
 				int nrPoints = _rootResult.getEmptyPoints().getSize();
 				entry.xy = new int[nrPoints];
-				entry.wins = new long[nrPoints];
-				entry.played = new long[nrPoints];
+				entry.wins = new int[nrPoints];
+				entry.played = new int[nrPoints];
 				for (int i=0; i<nrPoints; i++)
 				{
 					int entryXY = _rootResult.getEmptyPoints().get(i);
@@ -374,8 +377,8 @@ public class MonteCarloHashMapSearch
 				for (int i=0; i<entry.xy.length; i++)
 				{
 					int entryXY = entry.xy[i];
-					entry.wins[i] +=_rootResult.getWins(entryXY);
-					entry.played[i] +=_rootResult.getPlayouts(entryXY);
+					entry.wins[i] =_rootResult.getWins(entryXY);
+					entry.played[i] =_rootResult.getPlayouts(entryXY);
 				}
 				entry.setOccurrences(1);
 				_book.put(entry);
@@ -385,8 +388,8 @@ public class MonteCarloHashMapSearch
 			{
 			    for (int i=0; i<entry.xy.length; i++)
 			    {
-			    	entry.wins[i] +=_rootResult.getWins(entry.xy[i]);
-			    	entry.played[i] +=_rootResult.getPlayouts(entry.xy[i]);
+			    	entry.wins[i] =_rootResult.getWins(entry.xy[i]);
+			    	entry.played[i] =_rootResult.getPlayouts(entry.xy[i]);
 			    }
 			    entry.setOccurrences(entry.getOccurrences()+1);
 			    entry.setTimestamp(System.currentTimeMillis());
