@@ -98,8 +98,19 @@ public class MCBoardDisplay
 			});
 		
 		repaint();
+		setToolTipText("");
 	}
-    
+
+	@Override
+	public String getToolTipText(MouseEvent event)
+	{
+		int moveX = 1+(event.getX()-offsetX)/pointSize;
+		int moveY = 1+(event.getY()-offsetY)/pointSize;
+		int xy = GoArray.toXY(moveX, moveY);
+		return Integer.toString((int)_result.getVirtualWins(xy))+"/"+Integer.toString((int) _result.getVirtualPlayouts(xy)) + " - " +
+		 Integer.toString(_result.getWins(xy))+"/"+Integer.toString(_result.getPlayouts(xy)) + " - " + _result.computeResult(xy) + " - "+ _result.getWinRatio(xy);
+	}
+	
 	@Override
     public void repaint()
     {

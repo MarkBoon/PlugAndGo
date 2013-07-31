@@ -430,6 +430,16 @@ public class MonteCarloHashMapResult
 		_virtualPlayouts[xy] = FORBIDDEN;
 //		_results[xy] = Double.MIN_VALUE;
 	}
+	
+	public double getVirtualWins(int xy)
+	{
+		return _virtualWins[xy];
+	}
+
+	public double getVirtualPlayouts(int xy)
+	{
+		return _virtualPlayouts[xy];
+	}
 
 	public String toString()
 	{
