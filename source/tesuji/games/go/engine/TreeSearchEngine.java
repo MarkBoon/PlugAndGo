@@ -26,6 +26,14 @@
 
 package tesuji.games.go.engine;
 
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
+import javax.swing.JFrame;
+
 import org.apache.log4j.Logger;
 
 import tesuji.core.util.ArrayStack;
@@ -42,6 +50,9 @@ import tesuji.games.go.common.BasicGoMoveAdministration;
 import tesuji.games.go.common.GoEngineAdapter;
 import tesuji.games.go.common.GoMove;
 import tesuji.games.go.gui.GoDataPanel;
+import tesuji.games.go.gui.MCBoardController;
+import tesuji.games.go.gui.MCBoardDisplay;
+import tesuji.games.go.search.MonteCarloHashMapSearch;
 import tesuji.games.go.util.DefaultBoardProvider;
 import tesuji.games.go.util.GoGameProperties;
 
@@ -99,10 +110,30 @@ public class TreeSearchEngine
 		
 		DataRendererManager rendererManager = new DataRendererManager();
 		DataProviderList.getSingleton().addDataProvider(new DefaultBoardProvider(_moveAdministration.getBoardModel()));
-		GoDataPanel goDataPanel = new GoDataPanel(rendererManager);
+		final GoDataPanel goDataPanel = new GoDataPanel(rendererManager);
 		DataSelector dataSelector = new DataSelector(rendererManager);
 		
 		Console.getSingleton().addDataPanels(goDataPanel, dataSelector);
+		
+		goDataPanel.addKeyListener(new KeyAdapter()
+			{
+				@Override
+				public void keyPressed(KeyEvent event)
+				{
+					if (event.getKeyCode()==KeyEvent.VK_D)
+					{
+						JFrame window = new JFrame();					
+						MCBoardController controller = new MCBoardController(((MonteCarloHashMapSearch)_search).getAdministration(), ((MonteCarloHashMapSearch)_search).getHashMap());
+						MCBoardDisplay display = new MCBoardDisplay(controller);
+						Point p = goDataPanel.getLocation();
+						Dimension d = goDataPanel.getSize();
+						window.setLocation(p.x+d.width+20, p.y);
+						window.setSize(300, 300);
+						window.getContentPane().add(display);
+						window.setVisible(true);
+					}
+				}
+			});
     }
 
 	/* (non-Javadoc)

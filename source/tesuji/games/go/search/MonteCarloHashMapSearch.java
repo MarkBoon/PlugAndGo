@@ -6,8 +6,11 @@ import static tesuji.games.general.ColorConstant.opposite;
 import static tesuji.games.go.util.GoArray.createBytes;
 import static tesuji.games.go.util.GoArray.createDoubles;
 
+import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+
+import javax.swing.JFrame;
 
 import org.apache.log4j.Logger;
 import org.cliffc.high_scale_lib.NonBlockingHashMapLong;
@@ -20,6 +23,8 @@ import tesuji.games.general.search.SearchResult;
 import tesuji.games.go.common.GoConstant;
 import tesuji.games.go.common.GoMove;
 import tesuji.games.go.common.GoMoveFactory;
+import tesuji.games.go.gui.MCBoardController;
+import tesuji.games.go.gui.MCBoardDisplay;
 import tesuji.games.go.joseki.JosekiManager;
 import tesuji.games.go.joseki.MCBook;
 import tesuji.games.go.joseki.MCJosekiEntry;
@@ -29,6 +34,7 @@ import tesuji.games.go.pattern.util.PatternUtil;
 import tesuji.games.go.util.GoArray;
 import tesuji.games.go.util.IntStack;
 import tesuji.games.go.util.PointSet;
+import tesuji.games.util.Console;
 import tesuji.games.util.Point;
 
 public class MonteCarloHashMapSearch
@@ -93,6 +99,16 @@ public class MonteCarloHashMapSearch
 		parseSearchProperties();
 		if (_monteCarloAdministration!=null)
 			_monteCarloAdministration.set(event.getPropertyName(),event.getNewValue().toString());
+    }
+    
+    public MonteCarloPluginAdministration getAdministration()
+    {
+    	return (MonteCarloPluginAdministration) _monteCarloAdministration;
+    }
+    
+    public NonBlockingHashMapLong<MonteCarloHashMapResult> getHashMap()
+    {
+    	return _hashMap;
     }
     
     public MCBook getBook()
@@ -295,6 +311,18 @@ public class MonteCarloHashMapSearch
 		_logger.info("Nr sets "+_nrSets);
 		_logger.info("Nr root visits "+_rootResult.getPlayouts());
 		_logger.info(""+((double)_nrPlayouts/(double)(time3-time0))+" kpos/sec");
+		
+		JFrame window = new JFrame();					
+		MCBoardController controller = new MCBoardController(getAdministration(), getHashMap());
+		MCBoardDisplay display = new MCBoardDisplay(controller);
+		java.awt.Point p = Console.getSingleton().getDataPanel().getLocation();
+		Dimension d = Console.getSingleton().getDataPanel().getSize();
+		window.setLocation(p.x+d.width+20, p.y);
+		window.setSize(300, 300);
+		window.getContentPane().add(display);
+		window.setVisible(true);
+		while (window.isVisible())
+			Thread.sleep(100);
 		
 //		System.out.println(startNode.toString());
 		
@@ -656,7 +684,7 @@ public class MonteCarloHashMapSearch
 	   					int mid = (_searchAdministration.getBoardSize()+1) / 2;
 	   					for (int orientation=0; orientation<8; orientation++)
 	   					{
-	   						MCJosekiEntry entry = _book.get(_monteCarloAdministration.getPositionalChecksum(orientation));
+	   						MCJosekiEntry entry = _book.get(_searchAdministration.getPositionalChecksum(orientation));
 	   						if (entry!=null)
 	   						{
 	   							for (int i=0; i<entry.xy.length; i++)
