@@ -362,7 +362,7 @@ class IncrementalPatternTreeNode
     private boolean isRestEmpty(Pattern pattern, PointSpiral spiral, byte[] done, int orientation)
     {
     	int last = spiral.getLastSpiralIndex();
-		for (int j=0; j<last; j++)
+		for (int j=0; j<last && j<done.length; j++)
 		{
 			if (done[j]==0 && spiral.getAdjustedPoint(j,orientation,pattern)!=NOCARE)
 			{
