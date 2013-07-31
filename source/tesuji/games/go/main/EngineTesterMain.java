@@ -40,7 +40,7 @@ public class EngineTesterMain
 		logger.info("Start EngineTesterMain");
 		
 		String firstEngineName = "Bot1";
-		String secondEngineName = "Bot2";
+		String secondEngineName = "Bot4";
 		
 		if (args.length==2)
 		{
@@ -106,10 +106,10 @@ public class EngineTesterMain
 		engine1.clearBoard();
 		engine2.clearBoard();
 //		setup(administration,engine1,engine2);
-		engine1.requestMove(ColorConstant.BLACK);
-		engine2.requestMove(ColorConstant.BLACK);
-		engine1.clearBoard();
-		engine2.clearBoard();
+//		engine1.requestMove(ColorConstant.BLACK);
+//		engine2.requestMove(ColorConstant.BLACK);
+//		engine1.clearBoard();
+//		engine2.clearBoard();
 		
 		GoMove move = null;
 		while (!administration.isGameFinished())

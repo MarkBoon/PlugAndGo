@@ -96,8 +96,8 @@ public class MonteCarloHashMapResult
 			if (administration.isLegal(xy) && !administration.isVerboten(xy))
 			{
 				_emptyPoints.add(xy);
-				_virtualPlayouts[xy] = 0;
-				_virtualWins[xy] = 0;
+				_virtualPlayouts[xy] = 0.0f;
+				_virtualWins[xy] = 0.0f;
 			}
 		}
 		copy.recycle();
@@ -287,6 +287,9 @@ public class MonteCarloHashMapResult
 	
 	public int getBestVirtualMove()
 	{
+		_logNrPlayouts = Math.log(_totalPlayouts+1.0f);
+		_beta = getBeta();
+
 		int bestMove = GoConstant.PASS;
 		double bestResult = computeResult(_bestMove);
 		if (_bestMove!=GoConstant.PASS && bestResult>_bestResult)
@@ -376,9 +379,6 @@ public class MonteCarloHashMapResult
 	public void increasePlayouts()
 	{
 		_totalPlayouts++;
-		if ((_totalPlayouts&0x7)==0)
-			_logNrPlayouts = Math.log(_totalPlayouts);
-		_beta = getBeta();
 	}
 
 //	public void increasePlayouts(int xy)

@@ -29,16 +29,11 @@
  	</bean>
  	
 	<bean id="mctsGoAdministration" class="tesuji.games.go.monte_carlo.MonteCarloGoAdministration" singleton="false"/>
-	<bean id="mctsPatternsAdministration" class="tesuji.games.go.monte_carlo.MCPatternsAdministration" singleton="false">
-  		<constructor-arg>
-  			<value>GenTest</value>
-  		</constructor-arg>
-	</bean>
 	
 	<bean id="eyeMoveFilter" class="tesuji.games.go.monte_carlo.EyeMoveFilter" singleton="false"/>
 	<bean id="fogOfWarFilter" class="tesuji.games.go.monte_carlo.FogOfWarFilter" singleton="false"/>
 	
-	<bean id="patternManager" class="tesuji.games.go.pattern.common.HibernatePatternManager" singleton="true">
+<!--	<bean id="patternManager" class="tesuji.games.go.pattern.common.HibernatePatternManager" singleton="true">
 		<constructor-arg>
 			<value>GenTest</value>
 		</constructor-arg>
@@ -49,19 +44,11 @@
 			<ref bean="patternManager"/>
 		</constructor-arg>
 		<property name="urgency"><value>5</value></property>
-	</bean>
+	</bean>-->
 	
 	<bean id="MonteCarloTreeSearch" class="tesuji.games.go.search.MonteCarloTreeSearch" singleton="false">
-		<!-- <property name="monteCarloAdministration">
-			<ref bean="mctsGoAdministration"/>
-		</property> -->
 		<property name="monteCarloAdministration">
 			<ref bean="mctsGoAdministration"/>
-			<!--<bean class="tesuji.games.go.monte_carlo.MCTacticsAdministration" singleton="false">
-				  		<property name="USE_TACTICS_IN_EXPLORATION">
-				  			<value>false</value>
-				  		</property>
-		  	</bean>-->
 		</property>
   		<property name="isTestVersion">
   			<value>false</value>
@@ -94,8 +81,7 @@
 					<list>
 						<!--<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"/>
 						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"/>
-						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"/>
-						<ref bean="patternMatcher"/>-->
+						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"/>-->
 					</list>
 				</property>
 				<property name="explorationMoveGeneratorList">
@@ -119,9 +105,6 @@
 		<property name="isTestVersion">
 			<value>false</value>
 		</property>
-		<!--<property name="patternManager">
-			<ref bean="patternManager"/>
-		</property>-->
 	</bean>
  	
 	<bean id="MonteCarloHashmapSearch" class="tesuji.games.go.search.MonteCarloHashMapSearch" singleton="false">
@@ -139,17 +122,13 @@
 				</property>
 				<property name="simulationMoveGeneratorList">
 					<list>
-						<!--<bean class="tesuji.games.go.monte_carlo.move_generator.FirstLineAtari" singleton="false"/>
-						<bean class="tesuji.games.go.monte_carlo.move_generator.FirstLineBlock" singleton="false"/>-->
 						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"/>
 						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"/>
 						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"/>
-						<!--<ref bean="patternMatcher"/>-->
 					</list>
 				</property>
 				<property name="explorationMoveGeneratorList">
 					<list>
-						<!--<bean class="tesuji.games.go.monte_carlo.move_generator.TobiBlock" singleton="false"/>-->
 						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"><property name="urgency"><value>5</value></property></bean>
 						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"><property name="urgency"><value>5</value></property></bean>
 						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"><property name="urgency"><value>5</value></property></bean>
@@ -164,7 +143,7 @@
 			<value>2000</value>
 		</property>
   		<property name="useAMAF">
-  			<value>true</value>
+  			<value>false</value>
   		</property>
 		<property name="secondsPerMove">
 			<value>0</value>
@@ -175,9 +154,6 @@
 		<property name="isTestVersion">
 			<value>false</value>
 		</property>
-		<!--<property name="patternManager">
-			<ref bean="patternManager"/>
-		</property>-->
 	</bean>
  	
 </beans>

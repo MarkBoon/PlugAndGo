@@ -35,7 +35,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import tesuji.games.general.ColorConstant;
 import tesuji.games.go.search.MonteCarloHashMapResult;
 import tesuji.games.go.util.GoArray;
 import tesuji.games.model.BoardModel;
@@ -64,11 +63,10 @@ public class MCBoardDisplay
 	private int offsetX;
 	private int offsetY;
 	
-	private int lastX = 0;
-	private int lastY = 0;
-	
 	private MCBoardController _controller;
 	MonteCarloHashMapResult _result;
+
+	private static final double log1_5 = Math.log(1.5);
 	
 	public MCBoardDisplay(MCBoardController controller)
 	{
@@ -131,6 +129,7 @@ public class MCBoardDisplay
 			_controller.play(moveX, moveY);
 			updateAll(getGraphics());
 		}
+		requestFocus();
 	}
    
     /**
@@ -174,7 +173,12 @@ public class MCBoardDisplay
 				if (_result!=null)
 				{
 					int xy = GoArray.toXY(i, j);
-					drawCircle(g, i, j, _result.getWinRatio(xy), _result.getPlayouts(xy));
+					double ratio;
+					if (_result.getColor()==WHITE)
+						ratio = _result.getWinRatio(xy);
+					else
+						ratio = 1.0-_result.getWinRatio(xy);
+					drawCircle(g, i, j, ratio, _result.getPlayouts(xy));
 				}
 			break;
 			case BLACK:
@@ -266,18 +270,9 @@ public class MCBoardDisplay
 		g.drawOval(startX,startY,pointSize-1,pointSize-1);
 	}
 	
-	private void drawRectangle( Graphics g, int x, int y, Color color )
-	{
-		int startX = offsetX + (x-1)*pointSize;
-		int startY = offsetY + (y-1)*pointSize;
-
-		g.setColor(color);
-		g.drawRect(startX,startY,pointSize-1,pointSize-1);
-	}
-
 	private void drawCircle( Graphics g, int x, int y, double ratio, int nrPlays )
 	{
-		int size = (int)(Math.log(nrPlays)*3.0);
+		int size = (int)(Math.log(nrPlays)/log1_5);
 		int startX = offsetX + (pointSize-size)/2 + (x-1)*pointSize;
 		int startY = offsetY + (pointSize-size)/2 + (y-1)*pointSize;
 

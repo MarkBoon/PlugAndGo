@@ -312,7 +312,7 @@ public class MonteCarloHashMapSearch
 		_logger.info("Nr root visits "+_rootResult.getPlayouts());
 		_logger.info(""+((double)_nrPlayouts/(double)(time3-time0))+" kpos/sec");
 		
-		JFrame window = new JFrame();					
+/*		JFrame window = new JFrame();					
 		MCBoardController controller = new MCBoardController(getAdministration(), getHashMap());
 		MCBoardDisplay display = new MCBoardDisplay(controller);
 		java.awt.Point p = Console.getSingleton().getDataPanel().getLocation();
@@ -322,7 +322,7 @@ public class MonteCarloHashMapSearch
 		window.getContentPane().add(display);
 		window.setVisible(true);
 		while (window.isVisible())
-			Thread.sleep(100);
+			Thread.sleep(100);*/
 		
 //		System.out.println(startNode.toString());
 		

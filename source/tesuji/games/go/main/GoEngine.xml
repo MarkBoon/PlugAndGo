@@ -69,7 +69,7 @@
 		  			<value>1</value>
 		  		</property>
 		  		<property name="minimumNrNodes">
-		  			<value>100000</value>
+		  			<value>2000</value>
 		  		</property>
 		  		<property name="useAMAF">
 		  			<value>true</value>
@@ -117,7 +117,7 @@
 		  			<value>1</value>
 		  		</property>
 		  		<property name="minimumNrNodes">
-		  			<value>100000</value>
+		  			<value>2000</value>
 		  		</property>
 		  		<property name="useAMAF">
 		  			<value>true</value>
@@ -200,4 +200,40 @@
   		</property>
   	</bean>
 
+	<bean id="Bot4" class="tesuji.games.go.engine.TreeSearchEngine" singleton="false">
+  		<property name="jar" value="TreeSearchEngine.jar"/>
+  		<constructor-arg>
+			<bean class="tesuji.games.go.search.MonteCarloTreeSearch" singleton="false">
+				<property name="monteCarloAdministration">
+					<bean class="tesuji.games.go.monte_carlo.MCTacticsAdministration" singleton="false">
+				  		<property name="USE_TACTICS_IN_EXPLORATION">
+				  			<value>true</value>
+				  		</property>
+				  	</bean>
+				</property>
+		  		<property name="secondsPerMove">
+		  			<value>0</value>
+		  		</property>
+		  		<property name="nrProcessors">
+		  			<value>1</value>
+		  		</property>
+		  		<property name="minimumNrNodes">
+		  			<value>20000</value>
+		  		</property>
+		  		<property name="useAMAF">
+		  			<value>true</value>
+		  		</property>
+		  		<property name="nrSimulationsBeforeExpansion">
+		  			<value>64</value>
+		  		</property>
+		  		<property name="isTestVersion">
+		  			<value>false</value>
+		  		</property>
+			</bean>
+  		</constructor-arg>
+  		<property name="isTestVersion">
+  			<value>false</value>
+  		</property>
+  	</bean>
+  	
 </beans>
