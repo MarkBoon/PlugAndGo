@@ -123,11 +123,11 @@
 								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"><property name="urgency"><value>100</value></property></bean>
 								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"><property name="urgency"><value>80</value></property></bean>
 								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"><property name="urgency"><value>60</value></property></bean>
-								<bean class="tesuji.games.go.monte_carlo.move_generator.Cut" singleton="false"><property name="urgency"><value>150</value></property></bean>
+								<!--<bean class="tesuji.games.go.monte_carlo.move_generator.Cut" singleton="false"><property name="urgency"><value>150</value></property></bean>
 								<bean class="tesuji.games.go.monte_carlo.move_generator.KeimaBlock" singleton="false"><property name="urgency"><value>150</value></property></bean>
 								<bean class="tesuji.games.go.monte_carlo.move_generator.TobiBlock" singleton="false"><property name="urgency"><value>120</value></property></bean>
 								<bean class="tesuji.games.go.monte_carlo.move_generator.FirstLineAtari" singleton="false"><property name="urgency"><value>120</value></property></bean>
-								<bean class="tesuji.games.go.monte_carlo.move_generator.FirstLineBlock" singleton="false"><property name="urgency"><value>45</value></property></bean>
+								<bean class="tesuji.games.go.monte_carlo.move_generator.FirstLineBlock" singleton="false"><property name="urgency"><value>45</value></property></bean>-->
 							</list>
 						</property>
 				  	</bean>
@@ -150,9 +150,9 @@
 		  		<property name="isTestVersion">
 		  			<value>false</value>
 		  		</property>
-				<property name="book">
+				<!--<property name="book">
 					<bean class="tesuji.games.go.joseki.MCBook" singleton="false"/>
-				</property>
+				</property>-->
 			</bean>
   		</constructor-arg>
   		<property name="isTestVersion">
@@ -167,7 +167,7 @@
 				<property name="monteCarloAdministration">
 					<bean class="tesuji.games.go.monte_carlo.MCTacticsAdministration" singleton="false">
 				  		<property name="USE_TACTICS_IN_EXPLORATION">
-				  			<value>false</value>
+				  			<value>true</value>
 				  		</property>
 				  	</bean>
 				</property>
@@ -178,13 +178,13 @@
 		  			<value>1</value>
 		  		</property>
 		  		<property name="minimumNrNodes">
-		  			<value>2000</value>
+		  			<value>20000</value>
 		  		</property>
 		  		<property name="useAMAF">
 		  			<value>true</value>
 		  		</property>
 		  		<property name="nrSimulationsBeforeExpansion">
-		  			<value>16</value>
+		  			<value>64</value>
 		  		</property>
 		  		<property name="isTestVersion">
 		  			<value>false</value>
@@ -226,11 +226,11 @@
 								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"><property name="urgency"><value>100</value></property></bean>
 								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"><property name="urgency"><value>80</value></property></bean>
 								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"><property name="urgency"><value>60</value></property></bean>
-								<bean class="tesuji.games.go.monte_carlo.move_generator.Cut" singleton="false"><property name="urgency"><value>150</value></property></bean>
+								<!--<bean class="tesuji.games.go.monte_carlo.move_generator.Cut" singleton="false"><property name="urgency"><value>150</value></property></bean>
 								<bean class="tesuji.games.go.monte_carlo.move_generator.KeimaBlock" singleton="false"><property name="urgency"><value>150</value></property></bean>
 								<bean class="tesuji.games.go.monte_carlo.move_generator.TobiBlock" singleton="false"><property name="urgency"><value>120</value></property></bean>
 								<bean class="tesuji.games.go.monte_carlo.move_generator.FirstLineAtari" singleton="false"><property name="urgency"><value>120</value></property></bean>
-								<bean class="tesuji.games.go.monte_carlo.move_generator.FirstLineBlock" singleton="false"><property name="urgency"><value>45</value></property></bean>
+								<bean class="tesuji.games.go.monte_carlo.move_generator.FirstLineBlock" singleton="false"><property name="urgency"><value>45</value></property></bean>-->
 							</list>
 						</property>
 				  	</bean>
