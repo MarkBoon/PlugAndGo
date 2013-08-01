@@ -35,6 +35,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import org.apache.log4j.Logger;
+
 import tesuji.games.go.search.MonteCarloHashMapResult;
 import tesuji.games.go.util.GoArray;
 import tesuji.games.model.BoardModel;
@@ -53,7 +55,7 @@ public class MCBoardDisplay
 	 */
     private static final long serialVersionUID = 9066065760762198332L;
 
-//	private static Logger _logger = Logger.getLogger(MCBoardDisplay.class);
+	private static Logger _logger = Logger.getLogger(MCBoardDisplay.class);
 	
 	/** Brown background color for the board */
 	public static final Color BOARD_COLOR =		new Color(224,170,67);
@@ -65,6 +67,7 @@ public class MCBoardDisplay
 	
 	private MCBoardController _controller;
 	MonteCarloHashMapResult _result;
+	private String _tip = "";
 
 	private static final double log1_5 = Math.log(1.5);
 	
@@ -105,8 +108,12 @@ public class MCBoardDisplay
 		int moveX = 1+(event.getX()-offsetX)/pointSize;
 		int moveY = 1+(event.getY()-offsetY)/pointSize;
 		int xy = GoArray.toXY(moveX, moveY);
-		return Integer.toString((int)_result.getVirtualWins(xy))+"/"+Integer.toString((int) _result.getVirtualPlayouts(xy)) + " - " +
+		String tip = 
+		 Integer.toString((int)_result.getVirtualWins(xy))+"/"+Integer.toString((int) _result.getVirtualPlayouts(xy)) + " - " +
 		 Integer.toString(_result.getWins(xy))+"/"+Integer.toString(_result.getPlayouts(xy)) + " - " + _result.computeResult(xy) + " - "+ _result.getWinRatio(xy);
+		if (!tip.equals(_tip))
+			_logger.info(_tip=tip);
+		return tip;
 	}
 	
 	@Override

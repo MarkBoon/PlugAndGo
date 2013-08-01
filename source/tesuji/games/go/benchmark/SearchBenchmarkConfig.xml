@@ -125,6 +125,7 @@
 						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"/>
 						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"/>
 						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"/>
+						<!-- <ref bean="patternMatcher"/> -->
 					</list>
 				</property>
 				<property name="explorationMoveGeneratorList">
