@@ -212,8 +212,6 @@ public abstract class AbstractMonteCarloAdministration
 		
 	protected BoardMarker _marker;
 
-	private boolean _isTestVersion;
-	
 	protected int _lastRandomNumber;
 	
 	private ArrayStack<GoMoveIterator> _iteratorPool =	new ArrayStack<GoMoveIterator>();
@@ -381,8 +379,6 @@ public abstract class AbstractMonteCarloAdministration
 		
 		_maxGameLength = source._maxGameLength;
 		_mercyThreshold = source._mercyThreshold;
-		
-		_isTestVersion = source._isTestVersion;
 	}
 	
 	/**
@@ -1018,20 +1014,6 @@ public abstract class AbstractMonteCarloAdministration
     {
     	return _boardSize;
     }
-
-    /*
-     * (non-Javadoc)
-     * @see tesuji.games.go.monte_carlo.MonteCarloAdministration#setIsTestVersion(boolean)
-     */
-	public void setIsTestVersion(boolean testVersion)
-	{
-		_isTestVersion = testVersion;
-	}
-	
-	public boolean isTestVersion()
-	{
-		return _isTestVersion;
-	}
 	
     /*
      * (non-Javadoc)

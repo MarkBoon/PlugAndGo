@@ -302,7 +302,6 @@ public class MCPatternsAdministration
 	public MonteCarloAdministration<GoMove> createClone()
 	{
 		MCPatternsAdministration clone = new MCPatternsAdministration(getBoardSize(), _patternSet.createClone());
-		clone.setIsTestVersion(isTestVersion());
 		clone.initBoardModel(getBoardSize());		
 		clone.copyDataFrom(this);
 		

@@ -28,6 +28,7 @@ package tesuji.games.go.monte_carlo;
 
 import org.apache.log4j.Logger;
 
+import tesuji.games.general.GlobalParameters;
 import tesuji.games.go.common.GoMove;
 import tesuji.games.go.monte_carlo.MonteCarloAdministration;
 import tesuji.games.go.tactics.LadderReader;
@@ -146,7 +147,7 @@ public class MCTacticsAdministration
 	{
 		super.clear();
 
-		_logger.info("MC_TEST_VERSION = "+isTestVersion());
+		_logger.info("MC_TEST_VERSION = "+GlobalParameters.isTestVersion());
 //		_logger.info("FOG_OF_WAR = "+FOG_OF_WAR);
 //		_logger.info("NO_FIRST_LINE = "+NO_FIRST_LINE);
 //		_logger.info("NO_EMPTY_TRIANGLE = "+NO_EMPTY_TRIANGLE);
@@ -407,7 +408,7 @@ public class MCTacticsAdministration
 		{
 			if (isUSE_TACTICS_IN_SIMULATION())
 			{
-//				if (!isTestVersion() || _lastRandomNumber<(_boardSize*_boardSize)/2+_boardSize)
+//				if (!GlobalParameters.isTestVersion() || _lastRandomNumber<(_boardSize*_boardSize)/2+_boardSize)
 				{
 					int tacticalXY = getTacticalMove(_previousMove);
 					if (tacticalXY!=UNDEFINED_COORDINATE && isLegal(tacticalXY))
@@ -734,7 +735,6 @@ public class MCTacticsAdministration
 	public MonteCarloAdministration<GoMove> createClone()
 	{
 		MCTacticsAdministration clone = new MCTacticsAdministration(getBoardSize());
-		clone.setIsTestVersion(isTestVersion());
 		clone.copyDataFrom(this);
 		
 		return clone;

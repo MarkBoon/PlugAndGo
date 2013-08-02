@@ -35,6 +35,7 @@ import org.apache.log4j.Logger;
 import tesuji.core.util.ArrayStack;
 
 import tesuji.games.general.Checksum;
+import tesuji.games.general.GlobalParameters;
 import tesuji.games.general.Move;
 import tesuji.games.general.MoveIterator;
 import tesuji.games.general.TreeNode;
@@ -92,7 +93,6 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 	
 	protected int _nrSimulationsBeforeExpansion = 1;
 	protected boolean _useAMAF = false;
-	protected boolean _isTestVersion = false;
 	
 	private int _nrSimulatedMoves;
 	
@@ -118,7 +118,6 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 	{
 		this();
 		setMonteCarloAdministration(administration);
-		administration.setIsTestVersion(_isTestVersion);
 	}
 	
 	public void setMonteCarloAdministration(MonteCarloAdministration<MoveType> administration)
@@ -161,7 +160,6 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 		if (_monteCarloAdministration!=null)
 			rootResult.setMove(_monteCarloAdministration.getMoveFactory().createDummyMove(opposite(_monteCarloAdministration.getColorToMove())));
 		_rootNode.setContent(rootResult);
-		_rootNode.getContent().setIsTestVersion(getIsTestVersion());
 		if (_rootNode.hashCode()!=Checksum.UNINITIALIZED && _rootNode.hashCode()!=_monteCarloAdministration.getPositionalChecksum())
 			throw new IllegalStateException();
 	}
@@ -190,9 +188,7 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 
 		assert _monteCarloAdministration.isConsistent() : "Inconsistent Monte-Carlo administration at the start of the search.";
 
-		GoArray.clear(_ownershipArray);
-		_monteCarloAdministration.setIsTestVersion(getIsTestVersion());
-		_monteCarloAdministration.setColorToMove(startColor);
+		GoArray.clear(_ownershipArray);		_monteCarloAdministration.setColorToMove(startColor);
 		_nrPlayouts = 0;
 		_nrSets = 0;
 		
@@ -245,7 +241,7 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 			saved = ((_minimumNrNodes*_nrGeneratedMoves - _totalNrPlayouts) * 100) / (_minimumNrNodes*_nrGeneratedMoves);
 		long time3 = System.currentTimeMillis();
 
-		if (getIsTestVersion())
+		if (GlobalParameters.isTestVersion())
 			_logger.info("TEST VERSION");
 		_logger.info("Playout limit "+_nodeLimit + " - last score " + _lastScore);
 		_logger.info("Nr playouts "+_nrPlayouts);
@@ -678,18 +674,6 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 	public void setUseAMAF(boolean useAMAF)
 	{
 		_useAMAF = useAMAF;
-	}
-
-	public boolean getIsTestVersion()
-	{
-		return _isTestVersion;
-	}
-
-	public void setIsTestVersion(boolean isTestVersion)
-	{
-		_isTestVersion = isTestVersion;
-		if (_monteCarloAdministration!=null)
-			_monteCarloAdministration.setIsTestVersion(_isTestVersion);
 	}
 
 	/*

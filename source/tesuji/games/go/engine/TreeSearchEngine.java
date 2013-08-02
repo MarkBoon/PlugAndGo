@@ -30,7 +30,6 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 import javax.swing.JFrame;
 
@@ -38,6 +37,7 @@ import org.apache.log4j.Logger;
 
 import tesuji.core.util.ArrayStack;
 
+import tesuji.games.general.GlobalParameters;
 import tesuji.games.general.MoveAdministration;
 import tesuji.games.general.MoveStack;
 import tesuji.games.general.provider.DataProviderList;
@@ -72,8 +72,6 @@ public class TreeSearchEngine
 	private MoveStack<GoMove> _moveList = new MoveStack<GoMove>();
 	private boolean _isInitialized = false;
 	
-	private boolean _isTestVersion = false;
-		
 	private Logger _logger;
 	
 	public TreeSearchEngine()
@@ -299,14 +297,22 @@ public class TreeSearchEngine
 	
 	public boolean getIsTestVersion()
 	{
-		return _isTestVersion;
+		return GlobalParameters.isTestVersion();
 	}
 
-	public void setIsTestVersion(boolean isTestVersion)
+	public void setIsTestVersion(boolean flag)
 	{
-		_isTestVersion = isTestVersion;
-		if (_search!=null)
-			_search.setIsTestVersion(_isTestVersion);
+		GlobalParameters.setTestVersion(flag);
+	}
+	
+	public boolean getIsCollectingStatistics()
+	{
+		return GlobalParameters.isCollectingStatistics();
+	}
+
+	public void setIsCollectingStatistics(boolean flag)
+	{
+		GlobalParameters.setCollectingStatistics(flag);
 	}
 	
 	public MoveAdministration<GoMove, GoGameProperties> getMoveAdministration()

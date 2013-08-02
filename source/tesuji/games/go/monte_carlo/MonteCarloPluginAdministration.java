@@ -229,14 +229,10 @@ public class MonteCarloPluginAdministration
 
 	private ProbabilityMap _probabilityMap;
 
-	private boolean _isTestVersion;
-	
 	protected int _lastRandomNumber;
 	
 	private ArrayStack<GoMoveIterator> _iteratorPool =	new ArrayStack<GoMoveIterator>();
 
-	private boolean _spreadTest = false;
-	
 	private List<MoveFilter> _simulationMoveFilterList = new ArrayList<MoveFilter>();
 	private List<MoveFilter> _explorationMoveFilterList = new ArrayList<MoveFilter>();
 
@@ -398,7 +394,6 @@ public class MonteCarloPluginAdministration
 	public void copyDataFrom(MonteCarloAdministration<GoMove> sourceAdministration)
 	{
 		MonteCarloPluginAdministration source = (MonteCarloPluginAdministration) sourceAdministration;
-		_spreadTest = source._spreadTest;
 		_copyDataFrom(source);
 	}
 
@@ -451,8 +446,6 @@ public class MonteCarloPluginAdministration
 		
 		_maxGameLength = source._maxGameLength;
 		_mercyThreshold = source._mercyThreshold;
-		
-		_isTestVersion = source._isTestVersion;
 		
 		for (int i=_simulationMoveFilterList.size(); --i>=0;)
 		{
@@ -639,8 +632,13 @@ public class MonteCarloPluginAdministration
 					{
 						merged = true;
 						int mergeLocation = next;
-						int runner = next;
+						int runner = next;						
 						int chain = _chain[xy];
+						
+						int nextStoneAge = _stoneAge[_chain[next]];
+						if (nextStoneAge<_stoneAge[chain])
+							_stoneAge[chain] = nextStoneAge;
+
 						do
 						{
 							_chain[mergeLocation] = chain;
@@ -1803,20 +1801,6 @@ public class MonteCarloPluginAdministration
     {
     	return _boardSize;
     }
-
-    /*
-     * (non-Javadoc)
-     * @see tesuji.games.go.monte_carlo.MonteCarloAdministration#setIsTestVersion(boolean)
-     */
-	public void setIsTestVersion(boolean testVersion)
-	{
-		_isTestVersion = testVersion;
-	}
-	
-	public boolean isTestVersion()
-	{
-		return _isTestVersion;
-	}
 	
     /*
      * (non-Javadoc)
@@ -1909,16 +1893,6 @@ public class MonteCarloPluginAdministration
     {
 //    	return SGFUtil.createSGF(getMoveStack()) +"\n\n"+GoArray.printBoardToString(_board);
     	return SGFUtil.createSGF(getMoveStack()) +"\n\n"+_boardModel.toString();
-    }
-    
-    public void setIsSpreadTest(boolean spreadTest)
-    {
-	    _spreadTest = spreadTest;
-    }
-
-	public boolean getIsSpreadTest()
-    {
-	    return _spreadTest;
     }
 
 	/**

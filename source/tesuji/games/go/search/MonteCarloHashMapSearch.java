@@ -40,8 +40,6 @@ import tesuji.games.util.Point;
 public class MonteCarloHashMapSearch
 	implements Search<GoMove>, PropertyChangeListener
 {
-	public static boolean testVersion = false;
-	
 	private static Logger _logger = Logger.getLogger(MonteCarloHashMapSearch.class);
 
 	protected MonteCarloAdministration<GoMove> _monteCarloAdministration;
@@ -231,12 +229,6 @@ public class MonteCarloHashMapSearch
 		if (_nrThreads<=0)
 			_nrThreads = 1;
 		_searchProperties.setIntProperty(SearchProperties.NR_PROCESSORS,_nrThreads);
-    }
-
-//	@Override
-    public void setIsTestVersion(boolean testVersion)
-    {
-    	MonteCarloHashMapSearch.testVersion = testVersion;
     }
 
 //	@Override

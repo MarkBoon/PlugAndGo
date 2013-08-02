@@ -191,16 +191,6 @@ public interface MonteCarloAdministration<MoveType extends Move>
 	 * @return
 	 */
 	public boolean isConsistent();
-
-	/**
-	 * This is a property used in many classes under construction. It is used when a relatively small
-	 * change needs to be tested. In that case two identical engines are started, one of which has
-	 * this property set to true. It can then test this property and change its behaviour to use some
-	 * new code that needs to be tested to see if it's an improvement or not.
-	 * 
-	 * @param testVersion
-	 */
-	public void setIsTestVersion(boolean testVersion);
 	
 	public MoveFactory<MoveType> getMoveFactory();
 	

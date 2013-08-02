@@ -27,6 +27,7 @@
 package tesuji.games.go.search;
 
 import tesuji.core.util.ArrayStack;
+import tesuji.games.general.GlobalParameters;
 import tesuji.games.general.Move;
 import tesuji.games.general.search.SearchResult;
 import tesuji.games.go.common.GoMove;
@@ -90,8 +91,6 @@ public class MonteCarloTreeSearchResult<MoveType extends Move>
 	 * Used to prevent loops when updating values in a tree that has transpositions.
 	 */
 	protected int _updateTimeStamp;
-	
-	private static boolean _isTestVersion = false;
 	
 	/**
 	 * The exploration-factor determines how strongly the search will favour exploring
@@ -293,8 +292,7 @@ public class MonteCarloTreeSearchResult<MoveType extends Move>
 
 	public double getUrgencyValue()
 	{
-//		if (getIsTestVersion())
-			return 0.0;
+		return 0.0;
 		
 //		return (_urgencyFactor / ((double)((GoMove)getMove()).getUrgency())) / (_nrPlayouts+1);
 	}
@@ -456,7 +454,7 @@ public class MonteCarloTreeSearchResult<MoveType extends Move>
 
     	_move = move;
     	
-    	if (getIsTestVersion())
+    	if (GlobalParameters.isTestVersion())
     	{
     		_nrVirtualPlayouts = INITIAL_VISITS;
     		_nrVirtualWins = INITIAL_WINS;
@@ -524,16 +522,6 @@ public class MonteCarloTreeSearchResult<MoveType extends Move>
     {
     	_parentResult = result;
     }
-
-	public boolean getIsTestVersion()
-	{
-		return _isTestVersion;
-	}
-
-	public void setIsTestVersion(boolean isTestVersion)
-	{
-		_isTestVersion = isTestVersion;
-	}
 
 	public byte[] getBlackOwnership()
 	{

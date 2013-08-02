@@ -479,7 +479,7 @@ public class IncrementalPatternMatcher
     
     /**
      * Obviously, an incremental pattern-matcher has a state.
-     * Cloning the obejct will replicate the state.
+     * Cloning the object will replicate the state.
      * 
      * @return the cloned pattern-matcher with state.
      */
@@ -512,8 +512,6 @@ public class IncrementalPatternMatcher
 		
 		assert(isEqual(this,clone));
 
-		if (_boardModel.hasListeners())
-			return clone;
 		return clone;
     }
     
