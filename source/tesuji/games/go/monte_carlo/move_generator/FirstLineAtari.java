@@ -21,7 +21,7 @@ public class FirstLineAtari extends LadderMoveGenerator
 				int neighbour = FourCursor.getNeighbour(xy, n);
 				if (isBlock(neighbour,color))
 				{
-//					if (isSafeToMove(neighbour))
+					if (isSafeToMove(neighbour))
 						return neighbour;
 				}
 			}

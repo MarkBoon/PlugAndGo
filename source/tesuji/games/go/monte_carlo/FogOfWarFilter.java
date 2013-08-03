@@ -1,5 +1,7 @@
 package tesuji.games.go.monte_carlo;
 
+import static tesuji.games.general.ColorConstant.EMPTY;
+
 import static tesuji.games.go.util.GoArray.FIRST;
 import static tesuji.games.go.util.GoArray.LAST;
 import static tesuji.games.go.util.GoArray.copy;
@@ -39,6 +41,7 @@ public class FogOfWarFilter implements MoveFilter, BoardModelListener
 	public void register(MonteCarloPluginAdministration administration)
 	{
 		_administration = administration;
+		_administration.getBoardModel().addBoardModelListener(this);
 		_fogOfWar = createBytes();
 		clear();
 	}
@@ -65,14 +68,17 @@ public class FogOfWarFilter implements MoveFilter, BoardModelListener
 //	@Override
     public void changeBoard(BoardChange event)
     {
-		int xy = event.getXY();
-		_fogOfWar[xy] = CLEAR;
-		for (int n=12; --n>=0;)
-		{
-			int next = TwelveCursor.getNeighbour(xy, n);
-			if (next>=FIRST && next<=LAST)
-				_fogOfWar[next] = CLEAR;
-		}
+    	if (event.getNewValue()!=EMPTY)
+    	{
+			int xy = event.getXY();
+			_fogOfWar[xy] = CLEAR;
+			for (int n=12; --n>=0;)
+			{
+				int next = TwelveCursor.getNeighbour(xy, n);
+				if (next>=FIRST && next<=LAST)
+					_fogOfWar[next] = CLEAR;
+			}
+    	}
     }
 	
 	@Override

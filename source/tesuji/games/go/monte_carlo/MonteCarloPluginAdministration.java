@@ -188,6 +188,11 @@ public class MonteCarloPluginAdministration
 	protected IntStack _moveStack;
 	
 	/**
+	 * A stack with the most recent captured stones.
+	 */
+	protected IntStack _captiveStack;
+	
+	/**
 	 * A stack with the move-coordinates that have priority.
 	 */
 	protected IntStack _priorityMoveStack;
@@ -266,6 +271,7 @@ public class MonteCarloPluginAdministration
 
 		_illegalStack = ArrayFactory.createIntStack();
 		_moveStack = ArrayFactory.createLargeIntStack();
+		_captiveStack = ArrayFactory.createIntStack();
 		_checksumStack = ArrayFactory.createLargeLongStack();
 		_priorityMoveStack = ArrayFactory.createIntStack();
 		_urgencyStack = ArrayFactory.createIntStack();
@@ -373,6 +379,7 @@ public class MonteCarloPluginAdministration
 		_mercyThreshold = _boardSize*3;
 		
 		_moveStack.clear();
+		_captiveStack.clear();
 		_checksumStack.clear();
 		_liberties[0] = 1000;
 	}
@@ -434,6 +441,7 @@ public class MonteCarloPluginAdministration
 		copy(source._stoneAge, _stoneAge);
 		
 		_moveStack.copyFrom(source._moveStack);
+		_captiveStack.copyFrom(source._captiveStack);
 		_checksumStack.copyFrom(source._checksumStack);
 		_probabilityMap.copyFrom(source._probabilityMap);
 		
@@ -481,7 +489,8 @@ public class MonteCarloPluginAdministration
 	
 	public void playMove(int xy)
 	{
-		_moveStack.push(xy);		
+		_moveStack.push(xy);
+		_captiveStack.clear();
 		play(xy);
 		
 		if (xy==PASS)
@@ -910,6 +919,7 @@ public class MonteCarloPluginAdministration
 			assert _boardModel.get(captive)==_oppositeColor : SGFUtil.createSGF(getMoveStack());
 			
 			_chain[captive] = 0;
+			_captiveStack.push(captive);
 			
 			removeStone(captive);
 			
@@ -1832,6 +1842,11 @@ public class MonteCarloPluginAdministration
     	return _moveStack;
     }
     
+    public IntStack getCaptiveStack()
+    {
+    	return _captiveStack;
+    }
+    
     public byte[] getBlackOwnership()
     {
     	return _black;
@@ -1970,12 +1985,12 @@ public class MonteCarloPluginAdministration
 
     public boolean isPrehistoricChain(int chain)
     {
-    	return (_stoneAge[chain]<=_playoutStart);
+    	return (_stoneAge[chain]<=_playoutStart+5);
     }
     
     public boolean isPrehistoricStone(int xy)
     {
-    	return (_stoneAge[_chain[xy]]<=_playoutStart);
+    	return (_stoneAge[_chain[xy]]<=_playoutStart+5);
     }
     
     public void setSimulationMoveFilterList(List<MoveFilter> list)
