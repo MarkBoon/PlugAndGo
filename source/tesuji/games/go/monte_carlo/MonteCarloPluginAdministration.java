@@ -1080,8 +1080,8 @@ public class MonteCarloPluginAdministration
 		assert(_probabilityMap.isConsistent());
 		while (emptyPoints.getSize()!=0)
 		{
-			assert(_probabilityMap.hasPoints());
-			int xy = _probabilityMap.getCoordinate();
+//			assert(_probabilityMap.hasPoints());
+			int xy = _probabilityMap.getCoordinate(getColorToMove());
 			assert(xy!=PASS);
 			assert(_boardModel.get(xy)==EMPTY);
 			if (isLegal(xy) && !isVerboten(xy,filterList))
@@ -1090,18 +1090,18 @@ public class MonteCarloPluginAdministration
 				{
 					int illegalXY = _illegalStack.pop();
 					emptyPoints.add(illegalXY);
-					_probabilityMap.add(illegalXY);
+					_probabilityMap.add(illegalXY,getColorToMove());
 				}
 				assert(_probabilityMap.isConsistent());
 				return xy;
 			}
 			emptyPoints.remove(xy);
 			_illegalStack.push(xy);
-			assert(_probabilityMap.getWeight(xy)==ProbabilityMap.DEFAULT);
-			_probabilityMap.reset(xy);
+			assert(_probabilityMap.getWeight(xy,getColorToMove())==ProbabilityMap.DEFAULT);
+			_probabilityMap.clear(xy,getColorToMove());
 //			Statistics.increment("IllegalTries");
 		}
-		assert(!_probabilityMap.hasPoints());
+//		assert(!_probabilityMap.hasPoints());
 //		if ((emptyPoints.getSize()==0 && _probabilityMap.hasPoints()) || (emptyPoints.getSize()!=0 && !_probabilityMap.hasPoints()))
 //			System.err.println("Inconsistent!");
 		assert(_probabilityMap.isConsistent());
@@ -1110,7 +1110,7 @@ public class MonteCarloPluginAdministration
 		{
 			int illegalXY = _illegalStack.pop();
 			emptyPoints.add(illegalXY);
-			_probabilityMap.add(illegalXY);
+			_probabilityMap.add(illegalXY,getColorToMove());
 		}
 
 		assert(_probabilityMap.isConsistent());
@@ -1146,8 +1146,11 @@ public class MonteCarloPluginAdministration
 		{
 			int xy = _priorityMoveStack.pop();
 			int urgency = _urgencyStack.pop();
-			_probabilityMap.subtract(xy, urgency);
-			_probabilityMap.add(xy, urgency/4);
+			if (_boardModel.get(xy)==EMPTY)
+			{
+				_probabilityMap.subtract(xy, urgency);
+				_probabilityMap.add(xy, urgency/4);
+			}
 		}
 //		_priorityMoveStack.clear();
 //    	_urgencyStack.clear();
@@ -1366,7 +1369,7 @@ public class MonteCarloPluginAdministration
 			_whiteDiagonalNeighbours[right(above)]++;
 			_whiteDiagonalNeighbours[right(below)]++;			
 		}
-		_probabilityMap.reset(xy);
+		_probabilityMap.clear(xy);
 	}
 
 	/**
@@ -1729,7 +1732,7 @@ public class MonteCarloPluginAdministration
     {
     	for (int i=FIRST; i<=LAST; i++)
     	{
-    		assert (_boardModel.get(i)==EMPTY || _probabilityMap.getWeight(i)<ProbabilityMap.ERROR_MARGIN);
+//    		assert (_boardModel.get(i)==EMPTY || _probabilityMap.getWeight(i)<ProbabilityMap.ERROR_MARGIN);
 //        	if (_boardModel.get(i)==EMPTY && (_blackNeighbours[i]==4 || _whiteNeighbours[i]==4))
 //    		{
 //        		boolean isCapture = false;

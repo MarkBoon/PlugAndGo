@@ -4,36 +4,48 @@ import java.util.Arrays;
 
 import tesuji.core.util.MersenneTwisterFast;
 
+import static tesuji.games.general.ColorConstant.BLACK;
+
 public class ProbabilityMap
 {
 	public static final double ERROR_MARGIN = 0.000000001;
-	public static final double DEFAULT = Math.sqrt(ERROR_MARGIN);
+	public static final double DEFAULT = 1.0;
+//	public static final double DEFAULT = Math.sqrt(ERROR_MARGIN);
 	private MersenneTwisterFast _random;
 
-	private double[] _weights;
-	private double[] _rowSum;
-	private double _total;
+	private double[][] _weights;
+	private double[][] _rowSum;
+	private double[] _total;
 	
 	public ProbabilityMap(MersenneTwisterFast randomNumberGenerator)
 	{
 		_random = randomNumberGenerator;
-		_weights = GoArray.createDoubles();
-		_rowSum = new double[GoArray.WIDTH];
-		
+		_weights = new double[2][];
+		_weights[0] = GoArray.createDoubles();
+		_weights[1] = GoArray.createDoubles();
+		_rowSum = new double[2][];
+		_rowSum[0] = new double[GoArray.WIDTH];
+		_rowSum[1] = new double[GoArray.WIDTH];
+		_total = new double[2];
+
 		reset();
 	}
 	
-	public double getWeight(int xy)
+	public double getWeight(int xy, byte color)
 	{
-		return _weights[xy];
+		
+		return (color==BLACK)?_weights[0][xy]:_weights[1][xy];
 	}
 
 	public void add(int xy, double weight)
 	{
 		int y = GoArray.getY(xy);
-		_weights[xy] += weight;
-		_rowSum[y] += weight;
-		_total += weight;
+		_weights[0][xy] += weight;
+		_weights[1][xy] += weight;
+		_rowSum[0][y] += weight;
+		_rowSum[1][y] += weight;
+		_total[0] += weight;
+		_total[1] += weight;
 		assert(isConsistent());
 	}
 
@@ -50,10 +62,13 @@ public class ProbabilityMap
 	public void subtract(int xy, double weight)
 	{
 		int y = GoArray.getY(xy);
-		_weights[xy] -= weight;
-		_rowSum[y] -= weight;
+		_weights[0][xy] -= weight;
+		_weights[1][xy] -= weight;
+		_rowSum[0][y] -= weight;
+		_rowSum[0][y] -= weight;
 //		assert(_rowSum[y]>=0.0);
-		_total -= weight;
+		_total[0] -= weight;
+		_total[1] -= weight;
 //		assert(_total>=0.0);
 		assert(isConsistent());
 	}
@@ -63,82 +78,123 @@ public class ProbabilityMap
 		subtract(xy,urgency*DEFAULT);
 	}
 
-	public void reset(int xy)
+	public void clear(int xy)
 	{
 		int y = GoArray.getY(xy);
-		double weight = _weights[xy];
-		_weights[xy] = 0.0;
-		_rowSum[y] -= weight;
+		double weight0 = _weights[0][xy];
+		double weight1 = _weights[1][xy];
+		_weights[0][xy] = 0.0;
+		_weights[1][xy] = 0.0;
+		_rowSum[0][y] -= weight0;
+		_rowSum[1][y] -= weight1;
 //		assert(_rowSum[y]>=0.0);
-		_total -= weight;
+		_total[0] -= weight0;
+		_total[1] -= weight1;
+//		assert(_total>=0.0);
+	}
+
+	public void clear(int xy, byte color)
+	{
+		int i = (color==BLACK)? 0 : 1;
+		int y = GoArray.getY(xy);
+		double weight = _weights[i][xy];
+		_weights[i][xy] = 0.0;
+		_rowSum[i][y] -= weight;
+//		assert(_rowSum[y]>=0.0);
+		_total[i] -= weight;
 //		assert(_total>=0.0);
 	}
 
 	public void reset()
 	{
-		GoArray.clear(_weights);
-		Arrays.fill(_rowSum,0.0);
-		_total = 0.0;
+		GoArray.clear(_weights[0]);
+		GoArray.clear(_weights[1]);
+		Arrays.fill(_rowSum[0],0.0);
+		Arrays.fill(_rowSum[1],0.0);
+		_total[0] = 0.0;
+		_total[1] = 0.0;
 	}
 	
-	public void decay(int xy)
+	public int getCoordinate(byte color)
 	{
-		double weight = _weights[xy];
-		if (weight!=DEFAULT && weight!=0)
-			subtract(xy,_weights[xy]/2);
-	}
-	
-	public int getCoordinate()
-	{
-		double randomValue = _random.nextDouble() * _total;
-		assert( randomValue<_total);
+		int i = (color==BLACK)? 0 : 1;
+		double randomValue = _random.nextDouble() * _total[i];
+		assert( randomValue<_total[i]);
 		int y = 0;
 		double tmpSum = 0.0;
 		while (tmpSum<=randomValue)
-			tmpSum += _rowSum[++y];
+			tmpSum += _rowSum[i][++y];
 		
 		assert(y<GoArray.WIDTH);
 		
-		tmpSum -= _rowSum[y];
+		tmpSum -= _rowSum[i][y];
 		int xy = y * GoArray.WIDTH;
 		while (tmpSum<=randomValue)
-			tmpSum += _weights[++xy];
+			tmpSum += _weights[i][++xy];
 		
-		assert(_weights[xy]!=0.0);
+		assert(_weights[i][xy]!=0.0);
 		return xy;
 	}
 	
 	public void copyFrom(ProbabilityMap source)
 	{
-		System.arraycopy(source._weights,0,_weights,0,GoArray.MAX);
-		System.arraycopy(source._rowSum,0,_rowSum,0,GoArray.WIDTH);
-		_total = source._total;
+		System.arraycopy(source._weights[0],0,_weights[0],0,GoArray.MAX);
+		System.arraycopy(source._weights[1],0,_weights[1],0,GoArray.MAX);
+		System.arraycopy(source._rowSum[0],0,_rowSum[0],0,GoArray.WIDTH);
+		System.arraycopy(source._rowSum[1],0,_rowSum[1],0,GoArray.WIDTH);
+		_total[0] = source._total[0];
+		_total[1] = source._total[1];
 	}
 	
-	public boolean hasPoints()
-	{
-		return _total > ERROR_MARGIN;
-	}
+//	public boolean hasPoints()
+//	{
+//		return _total > ERROR_MARGIN;
+//	}
 	
 	public boolean isConsistent()
 	{
-		double total = 0.0;
-		double rowTotal = 0.0;
-		
-		for (int i=GoArray.FIRST; i<=GoArray.LAST; i++)
-		{
-			total += _weights[i];
-			assert(_weights[i]>=0.0);
-		}
-		for (int i=0; i<GoArray.WIDTH; i++)
-		{
-			rowTotal += _rowSum[i];
-			assert(_rowSum[i]>-ERROR_MARGIN);
-		}
-		
-		assert(Math.abs(_total-total)<ERROR_MARGIN);
-		assert(Math.abs(_total-rowTotal)<ERROR_MARGIN);
+//		double total = 0.0;
+//		double rowTotal = 0.0;
+//		
+//		for (int i=GoArray.FIRST; i<=GoArray.LAST; i++)
+//		{
+//			total += _weights[i];
+//			assert(_weights[i]>=0.0);
+//		}
+//		for (int i=0; i<GoArray.WIDTH; i++)
+//		{
+//			rowTotal += _rowSum[i];
+//			assert(_rowSum[i]>-ERROR_MARGIN);
+//		}
+//		
+//		assert(Math.abs(_total-total)<ERROR_MARGIN);
+//		assert(Math.abs(_total-rowTotal)<ERROR_MARGIN);
 		
 		return true;
+	}
+	
+	public String toString()
+	{
+		StringBuilder out = new StringBuilder();
+		out.append('\n');
+		for (int row=1; row<GoArray.WIDTH; row++)
+		{
+			for (int col=1; col<GoArray.WIDTH; col++)
+			{
+				int xy = GoArray.toXY(col, row);
+				out.append(_weights[0][xy]);
+				out.append(' ');
+			}
+			out.append("   ");
+			for (int col=1; col<GoArray.WIDTH; col++)
+			{
+				int xy = GoArray.toXY(col, row);
+				out.append(_weights[1][xy]);
+				out.append(' ');
+			}
+			out.append('\n');
+		}
+		out.append('\n');
+		return out.toString();
 	}
 }
