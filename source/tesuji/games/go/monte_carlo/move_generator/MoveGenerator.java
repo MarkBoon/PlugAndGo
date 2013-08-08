@@ -4,7 +4,7 @@ import tesuji.games.go.monte_carlo.MonteCarloPluginAdministration;
 
 public interface MoveGenerator
 {
-//	void clear();
+	void clear();
 	void register(MonteCarloPluginAdministration administration);
 	int generate();
 	void update();

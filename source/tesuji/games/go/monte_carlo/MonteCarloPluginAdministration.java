@@ -78,7 +78,7 @@ public class MonteCarloPluginAdministration
 	protected int		_boardSize = 9;
 	protected double	_komi = 7.5;
 	protected int		_intKomi = 7;
-	protected byte		_colorToPlay;
+	protected byte		_colorToPlay = BLACK;
 	protected byte		_oppositeColor;
 	protected int		_previousMove;
 	protected int		_nrPasses;
@@ -382,6 +382,16 @@ public class MonteCarloPluginAdministration
 		_captiveStack.clear();
 		_checksumStack.clear();
 		_liberties[0] = 1000;
+		
+		for (int i=_simulationMoveGeneratorList.size(); --i>=0;)
+		{
+			_simulationMoveGeneratorList.get(i).clear();
+		}
+		for (int i=_explorationMoveGeneratorList.size(); --i>=0;)
+		{
+			_explorationMoveGeneratorList.get(i).clear();
+		}
+		
 	}
 	
 	public boolean isFirstRow(int xy)

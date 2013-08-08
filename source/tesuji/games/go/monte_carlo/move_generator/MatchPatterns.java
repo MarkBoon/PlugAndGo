@@ -27,30 +27,45 @@ public class MatchPatterns extends AbstractMoveGenerator
 		administration = admin;
 	    _patternMatcher = new IncrementalPatternMatcher();
 	    _patternMatcher.setPatternGroup(_patternManager.getDefaultPatternGroup());
-	    _patternMatcher.initialise(new DefaultBoardModel(administration.getBoardSize()));
 		administration._explorationMoveSupport.addBoardModelListener(_patternMatcher);
 		administration.getBoardModel().addBoardModelListener(_patternMatcher);
-		generate();
+		clear();		
     }
+	
+	public void clear()
+	{
+	    _patternMatcher.initialise(new DefaultBoardModel(administration.getBoardSize()));
+		
+    	ProbabilityMap map = administration.getProbabilityMap();
+		ArrayList<PatternMatch> matchList = _patternMatcher.getMatchList();
+		for (PatternMatch pm : matchList)
+		{
+			map.add(pm.getMoveXY(ColorConstant.BLACK), pm.getUrgencyValue(ColorConstant.BLACK), ColorConstant.BLACK);
+			map.add(pm.getMoveXY(ColorConstant.WHITE), pm.getUrgencyValue(ColorConstant.WHITE), ColorConstant.WHITE);
+		}
+	}
 
 //	@Override
     public int generate()
     {
+    	byte[] board = administration.getBoardArray();
     	ProbabilityMap map = administration.getProbabilityMap();
 		_patternMatcher.updatePatternMatches();
-		ArrayList<PatternMatch> matchList = _patternMatcher.getNewMatchList();
+		ArrayList<PatternMatch> matchList = _patternMatcher.getDeletedMatchList();
 		for (PatternMatch pm : matchList)
 		{
-			if (administration.getColorToMove()==ColorConstant.BLACK)
-			{
-				map.add(pm.getXY(), pm.getUrgencyValue(ColorConstant.BLACK));
+			if (board[pm.getMoveXY(ColorConstant.BLACK)]==ColorConstant.EMPTY)
+				map.subtract(pm.getMoveXY(ColorConstant.BLACK), pm.getUrgencyValue(ColorConstant.BLACK), ColorConstant.BLACK);
+			if (board[pm.getMoveXY(ColorConstant.WHITE)]==ColorConstant.EMPTY)
+				map.subtract(pm.getMoveXY(ColorConstant.WHITE), pm.getUrgencyValue(ColorConstant.WHITE), ColorConstant.WHITE);
+		}
+		matchList = _patternMatcher.getNewMatchList();
+		for (PatternMatch pm : matchList)
+		{
+			map.add(pm.getMoveXY(ColorConstant.BLACK), pm.getUrgencyValue(ColorConstant.BLACK), ColorConstant.BLACK);
 //				administration.addPriorityMove(pm.getXY(), pm.getUrgencyValue(ColorConstant.BLACK));
-			}
-			else
-			{
-				map.add(pm.getXY(), pm.getUrgencyValue(ColorConstant.WHITE));
+			map.add(pm.getMoveXY(ColorConstant.WHITE), pm.getUrgencyValue(ColorConstant.WHITE), ColorConstant.WHITE);
 //				administration.addPriorityMove(pm.getXY(), pm.getUrgencyValue(ColorConstant.WHITE));
-			}
 		}
 		return UNDEFINED_COORDINATE;
     }

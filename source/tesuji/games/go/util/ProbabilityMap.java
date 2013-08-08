@@ -1,5 +1,6 @@
 package tesuji.games.go.util;
 
+import java.text.DecimalFormat;
 import java.util.Arrays;
 
 import tesuji.core.util.MersenneTwisterFast;
@@ -8,6 +9,8 @@ import static tesuji.games.general.ColorConstant.BLACK;
 
 public class ProbabilityMap
 {
+	private static final  DecimalFormat df = new DecimalFormat("##.##");
+	
 	public static final double ERROR_MARGIN = 0.000000001;
 	public static final double DEFAULT = 1.0;
 //	public static final double DEFAULT = Math.sqrt(ERROR_MARGIN);
@@ -49,6 +52,16 @@ public class ProbabilityMap
 		assert(isConsistent());
 	}
 
+	public void add(int xy, double weight, byte color)
+	{
+		int i = (color==BLACK)? 0 : 1;
+		int y = GoArray.getY(xy);
+		_weights[i][xy] += weight;
+		_rowSum[i][y] += weight;
+		_total[i] += weight;
+		assert(isConsistent());
+	}
+
 	public void add(int xy)
 	{
 		add(xy,DEFAULT);
@@ -69,6 +82,18 @@ public class ProbabilityMap
 //		assert(_rowSum[y]>=0.0);
 		_total[0] -= weight;
 		_total[1] -= weight;
+//		assert(_total>=0.0);
+		assert(isConsistent());
+	}
+	
+	public void subtract(int xy, double weight, byte color)
+	{
+		int i = (color==BLACK)? 0 : 1;
+		int y = GoArray.getY(xy);
+		_weights[i][xy] -= weight;
+		_rowSum[i][y] -= weight;
+//		assert(_rowSum[y]>=0.0);
+		_total[i] -= weight;
 //		assert(_total>=0.0);
 		assert(isConsistent());
 	}
@@ -182,15 +207,15 @@ public class ProbabilityMap
 			for (int col=1; col<GoArray.WIDTH; col++)
 			{
 				int xy = GoArray.toXY(col, row);
-				out.append(_weights[0][xy]);
-				out.append(' ');
+				out.append(df.format(_weights[0][xy]));
+				out.append('\t');
 			}
-			out.append("   ");
+			out.append("\t\t");
 			for (int col=1; col<GoArray.WIDTH; col++)
 			{
 				int xy = GoArray.toXY(col, row);
-				out.append(_weights[1][xy]);
-				out.append(' ');
+				out.append(df.format(_weights[1][xy]));
+				out.append('\t');
 			}
 			out.append('\n');
 		}

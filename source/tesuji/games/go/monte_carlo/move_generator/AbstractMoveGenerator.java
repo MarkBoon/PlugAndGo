@@ -39,6 +39,10 @@ public abstract class AbstractMoveGenerator implements MoveGenerator
 		_weight = weight;
 	}
 
+	public void clear()
+	{
+	}
+
 	public void update()
 	{
 	}

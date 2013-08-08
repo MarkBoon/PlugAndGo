@@ -91,7 +91,7 @@ class IncrementalPatternTreeLeaf
 			blackXY = GoArray.toXY(tmpPoint.x,tmpPoint.y);
 		}
 	 	else														// No recommended move for black
-			blackXY = UNDEFINED_COORDINATE;
+			blackXY = 0;
 	
 		if (pattern.getWhiteX() != UNDEFINED_COORDINATE)	// There is a recommended move for white
 		{
@@ -101,7 +101,7 @@ class IncrementalPatternTreeLeaf
 			whiteXY = GoArray.toXY(tmpPoint.x,tmpPoint.y);
 		}
 	 	else														// No recommended move for white
-			whiteXY = UNDEFINED_COORDINATE;
+			whiteXY = 0;
 		
 		List<PatternCondition> patConditions = pattern.getConditionList();
 		if (patConditions!=null)
