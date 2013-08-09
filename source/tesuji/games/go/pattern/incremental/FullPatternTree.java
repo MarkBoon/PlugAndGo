@@ -84,7 +84,7 @@ class FullPatternTree
 	 */
 	public FullPatternTree()
 	{
-		root = new IncrementalPatternTreeNode();
+		root = new IncrementalPatternTreeNode(PatternNodeType.ROOT);
 	}
 	
 	/**

@@ -51,10 +51,11 @@ class IncrementalPatternTreeNode
 	 */
 	private static final long serialVersionUID = -4750713892478332987L;
 	
-	private PatternNodeType type;
+	private PatternNodeType type; // The parent is actually only used as debugging info.
 	
 	private int pointNr = 0;
 	private int nextCoordinate = UNDEFINED_COORDINATE;
+	private IncrementalPatternTreeNode parent; // The parent is actually only used for debugging.
 	private IncrementalPatternTreeNode blackChild;
 	private IncrementalPatternTreeNode whiteChild;
 	private IncrementalPatternTreeNode emptyChild;
@@ -148,6 +149,7 @@ class IncrementalPatternTreeNode
 		{
 			Pattern pattern = terminalList.get(i);
 			IncrementalPatternTreeLeaf leaf = new IncrementalPatternTreeLeaf(pattern,spiral,done,orientation);
+			leaf.parent = this;
 			if (leafList==null)
 				leafList = new ArrayList<IncrementalPatternTreeLeaf>();
 			if (!isInList(leaf,leafList))
@@ -167,6 +169,7 @@ class IncrementalPatternTreeNode
 		{
 			if (noCareChild==null)
 				noCareChild = new IncrementalPatternTreeNode(PatternNodeType.NOCARE);
+			noCareChild.parent = this;
 			noCareChild.addPatterns(noCareList,spiral,depth+1,orientation,done);
 		}
 
@@ -174,24 +177,28 @@ class IncrementalPatternTreeNode
 		{
 			if (blackChild==null)
 				blackChild = new IncrementalPatternTreeNode(PatternNodeType.BLACK);
+			blackChild.parent = this;
 			blackChild.addPatterns(blackList,spiral,depth+1,orientation,done);
 		}
 		if (whiteList.size()!=0)
 		{
 			if (whiteChild==null)
 				whiteChild = new IncrementalPatternTreeNode(PatternNodeType.WHITE);
+			whiteChild.parent = this;
 			whiteChild.addPatterns(whiteList,spiral,depth+1,orientation,done);
 		}
 		if (emptyList.size()!=0)
 		{
 			if (emptyChild==null)
 				emptyChild = new IncrementalPatternTreeNode(PatternNodeType.EMPTY);
+			emptyChild.parent = this;
 			emptyChild.addPatterns(emptyList,spiral,depth+1,orientation,done);
 		}
 		if (edgeList.size()!=0)
 		{
 			if (edgeChild==null)
 				edgeChild = new IncrementalPatternTreeNode(PatternNodeType.EDGE);
+			edgeChild.parent = this;
 			edgeChild.addPatterns(edgeList,spiral,depth+1,orientation,done);
 		}
 			

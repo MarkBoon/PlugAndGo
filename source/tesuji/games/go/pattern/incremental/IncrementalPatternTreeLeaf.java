@@ -53,6 +53,8 @@ class IncrementalPatternTreeLeaf
 	private int orientation;					// Orientation in which the pattern is stored in the tree.
 	private List<PatternConditionInterface> conditions;	// A list with the conditions put in the proper orientation
 	
+	IncrementalPatternTreeNode parent; // The parent is actually only used for debugging.
+	
 	/**
 		Construct the object that describes a pattern as a leaf node in the search tree
 		by getting the data from a pattern object.

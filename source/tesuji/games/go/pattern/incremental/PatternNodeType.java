@@ -6,5 +6,6 @@ public enum PatternNodeType
 	BLACK,
 	WHITE,
 	EDGE,
-	NOCARE
+	NOCARE,
+	ROOT
 }
