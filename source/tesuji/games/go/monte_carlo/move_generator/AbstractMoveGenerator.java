@@ -42,6 +42,10 @@ public abstract class AbstractMoveGenerator implements MoveGenerator
 	public void clear()
 	{
 	}
+	
+	public void setBoardSize(int size)
+	{
+	}
 
 	public void update()
 	{

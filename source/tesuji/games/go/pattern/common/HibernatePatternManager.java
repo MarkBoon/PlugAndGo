@@ -158,6 +158,7 @@ public class HibernatePatternManager
         	Session hibernateSession = openSession();        	
 	    	Transaction t = hibernateSession.beginTransaction();
 	    	hibernateSession.delete(pattern);
+	    	hibernateSession.flush();
 	    	t.commit();
         }
         catch (HibernateException ex)
@@ -181,6 +182,7 @@ public class HibernatePatternManager
         	Session hibernateSession = openSession();        	
 	    	Transaction t = hibernateSession.beginTransaction();
         	hibernateSession.update(pattern);
+	    	hibernateSession.flush();
         	t.commit();
         }
         catch (HibernateException ex)
@@ -238,6 +240,7 @@ public class HibernatePatternManager
         		Pattern pattern = patternList.get(i);
         		pattern.setPatternNr(i);
         		hibernateSession.update(pattern);
+    	    	hibernateSession.flush();
         	}
 	    	t.commit();
         }
@@ -287,6 +290,7 @@ public class HibernatePatternManager
 	    	Session hibernateSession = openSession();        	
 	    	Transaction t = hibernateSession.beginTransaction();
 	    	hibernateSession.delete(patternGroup);
+	    	hibernateSession.flush();
 	    	t.commit();
 	    }
 	    catch (HibernateException ex)
@@ -311,6 +315,7 @@ public class HibernatePatternManager
 	    	Transaction t = hibernateSession.beginTransaction();
 	    	logger.info("Update group "+patternGroup+"-"+patternGroup.getDescription());
 	    	hibernateSession.update(patternGroup);
+	    	hibernateSession.flush();
 	    	t.commit();
 	    }
 	    catch (HibernateException ex)

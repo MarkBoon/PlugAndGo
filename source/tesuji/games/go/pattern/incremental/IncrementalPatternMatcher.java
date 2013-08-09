@@ -59,7 +59,7 @@ public class IncrementalPatternMatcher
 	private PatternGroup group;
 	private FullPatternTree tree;
 	private PatternManager patternManager;
-	private DefaultBoardModel _boardModel = new DefaultBoardModel();;
+	private DefaultBoardModel _boardModel; // = new DefaultBoardModel();
 	private PatternMatchList _matchList = new PatternMatchList();
 	private ArrayList<BoardChange> _boardChangeList = new ArrayList<BoardChange>(32);
 	private int _moveNr;
@@ -76,6 +76,7 @@ public class IncrementalPatternMatcher
 	 */
 	public IncrementalPatternMatcher()
 	{
+		matchingState = new MatchingState[GoArray.MAX];
 		group = new PatternGroup();
 		
 		recomputeTree();
@@ -90,7 +91,21 @@ public class IncrementalPatternMatcher
 		setPatternGroup(patternGroup);
 	}
 	
-	public void initialise(BoardModel boardModel)
+	public void setBoardSize(int size)
+	{
+		_boardModel = new DefaultBoardModel(size);
+		for (int i=0; i<GoArray.MAX; i++)
+		{
+			if (_boardModel.get(i)!=EDGE)
+			{
+				_boardModel.set(i,_boardModel.get(i));
+				matchingState[i] = new MatchingState();
+				matchingState[i].add(tree.getRoot());
+			}
+		}
+	}
+	
+	public void initialise()
 	{
 		// Due to the incremental nature of this pattern-matcher, new patterns can only be added
 		// before a new game starts, not during a game.
@@ -113,18 +128,17 @@ public class IncrementalPatternMatcher
 		_moveNr = 1;
 		_matchList.clear();
 		_boardChangeList.clear();
-		_boardModel = (DefaultBoardModel) boardModel;
+//		_boardModel = (DefaultBoardModel) boardModel;
 //		boardModel.addBoardModelListener(this);
-		matchingState = new MatchingState[GoArray.MAX];
-		for (int i=0; i<GoArray.MAX; i++)
-		{
-			if (_boardModel.get(i)!=EDGE)
-			{
-				_boardModel.set(i,boardModel.get(i));
-				matchingState[i] = new MatchingState();
-				matchingState[i].add(tree.getRoot());
-			}
-		}
+//		for (int i=0; i<GoArray.MAX; i++)
+//		{
+//			if (_boardModel.get(i)!=EDGE)
+//			{
+//				_boardModel.set(i,_boardModel.get(i));
+//				matchingState[i] = new MatchingState();
+//				matchingState[i].add(tree.getRoot());
+//			}
+//		}
 		for (int i=0; i<GoArray.MAX; i++)
 		{
 			if (_boardModel.get(i)!=EDGE)
@@ -227,7 +241,7 @@ public class IncrementalPatternMatcher
 				int nextXY = noCareChild.getNextCoordinate()+startXY;
 				if (nextXY>0 && nextXY<GoArray.MAX && matchingState[nextXY]!=null)
 					matchingState[nextXY].add(noCareChild);
-				recursiveMatchAndStoreState(noCareChild,startXY);
+				recursiveMatchAndStoreState(noCareChild,startXY); // XXX - was startXY!!!
 			}
 
 			// Figure out what's on the board point to be examined next. 
@@ -253,7 +267,7 @@ public class IncrementalPatternMatcher
 				int nextXY = noCareChild.getNextCoordinate()+startXY;
 				if (nextXY>0 && nextXY<GoArray.MAX && matchingState[nextXY]!=null)
 					matchingState[nextXY].remove(noCareChild);
-				recursiveMatchAndRemoveState(noCareChild,startXY);
+				recursiveMatchAndRemoveState(noCareChild,startXY); // XXX - was startXY!!!
 			}
 
 			// Figure out what's on the board point to be examined next. 
@@ -455,6 +469,8 @@ public class IncrementalPatternMatcher
     	tree = source.tree;
     	patternManager = source.patternManager;
     	
+    	if (_boardModel.getBoardSize()==0)
+    		_boardModel.setBoardSize(source._boardModel.getBoardSize());
     	System.arraycopy(source._boardModel.getSingleArray(), 0, _boardModel.getSingleArray() , 0, source._boardModel.getSingleArray().length);
 //    	GoArray.copy(source._boardModel.getSingleArray(), _boardModel.getSingleArray());
     	_matchList.copyDataFrom(source._matchList);

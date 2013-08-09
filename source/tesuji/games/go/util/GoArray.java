@@ -54,32 +54,10 @@ public class GoArray
 	/** Easy to spot number used for illegal or unitialized data. */
 	public static final int ILLEGAL_VALUE = Integer.MIN_VALUE;
 	
-	// Since Java has no facility to clear arrays fast, these
-	// arrays are kept empty and copied over existing arrays
-	// when they need to be cleared. Because Java *does* have a
-	// fast native array-copy function.
-//	private static final byte[]		byteZeros = 	new byte[MAX];
-//	private static final short[]	shortZeros = 	new short[MAX];
-//	private static final int[]		intZeros = 		new int[MAX];
-//	private static final long[]		longZeros = 	new long[MAX];
-//	private static final double[]	doubleZeros = 	new double[MAX];
-//	private static final Object[]	objectNulls = 	new Object[MAX];
-	
 	private static byte[][] rowArrays = new byte[WIDTH][0];
 
 //	private static IntStack toDoList = new IntStack();
 //	private static BoardMarker marker = new BoardMarker();
-	
-	// Is this actually necessary? Java already initializes everything to 0.
-//	static
-//	{
-//		for (int i=0; i<MAX; i++) byteZeros[i] = 0;
-//		for (int i=0; i<MAX; i++) shortZeros[i] = 0;
-//		for (int i=0; i<MAX; i++) intZeros[i] = 0;
-//		for (int i=0; i<MAX; i++) longZeros[i] = 0;
-//		for (int i=0; i<MAX; i++) doubleZeros[i] = 0.0;
-//		for (int i=0; i<MAX; i++) objectNulls[i] = null;
-//	}
 	
 	/**
 	 * Clear an array of byte
@@ -89,7 +67,6 @@ public class GoArray
 	public static final void clear(byte[] array)
 	{
 		Arrays.fill(array, (byte)0);
-//		System.arraycopy(byteZeros,0,array,0,MAX);
 	}
     
 	/**
@@ -100,7 +77,6 @@ public class GoArray
 	public static final void clear(short[] array)
 	{
 		Arrays.fill(array, (short)0);
-//		System.arraycopy(shortZeros,0,array,0,MAX);
 	}
     
 	/**
@@ -111,7 +87,6 @@ public class GoArray
 	public static final void clear(int[] array)
 	{
 		Arrays.fill(array, 0);
-//		System.arraycopy(intZeros,0,array,0,MAX);
 	}
     
 	/**
@@ -122,7 +97,6 @@ public class GoArray
 	public static final void clear(long[] array)
 	{
 		Arrays.fill(array, 0);
-//		System.arraycopy(longZeros,0,array,0,MAX);
 	}
     
 	/**
@@ -133,7 +107,6 @@ public class GoArray
 	public static final void clear(double[] array)
 	{
 		Arrays.fill(array,0.0);
-//		System.arraycopy(doubleZeros,0,array,0,MAX);
 	}
     
 	/**
@@ -144,7 +117,6 @@ public class GoArray
 	public static final void clear(float[] array)
 	{
 		Arrays.fill(array,0.0f);
-//		System.arraycopy(doubleZeros,0,array,0,MAX);
 	}
     
 	/**
@@ -155,7 +127,6 @@ public class GoArray
 	public static final void clear(Object[] array)
 	{
 		Arrays.fill(array,null);
-//		System.arraycopy(objectNulls,0,array,0,MAX);
 	}
     
 	/**

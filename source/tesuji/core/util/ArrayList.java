@@ -165,6 +165,7 @@ public class ArrayList<Type>
 			{
 				_array[i] = last;
 				_index--;
+				return;
 			}
 		}
 	}

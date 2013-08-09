@@ -51,6 +51,8 @@ class IncrementalPatternTreeNode
 	 */
 	private static final long serialVersionUID = -4750713892478332987L;
 	
+	private PatternNodeType type;
+	
 	private int pointNr = 0;
 	private int nextCoordinate = UNDEFINED_COORDINATE;
 	private IncrementalPatternTreeNode blackChild;
@@ -66,8 +68,9 @@ class IncrementalPatternTreeNode
 	/**
 	 * PatternTreeNode default constructor.
 	 */
-	public IncrementalPatternTreeNode()
+	public IncrementalPatternTreeNode(PatternNodeType type)
 	{
+		this.type = type;
 	}
 	
 	/**
@@ -163,32 +166,32 @@ class IncrementalPatternTreeNode
 		if (noCareList.size()!=0)
 		{
 			if (noCareChild==null)
-				noCareChild = new IncrementalPatternTreeNode();
+				noCareChild = new IncrementalPatternTreeNode(PatternNodeType.NOCARE);
 			noCareChild.addPatterns(noCareList,spiral,depth+1,orientation,done);
 		}
 
 		if (blackList.size()!=0)
 		{
 			if (blackChild==null)
-				blackChild = new IncrementalPatternTreeNode();
+				blackChild = new IncrementalPatternTreeNode(PatternNodeType.BLACK);
 			blackChild.addPatterns(blackList,spiral,depth+1,orientation,done);
 		}
 		if (whiteList.size()!=0)
 		{
 			if (whiteChild==null)
-				whiteChild = new IncrementalPatternTreeNode();
+				whiteChild = new IncrementalPatternTreeNode(PatternNodeType.WHITE);
 			whiteChild.addPatterns(whiteList,spiral,depth+1,orientation,done);
 		}
 		if (emptyList.size()!=0)
 		{
 			if (emptyChild==null)
-				emptyChild = new IncrementalPatternTreeNode();
+				emptyChild = new IncrementalPatternTreeNode(PatternNodeType.EMPTY);
 			emptyChild.addPatterns(emptyList,spiral,depth+1,orientation,done);
 		}
 		if (edgeList.size()!=0)
 		{
 			if (edgeChild==null)
-				edgeChild = new IncrementalPatternTreeNode();
+				edgeChild = new IncrementalPatternTreeNode(PatternNodeType.EDGE);
 			edgeChild.addPatterns(edgeList,spiral,depth+1,orientation,done);
 		}
 			

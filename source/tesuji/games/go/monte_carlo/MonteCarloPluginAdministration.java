@@ -1100,7 +1100,7 @@ public class MonteCarloPluginAdministration
 				{
 					int illegalXY = _illegalStack.pop();
 					emptyPoints.add(illegalXY);
-					_probabilityMap.add(illegalXY,getColorToMove());
+					_probabilityMap.reset(illegalXY,getColorToMove());
 				}
 				assert(_probabilityMap.isConsistent());
 				return xy;
@@ -1120,7 +1120,7 @@ public class MonteCarloPluginAdministration
 		{
 			int illegalXY = _illegalStack.pop();
 			emptyPoints.add(illegalXY);
-			_probabilityMap.add(illegalXY,getColorToMove());
+			_probabilityMap.reset(illegalXY,getColorToMove());
 		}
 
 		assert(_probabilityMap.isConsistent());
@@ -1175,7 +1175,7 @@ public class MonteCarloPluginAdministration
 				int xy = generator.generate();
 				if (xy!=UNDEFINED_COORDINATE)
 				{
-					_probabilityMap.add(xy,generator.getWeight());
+					_probabilityMap.add(xy,generator.getWeight(), _colorToPlay);
 //					return xy;
 				}
 			}
@@ -1834,6 +1834,14 @@ public class MonteCarloPluginAdministration
     	_boardSize = size;
     	//_board = GoArray.createBoardArray(size);
     	_boardModel.setBoardSize(size);
+		for (int i=_simulationMoveGeneratorList.size(); --i>=0;)
+		{
+			_simulationMoveGeneratorList.get(i).setBoardSize(size);
+		}
+		for (int i=_explorationMoveGeneratorList.size(); --i>=0;)
+		{
+			_explorationMoveGeneratorList.get(i).setBoardSize(size);
+		}
     	clear();
     }
     

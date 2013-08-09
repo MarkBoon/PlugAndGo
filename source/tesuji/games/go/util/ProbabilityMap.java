@@ -49,6 +49,10 @@ public class ProbabilityMap
 		_rowSum[1][y] += weight;
 		_total[0] += weight;
 		_total[1] += weight;
+		if (_weights[0][xy]<-ERROR_MARGIN)
+			throw new IllegalStateException();
+		if (_weights[1][xy]<-ERROR_MARGIN)
+			throw new IllegalStateException();
 		assert(isConsistent());
 	}
 
@@ -59,6 +63,8 @@ public class ProbabilityMap
 		_weights[i][xy] += weight;
 		_rowSum[i][y] += weight;
 		_total[i] += weight;
+		if (_weights[i][xy]<-ERROR_MARGIN)
+			throw new IllegalStateException();
 		assert(isConsistent());
 	}
 
@@ -78,11 +84,15 @@ public class ProbabilityMap
 		_weights[0][xy] -= weight;
 		_weights[1][xy] -= weight;
 		_rowSum[0][y] -= weight;
-		_rowSum[0][y] -= weight;
+		_rowSum[1][y] -= weight;
 //		assert(_rowSum[y]>=0.0);
 		_total[0] -= weight;
 		_total[1] -= weight;
 //		assert(_total>=0.0);
+		if (_weights[0][xy]<-ERROR_MARGIN)
+			throw new IllegalStateException();
+		if (_weights[1][xy]<-ERROR_MARGIN)
+			throw new IllegalStateException();
 		assert(isConsistent());
 	}
 	
@@ -95,6 +105,9 @@ public class ProbabilityMap
 //		assert(_rowSum[y]>=0.0);
 		_total[i] -= weight;
 //		assert(_total>=0.0);
+//		assert(_weights[i][xy]>=0.0);
+		if (_weights[i][xy]<-ERROR_MARGIN)
+			throw new IllegalStateException();
 		assert(isConsistent());
 	}
 
@@ -127,6 +140,18 @@ public class ProbabilityMap
 		_rowSum[i][y] -= weight;
 //		assert(_rowSum[y]>=0.0);
 		_total[i] -= weight;
+//		assert(_total>=0.0);
+	}
+
+	public void reset(int xy, byte color)
+	{
+		int i = (color==BLACK)? 0 : 1;
+		int y = GoArray.getY(xy);
+		double weight = _weights[i][xy];
+		_weights[i][xy] = DEFAULT;
+		_rowSum[i][y] -= weight-DEFAULT;
+//		assert(_rowSum[y]>=0.0);
+		_total[i] -= weight-DEFAULT;
 //		assert(_total>=0.0);
 	}
 

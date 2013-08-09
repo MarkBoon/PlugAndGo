@@ -8,6 +8,7 @@ public interface MoveGenerator
 	void register(MonteCarloPluginAdministration administration);
 	int generate();
 	void update();
+	void setBoardSize(int size);
 	MoveGenerator createClone();
 	void copyDataFrom(MoveGenerator source);
 	

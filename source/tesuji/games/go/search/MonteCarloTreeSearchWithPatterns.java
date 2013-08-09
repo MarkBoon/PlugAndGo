@@ -178,7 +178,7 @@ public class MonteCarloTreeSearchWithPatterns<MoveType extends Move>
 	{		
 		if (!_isInitialized)
 		{
-			_patternMatcher.initialise(_monteCarloAdministration.getBoardModel());
+			_patternMatcher.initialise();
 			_monteCarloAdministration.getBoardModel().addBoardModelListener(_patternMatcher);
 			_isInitialized = true;
 		}

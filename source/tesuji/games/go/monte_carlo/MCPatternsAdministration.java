@@ -106,6 +106,7 @@ public class MCPatternsAdministration
     	super.setBoardSize(size);
     	if (oldSize!=size)
     	{
+    		_patternSet.setBoardSize(size);
     		clear();
     	}
     }
@@ -117,7 +118,7 @@ public class MCPatternsAdministration
     	if (_patternSet!=null)
     		getBoardModel().removeBoardModelListener(_patternSet); // This deallocates the former pattern-tree.
 		_patternSet = loadPatternSet(_patternSet.getPatternGroup().getGroupName());
-		_patternSet.initialise(getBoardModel());
+		_patternSet.initialise();
     }
 
 	/*

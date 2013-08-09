@@ -50,8 +50,8 @@ public class ImmediateAtariEscape extends LadderMoveGenerator
 							int escapeXY = _ladderReader.getLastLadderMove();
 							if (escapeXY!=PASS && escapeXY!=UNDEFINED_COORDINATE)
 							{
-								administration.getProbabilityMap().add(escapeXY, 0.5);
-								//return escapeXY;
+								//administration.getProbabilityMap().add(escapeXY, 0.5);
+								return escapeXY;
 							}
 						}
 					}

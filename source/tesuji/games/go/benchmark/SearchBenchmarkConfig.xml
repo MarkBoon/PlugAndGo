@@ -33,9 +33,9 @@
 	<bean id="eyeMoveFilter" class="tesuji.games.go.monte_carlo.EyeMoveFilter" singleton="false"/>
 	<bean id="fogOfWarFilter" class="tesuji.games.go.monte_carlo.FogOfWarFilter" singleton="false"/>
 	
-<!--	<bean id="patternManager" class="tesuji.games.go.pattern.common.HibernatePatternManager" singleton="true">
+	<bean id="patternManager" class="tesuji.games.go.pattern.common.HibernatePatternManager" singleton="true">
 		<constructor-arg>
-			<value>GenTest</value>
+			<value>Simulation9x9</value>
 		</constructor-arg>
 	</bean>
 	
@@ -44,7 +44,7 @@
 			<ref bean="patternManager"/>
 		</constructor-arg>
 		<property name="urgency"><value>5</value></property>
-	</bean>-->
+	</bean>
 	
 	<bean id="MonteCarloTreeSearch" class="tesuji.games.go.search.MonteCarloTreeSearch" singleton="false">
 		<property name="monteCarloAdministration">
@@ -79,9 +79,10 @@
 				</property>
 				<property name="simulationMoveGeneratorList">
 					<list>
-						<!--<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"/>
-						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"/>
-						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"/>-->
+						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"><property name="weight"><value>0.5</value></property><property name="checkHistory"><value>false</value></property></bean>
+						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"><property name="weight"><value>0.4</value></property><property name="checkHistory"><value>false</value></property></bean>
+						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"><property name="weight"><value>0.3</value></property><property name="checkHistory"><value>false</value></property></bean>
+						<ref bean="patternMatcher"/>
 					</list>
 				</property>
 				<property name="explorationMoveGeneratorList">
@@ -122,10 +123,10 @@
 				</property>
 				<property name="simulationMoveGeneratorList">
 					<list>
-						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"/>
-						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"/>
-						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"/>
-						<!-- <ref bean="patternMatcher"/> -->
+						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"><property name="weight"><value>0.5</value></property><property name="checkHistory"><value>false</value></property></bean>
+						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"><property name="weight"><value>0.4</value></property><property name="checkHistory"><value>false</value></property></bean>
+						<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"><property name="weight"><value>0.3</value></property><property name="checkHistory"><value>false</value></property></bean>
+						<ref bean="patternMatcher"/>
 					</list>
 				</property>
 				<property name="explorationMoveGeneratorList">
@@ -151,9 +152,6 @@
 		</property>
 		<property name="nrSimulationsBeforeExpansion">
 			<value>64</value>
-		</property>
-		<property name="isTestVersion">
-			<value>false</value>
 		</property>
 	</bean>
  	

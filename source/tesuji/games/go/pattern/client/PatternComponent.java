@@ -434,7 +434,9 @@ public class PatternComponent
 		if (pattern!=null)
 			pattern.addPropertyChangeListener(this);
 		calculateSizes();
-		repaint();
+//		repaint();
+		if (getGraphics()!=null)
+			paint(getGraphics());
 	}
 	
 	/**

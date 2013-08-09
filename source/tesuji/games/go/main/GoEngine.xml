@@ -54,9 +54,9 @@
 						</property>
 						<property name="simulationMoveGeneratorList">
 							<list>
-								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"><property name="weight"><value>0.5</value></property><property name="checkHistory"><value>false</value></property></bean>
-								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"><property name="weight"><value>0.4</value></property><property name="checkHistory"><value>false</value></property></bean>
-								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"><property name="weight"><value>0.3</value></property><property name="checkHistory"><value>false</value></property></bean>
+								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"><property name="weight"><value>5000</value></property><property name="checkHistory"><value>false</value></property></bean>
+								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"><property name="weight"><value>4000</value></property><property name="checkHistory"><value>false</value></property></bean>
+								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"><property name="weight"><value>3000</value></property><property name="checkHistory"><value>false</value></property></bean>
 								<ref bean="patternMatcher"/>
 							</list>
 						</property>

@@ -113,7 +113,7 @@ public class PatternListController
 			return;
 
 		patternManager.removePattern(selectedPattern);
-		patternList.remove(selectedPattern);
+		patternList.delete(selectedPattern);
 		selectedPattern = null;
 	}
 	
