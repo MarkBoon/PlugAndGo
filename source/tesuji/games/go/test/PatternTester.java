@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import tesuji.core.util.LoggerConfigurator;
 import tesuji.games.general.TreeNode;
 import tesuji.games.go.common.GoMove;
 import tesuji.games.go.common.GoMoveFactory;
@@ -22,6 +23,7 @@ public class PatternTester
 	
 	public static void main(String[] args) throws ParseException
 	{
+		LoggerConfigurator.configure();
 		HibernatePatternManager patternManager = new HibernatePatternManager("Simulation9X9");
 		MatchPatterns matchPatterns = new MatchPatterns(patternManager);
 		MonteCarloPluginAdministration admin = new MonteCarloPluginAdministration();

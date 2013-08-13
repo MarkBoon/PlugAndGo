@@ -72,7 +72,7 @@ public class PatternMatchList
 		remove(index);
 		get(index).matchListIndex = index;
 	}
-
+	
 	public void reset()
 	{
 		super.clear();

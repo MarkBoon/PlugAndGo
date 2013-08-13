@@ -71,7 +71,7 @@ public class MatchingState
     	return null;
     }
     
-    private PatternMatch findMatch(IncrementalPatternTreeLeaf leaf, int startXY)
+    public PatternMatch findMatch(IncrementalPatternTreeLeaf leaf, int startXY)
     {
     	for (int i=_matchList.size(); --i>=0;)
     	{
@@ -82,7 +82,7 @@ public class MatchingState
     	return null;
     }
     
-    private IncrementalPatternTreeNode findNode(IncrementalPatternTreeNode node)
+    IncrementalPatternTreeNode findNode(IncrementalPatternTreeNode node)
     {
     	for (int i=_nodeList.size(); --i>=0;)
     	{
