@@ -42,20 +42,21 @@ public class SearchResultFactory
 	 * This has the double benefit of not needing synchronization of the object-pool
 	 * and that threads don't have to wait for each other to create objects.
 	 */
-	static class LocalAllocationHelper
-		extends ThreadLocal<SearchResultFactory>
-	{
-		@Override
-		public SearchResultFactory initialValue()
-		{
-			return new SearchResultFactory();
-		}
-	}
+//	static class LocalAllocationHelper
+//		extends ThreadLocal<SearchResultFactory>
+//	{
+//		@Override
+//		public SearchResultFactory initialValue()
+//		{
+//			return new SearchResultFactory();
+//		}
+//	}
+//
+//	private static LocalAllocationHelper _singleton;
+	private static SearchResultFactory _singleton;
 
-	private static LocalAllocationHelper _singleton;
-
-	private ArrayStack<MonteCarloTreeSearchResult<GoMove>> mctsResultPool =
-		new ArrayStack<MonteCarloTreeSearchResult<GoMove>>();
+	private SynchronizedArrayStack<MonteCarloTreeSearchResult<GoMove>> mctsResultPool =
+		new SynchronizedArrayStack<MonteCarloTreeSearchResult<GoMove>>();
 	
 	private static SynchronizedArrayStack<MonteCarloHashMapResult> mchmResultPool =
 		new SynchronizedArrayStack<MonteCarloHashMapResult>();
@@ -63,12 +64,18 @@ public class SearchResultFactory
 	public static SearchResultFactory getSingleton()
 	{
 		if (_singleton==null)
+			_singleton = new SearchResultFactory();
+		return _singleton;
+
+		/*
+		if (_singleton==null)
 		{
 			_singleton = new LocalAllocationHelper();
 			FactoryReport.addFactory(_singleton.get());
 		}
 		
 		return _singleton.get();
+		*/
 	}
 	
 	/*

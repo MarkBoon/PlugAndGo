@@ -7,20 +7,23 @@ import tesuji.core.util.SynchronizedArrayStack;
  */
 public class PatternMatchFactory
 {
+	private static int nrMatches = 0;
+
 	/**
 	 * This helper-class ensures there's a unique factory for each thread.
 	 */
-	static class LocalAllocationHelper
-		extends ThreadLocal<PatternMatchFactory>
-	{
-		@Override
-		public PatternMatchFactory initialValue()
-		{
-			return new PatternMatchFactory();
-		}
-	}
-
-	private static LocalAllocationHelper _singleton;
+//	static class LocalAllocationHelper
+//		extends ThreadLocal<PatternMatchFactory>
+//	{
+//		@Override
+//		public PatternMatchFactory initialValue()
+//		{
+//			return new PatternMatchFactory();
+//		}
+//	}
+//
+//	private static LocalAllocationHelper _singleton;
+	private static PatternMatchFactory _singleton;
 
 	private static final int INITIAL_POOL_SIZE = 2000;
 
@@ -29,9 +32,19 @@ public class PatternMatchFactory
 	public static PatternMatchFactory getSingleton()
 	{
 		if (_singleton==null)
+			_singleton = new PatternMatchFactory();
+		return _singleton;
+		/*
+		if (_singleton==null)
 			_singleton = new LocalAllocationHelper();
 		
 		return _singleton.get();
+		*/
+	}
+	
+	public String getFactoryReport()
+	{
+		return "Number of PatternMatch objects:\t\t\t"+nrMatches;
 	}
 	
 	private PatternMatchFactory()
@@ -50,6 +63,7 @@ public class PatternMatchFactory
 		{
 			if (pool.isEmpty())
 			{
+				nrMatches++;
 				return new PatternMatch(pool);
 			}
 			else

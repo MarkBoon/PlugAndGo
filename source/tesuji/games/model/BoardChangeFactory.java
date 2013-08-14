@@ -26,7 +26,6 @@
 package tesuji.games.model;
 
 import tesuji.core.util.Factory;
-import tesuji.core.util.FactoryReport;
 import tesuji.core.util.SynchronizedArrayStack;
 import tesuji.games.go.util.GoArray;
 
@@ -37,26 +36,33 @@ public class BoardChangeFactory
 	implements Factory
 {
 	private static int nrBoardChanges = 0;
-	
+
+	private static final int INITIAL_POOL_SIZE = 1000;
+
 	/**
 	 * This helper-class ensures there's a unique factory for each thread.
 	 */
-	static class LocalAllocationHelper
-		extends ThreadLocal<BoardChangeFactory>
-	{
-		@Override
-		public BoardChangeFactory initialValue()
-		{
-			return new BoardChangeFactory();
-		}
-	}
-
-	private static LocalAllocationHelper _singleton;
+//	static class LocalAllocationHelper
+//		extends ThreadLocal<BoardChangeFactory>
+//	{
+//		@Override
+//		public BoardChangeFactory initialValue()
+//		{
+//			return new BoardChangeFactory();
+//		}
+//	}
+//
+//	private static LocalAllocationHelper _singleton;
+	private static BoardChangeFactory _singleton;
 	
 	private SynchronizedArrayStack<BoardChange> pool = new SynchronizedArrayStack<BoardChange>();
 
 	public static BoardChangeFactory getSingleton()
 	{
+		if (_singleton==null)
+			_singleton = new BoardChangeFactory();
+		return _singleton;
+		/*
 		if (_singleton==null)
 		{
 			_singleton = new LocalAllocationHelper();
@@ -64,8 +70,15 @@ public class BoardChangeFactory
 		}
 		
 		return _singleton.get();
+		*/
 	}
 	
+	private BoardChangeFactory()
+	{
+		for (int i=0; i<INITIAL_POOL_SIZE; i++)
+			pool.push(new BoardChange(pool));
+	}
+
 	public String getFactoryName()
 	{
 		return "BoardChangeFactory";

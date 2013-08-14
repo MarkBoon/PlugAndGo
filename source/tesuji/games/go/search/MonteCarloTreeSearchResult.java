@@ -26,7 +26,7 @@
 
 package tesuji.games.go.search;
 
-import tesuji.core.util.ArrayStack;
+import tesuji.core.util.SynchronizedArrayStack;
 import tesuji.games.general.GlobalParameters;
 import tesuji.games.general.Move;
 import tesuji.games.general.search.SearchResult;
@@ -109,7 +109,7 @@ public class MonteCarloTreeSearchResult<MoveType extends Move>
 	private byte[] _blackOwnership;
 	private byte[] _whiteOwnership;
 	
-	private ArrayStack<MonteCarloTreeSearchResult<MoveType>> _owner;
+	private SynchronizedArrayStack<MonteCarloTreeSearchResult<MoveType>> _owner;
 	
 	protected MonteCarloTreeSearchResult()
 	{
@@ -120,7 +120,7 @@ public class MonteCarloTreeSearchResult<MoveType extends Move>
 	 * 
 	 * @param owner
 	 */
-	MonteCarloTreeSearchResult(ArrayStack<MonteCarloTreeSearchResult<MoveType>> owner)
+	MonteCarloTreeSearchResult(SynchronizedArrayStack<MonteCarloTreeSearchResult<MoveType>> owner)
 	{
 		_owner = owner;
 	}

@@ -37,6 +37,7 @@ import tesuji.core.util.LoggerConfigurator;
 import tesuji.games.general.search.Search;
 import tesuji.games.general.search.SearchProperties;
 import tesuji.games.go.common.GoMove;
+import tesuji.games.go.pattern.incremental.PatternMatchFactory;
 import tesuji.games.go.util.GoGameProperties;
 import tesuji.games.go.util.Statistics;
 
@@ -87,6 +88,7 @@ public class SearchBenchmarkSuite
 			SearchBenchmark.doSearch(search);
 		}		
 		_logger.info("");
+		_logger.info("Nr pattern matches created: "+PatternMatchFactory.getSingleton().getFactoryReport());
 		_logger.info("Done.");
 		System.exit(0);
 	}

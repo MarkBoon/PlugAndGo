@@ -40,7 +40,7 @@ import tesuji.games.model.BoardModel;
 public class GoArray
 {
 	/** Width of a 'row'. */
-	public static final int MAX_BOARD_SIZE = 9;
+	public static final int MAX_BOARD_SIZE = 19;
 	/** Width of a 'row'. */
 	public static final int WIDTH = MAX_BOARD_SIZE+1;
 	/** Width of a 'row'. */

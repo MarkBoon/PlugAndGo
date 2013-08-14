@@ -127,7 +127,7 @@ public class IncrementalPatternMatcher
 		
 		_moveNr = 1;
 		_matchList.clear();
-		_boardChangeList.clear();
+    	clearBoardChangeList();
 		for (int i=0; i<GoArray.MAX; i++)
 		{
 			if (_boardModel.get(i)!=EDGE)
@@ -560,7 +560,7 @@ public class IncrementalPatternMatcher
     	_matchList.copyDataFrom(source._matchList);
 //    	assert(_matchList.equals(source._matchList));
     	_deletedMatchList.clear(); // TODO - check for correctness.
-    	_boardChangeList.clear();  // TODO - check for correctness.
+    	clearBoardChangeList();
     	_moveNr = source._moveNr;
 		for (int i=0; i<GoArray.MAX; i++)
 		{
@@ -575,6 +575,16 @@ public class IncrementalPatternMatcher
 		assert(isEqual(this,source));
 		if (_boardModel.hasListeners())
 			return;
+    }
+    
+    private void clearBoardChangeList()
+    {
+    	for (int i=_boardChangeList.size(); --i>=0;)
+    	{
+    		BoardChange bc = _boardChangeList.get(i);
+    		bc.recycle();
+    	}
+    	_boardChangeList.clear();
     }
     
     /**
