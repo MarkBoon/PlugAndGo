@@ -1302,12 +1302,14 @@ public class Pattern
 	public void setUserX(int x)
 	{
 		userX = x;
+		startX = x;
 		
 		firePropertyChange(USERPOINT_PROPERTY,null,new Point(userX,userX));
 	}
 	public void setUserY(int y)
 	{
 		userY = y;
+		startY = y;
 		
 		firePropertyChange(USERPOINT_PROPERTY,null,new Point(userX,userX));
 	}
@@ -1363,7 +1365,15 @@ public class Pattern
 					else
 						c = 'o';
 				}
-				
+				if (i==startX && j==startY)
+				{
+					if (c=='x')
+						c = 'b';
+					else if (c=='o')
+						c = 'w';
+					else
+						c = '#';
+				}
 				stringBuffer.append(c);
 			}
 			if (hasRightEdge())

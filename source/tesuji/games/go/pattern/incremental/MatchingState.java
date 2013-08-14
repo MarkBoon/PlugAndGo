@@ -50,6 +50,12 @@ public class MatchingState
     {
     	return _nodeList;
     }
+    
+    public void clear()
+    {
+    	_matchList.clear();
+    	_nodeList.clear();
+    }
 
     public void add(PatternMatch match)
     {
@@ -94,6 +100,7 @@ public class MatchingState
     
     public void add(IncrementalPatternTreeNode node)
     {
+    	assert(findNode(node)==null);
     	_nodeList.add(node);
     }
     
@@ -107,6 +114,7 @@ public class MatchingState
     			return;
     		}
     	}
+    	assert(false);
     }
        
     public boolean hasMatches()

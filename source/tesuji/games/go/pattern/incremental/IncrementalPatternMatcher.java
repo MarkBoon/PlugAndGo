@@ -128,17 +128,14 @@ public class IncrementalPatternMatcher
 		_moveNr = 1;
 		_matchList.clear();
 		_boardChangeList.clear();
-//		_boardModel = (DefaultBoardModel) boardModel;
-//		boardModel.addBoardModelListener(this);
-//		for (int i=0; i<GoArray.MAX; i++)
-//		{
-//			if (_boardModel.get(i)!=EDGE)
-//			{
-//				_boardModel.set(i,_boardModel.get(i));
-//				matchingState[i] = new MatchingState();
-//				matchingState[i].add(tree.getRoot());
-//			}
-//		}
+		for (int i=0; i<GoArray.MAX; i++)
+		{
+			if (_boardModel.get(i)!=EDGE)
+			{
+				matchingState[i].clear();
+				matchingState[i].add(tree.getRoot()); // XXX - superfluous?
+			}
+		}
 		for (int i=0; i<GoArray.MAX; i++)
 		{
 			if (_boardModel.get(i)!=EDGE)
@@ -207,17 +204,15 @@ public class IncrementalPatternMatcher
     		{
     			IncrementalPatternTreeNode node = nodeList.get(n);
     			recursiveMatchAndRemoveState(node,xy-node.getNextCoordinate());
-    	    	assert(checkConsistency());
     		}
-    		
+
     		_boardModel.set(boardChange.getXY(), boardChange.getNewValue());
-    		
+
     		for (int n=0; n<nodeList.size(); n++)
     		{
     			IncrementalPatternTreeNode node = nodeList.get(n);
     			recursiveMatchAndStoreState(node,xy-node.getNextCoordinate());
     		}
-    		
     		boardChange.recycle();
     	}
 
@@ -270,7 +265,6 @@ public class IncrementalPatternMatcher
 			}
 
 			// Figure out what's on the board point to be examined next. 
-			// Appropriately update node
 			node = getNextNodeAndCheck(node,startXY);
 		}
 	}

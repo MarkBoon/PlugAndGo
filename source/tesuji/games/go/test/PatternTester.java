@@ -14,17 +14,20 @@ import tesuji.games.go.monte_carlo.MoveFilter;
 import tesuji.games.go.monte_carlo.move_generator.MatchPatterns;
 import tesuji.games.go.monte_carlo.move_generator.MoveGenerator;
 import tesuji.games.go.pattern.common.HibernatePatternManager;
+import tesuji.games.go.pattern.incremental.PatternMatchList;
 import tesuji.games.sgf.SGFData;
 import tesuji.games.sgf.SGFParser;
 
 public class PatternTester
 {
-	private static final String sgf = "(;B[ba];W[fe];B[gb];W[fb];B[gf];W[ce];B[eg];W[db];B[fc];W[hc];B[af];W[dd];B[bd];W[fi];B[eh];W[gc];B[fg];W[bi];B[bg];W[dg];B[fh];W[gd];B[ef];W[ab];B[hb];W[dh];B[he];W[dc];B[ci];W[bh];B[cc];W[ig];B[if];W[hg];B[gh];W[eb];B[ia];W[ee];B[ie];W[ca];B[da];W[ic];B[id];W[ed];B[cf];W[ea];B[ib];W[di];B[gi];W[ff];B[ad];W[ch];B[cd];W[ah];B[hf];W[ag];B[gg];W[hd];B[ec];W[de];B[bb];W[ei];B[ih];W[hh];B[ga];W[ac];B[ii];W[ge];B[df];W[cb];B[bc];W[be];B[aa];W[ae];B[fa];W[fd];B[bf];W[ec];B[cg];W[ac];B[hi];W[hg];B[ig];W[hh])";
+	private static final String sgf = "(;B[ig];W[ic];B[cd];W[ag];B[bc];W[gc];B[eh];W[gh];B[ab];W[ac];B[ai];W[da];B[fa];W[cg];B[eb];W[bb];B[ia];W[ef];B[ff];W[hd];B[id];W[de];B[fg];W[fe];B[gb];W[ci];B[hh];W[hb];B[aa];W[fb];B[dd];W[bd];B[hf];W[gg];B[gd];W[eg];B[fh];W[dc];B[ec];W[ah];B[bf];W[di];B[bh];W[ea];B[ha];W[hg];B[ad];W[ba];B[bi];W[ac];B[cf];W[aa];B[ce];W[ee];B[fc];W[dh];B[gi];W[ab];B[ca];W[he];B[af];W[if];B[cb];W[dg];B[ab];W[cc];B[bb];W[ei];B[df];W[ie];B[fd];W[bg];B[ii];W[hc];B[db])";
+
+//	private static final String sgf = "(;B[ba];W[fe];B[gb];W[fb];B[gf];W[ce];B[eg];W[db];B[fc];W[hc];B[af];W[dd];B[bd];W[fi];B[eh];W[gc];B[fg];W[bi];B[bg];W[dg];B[fh];W[gd];B[ef];W[ab];B[hb];W[dh];B[he];W[dc];B[ci];W[bh];B[cc];W[ig];B[if];W[hg];B[gh];W[eb];B[ia];W[ee];B[ie];W[ca];B[da];W[ic];B[id];W[ed];B[cf];W[ea];B[ib];W[di];B[gi];W[ff];B[ad];W[ch];B[cd];W[ah];B[hf];W[ag];B[gg];W[hd];B[ec];W[de];B[bb];W[ei];B[ih];W[hh];B[ga];W[ac];B[ii];W[ge];B[df];W[cb];B[bc];W[be];B[aa];W[ae];B[fa];W[fd];B[bf];W[ec];B[cg];W[ac];B[hi];W[hg];B[ig];W[hh])";
 	
 	public static void main(String[] args) throws ParseException
 	{
 		LoggerConfigurator.configure();
-		HibernatePatternManager patternManager = new HibernatePatternManager("Simulation9X9");
+		HibernatePatternManager patternManager = new HibernatePatternManager("Test");
 		MatchPatterns matchPatterns = new MatchPatterns(patternManager);
 		MonteCarloPluginAdministration admin = new MonteCarloPluginAdministration();
 		List<MoveFilter> filterList = new ArrayList<MoveFilter>();
@@ -39,11 +42,14 @@ public class PatternTester
 		SGFParser<GoMove> parser = new SGFParser<GoMove>(GoMoveFactory.getSingleton());
 		parser.parse(sgf);
 		TreeNode<SGFData<GoMove>> node = parser.getDocumentNode();
+		PatternMatchList list = matchPatterns.getMatches();
+		int nrMoves = 0;
 		node = node.getFirstChild();
 		while (node!=null)
 		{
 			admin.playMove(node.getContent().getMove());
 			node = node.getFirstChild();
+			nrMoves++;
 		}
 		System.out.println("Done");
 	}

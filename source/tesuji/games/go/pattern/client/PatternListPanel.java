@@ -382,6 +382,7 @@ public class PatternListPanel
 							if (selectedPatternComponent!=null)
 								selectedPatternComponent.setSelected(false);
 							controller.setSelectedPattern(patternComponent.getPattern());
+							System.out.println(patternComponent.getPattern().toString());
 							actionManager.applyRules();
 							selectedPatternComponent = patternComponent;
 							patternComponent.setSelected(true);

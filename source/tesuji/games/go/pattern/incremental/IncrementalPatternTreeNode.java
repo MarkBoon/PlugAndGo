@@ -402,7 +402,7 @@ class IncrementalPatternTreeNode
 					if (done[i]!=0)
 						continue;
 	
-					if (depth<5)
+					if (depth<500) // XXX - experiment, was <5
 					{
 						bestPoint = i;
 						break;

@@ -7,6 +7,7 @@ import tesuji.games.go.monte_carlo.MonteCarloPluginAdministration;
 import tesuji.games.go.pattern.common.PatternManager;
 import tesuji.games.go.pattern.incremental.IncrementalPatternMatcher;
 import tesuji.games.go.pattern.incremental.PatternMatch;
+import tesuji.games.go.pattern.incremental.PatternMatchList;
 import tesuji.games.go.util.ProbabilityMap;
 
 public class MatchPatterns extends AbstractMoveGenerator
@@ -96,22 +97,31 @@ public class MatchPatterns extends AbstractMoveGenerator
     	byte[] board = administration.getBoardArray();
     	ProbabilityMap map = administration.getProbabilityMap();
 		_patternMatcher.updatePatternMatches();
-		ArrayList<PatternMatch> matchList = _patternMatcher.getDeletedMatchList();
-		for (PatternMatch pm : matchList)
-		{
-			if (board[pm.getMoveXY(ColorConstant.BLACK)]==ColorConstant.EMPTY)
-				map.subtract(pm.getMoveXY(ColorConstant.BLACK), pm.getUrgencyValue(ColorConstant.BLACK), ColorConstant.BLACK);
-			if (board[pm.getMoveXY(ColorConstant.WHITE)]==ColorConstant.EMPTY)
-				map.subtract(pm.getMoveXY(ColorConstant.WHITE), pm.getUrgencyValue(ColorConstant.WHITE), ColorConstant.WHITE);
-		}
-		matchList = _patternMatcher.getNewMatchList();
-		for (PatternMatch pm : matchList)
+		ArrayList<PatternMatch> deletedMatchList = _patternMatcher.getDeletedMatchList();
+		ArrayList<PatternMatch> newMatchList = _patternMatcher.getNewMatchList();
+		for (PatternMatch pm : newMatchList)
 		{
 			if (board[pm.getMoveXY(ColorConstant.BLACK)]==ColorConstant.EMPTY)
 				map.add(pm.getMoveXY(ColorConstant.BLACK), pm.getUrgencyValue(ColorConstant.BLACK), ColorConstant.BLACK);
 			if (board[pm.getMoveXY(ColorConstant.WHITE)]==ColorConstant.EMPTY)
 				map.add(pm.getMoveXY(ColorConstant.WHITE), pm.getUrgencyValue(ColorConstant.WHITE), ColorConstant.WHITE);
 		}
+		for (PatternMatch pm : deletedMatchList)
+		{
+			if (board[pm.getMoveXY(ColorConstant.BLACK)]==ColorConstant.EMPTY)
+				map.subtract(pm.getMoveXY(ColorConstant.BLACK), pm.getUrgencyValue(ColorConstant.BLACK), ColorConstant.BLACK);
+			if (board[pm.getMoveXY(ColorConstant.WHITE)]==ColorConstant.EMPTY)
+				map.subtract(pm.getMoveXY(ColorConstant.WHITE), pm.getUrgencyValue(ColorConstant.WHITE), ColorConstant.WHITE);
+		}
 	}
 
+	public String toString()
+	{
+		return administration.toString();
+	}
+	
+	public PatternMatchList getMatches()
+	{
+		return _patternMatcher.getMatchList();
+	}
 }
