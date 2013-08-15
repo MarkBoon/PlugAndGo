@@ -100,8 +100,31 @@ public class PointSpiral
 			for (int j=d-1; j>-d; j--)	{ spiralMapX[counter] = -d;	spiralMapY[counter++] = j; }
 		}
 
+		//sortSpiral();
+		
 		pointOrder = new int[LONGEST_SPIRAL];
 		computePointOrder();
+	}
+	
+	private void sortSpiral()
+	{
+		for (int i=0; i<spiralMapX.length; i++)
+		{
+			for (int j=i+1; j<spiralMapX.length; j++)
+			{
+				int diff1 = Math.abs(spiralMapX[i]) + Math.abs(spiralMapY[i]);
+				int diff2 = Math.abs(spiralMapX[j]) + Math.abs(spiralMapY[j]);
+				if (diff2<diff1)
+				{
+					int tmpX = spiralMapX[i];
+					int tmpY = spiralMapY[i];
+					spiralMapX[i] = spiralMapX[j];
+					spiralMapY[i] = spiralMapY[j];
+					spiralMapX[j] = tmpX;
+					spiralMapY[j] = tmpY;
+				}
+			}
+		}
 	}
 
 	/**

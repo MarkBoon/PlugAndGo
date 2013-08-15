@@ -127,6 +127,8 @@ public class IncrementalPatternMatcher
 		
 		_moveNr = 1;
 		_matchList.clear();
+		_newMatchList.clear();
+		_deletedMatchList.clear();
     	clearBoardChangeList();
 		for (int i=0; i<GoArray.MAX; i++)
 		{
@@ -193,6 +195,9 @@ public class IncrementalPatternMatcher
 		_deletedMatchList.clear();
 		if (_boardModel.hasListeners())
 			return;
+		
+    	assert(checkConsistency());
+
     	for (int i=0; i<_boardChangeList.size(); i++)
     	{
     		BoardChange boardChange = _boardChangeList.get(i);
@@ -456,7 +461,7 @@ public class IncrementalPatternMatcher
 	private void removeMatch(IncrementalPatternTreeLeaf leaf, int startXY)
 	{
 		PatternMatch match = matchingState[startXY].findAndRemoveMatch(leaf, startXY);
-//		assert(match!=null); // It came here, there should be a match to be found.
+		assert(match!=null); // It came here, there should be a match to be found.
 		if (match==null)
 			return; // Actually, it happens when patterns are added dynamically.
 		_matchList.removeMatch(match);

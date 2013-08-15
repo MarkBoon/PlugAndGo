@@ -35,7 +35,7 @@ public class MatchingState
 {
 	// TODO - determine appropriate starting size.
 	private PatternMatchList _matchList = new PatternMatchList();
-	private ArrayList<IncrementalPatternTreeNode> _nodeList = new ArrayList<IncrementalPatternTreeNode>();
+	private ArrayList<IncrementalPatternTreeNode> _nodeList = new ArrayList<IncrementalPatternTreeNode>(100);
 	/**
      * @return the matchList
      */

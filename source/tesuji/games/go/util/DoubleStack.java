@@ -99,7 +99,7 @@ public class DoubleStack
 	 * 
 	 * @param value
 	 */
-	public final void push(int value)
+	public final void push(double value)
 	{
 		stack[index++] = value;
 	}

@@ -46,6 +46,7 @@ import tesuji.games.go.util.ArrayFactory;
 import tesuji.games.go.util.BoardMarker;
 import tesuji.games.go.util.DefaultBoardModel;
 import tesuji.games.go.util.DiagonalCursor;
+import tesuji.games.go.util.DoubleStack;
 import tesuji.games.go.util.FourCursor;
 import tesuji.games.go.util.GoArray;
 import tesuji.games.go.util.IntStack;
@@ -207,6 +208,7 @@ public class MonteCarloPluginAdministration
 //	protected IntStack _visitStack;
 //	protected IntStack _winStack;
 	protected IntStack _illegalStack;
+	protected DoubleStack _illegalUrgencyStack;
 	
 	/**
 	 * A list of checksums computed after each move. It's used to check for super-ko.
@@ -270,6 +272,7 @@ public class MonteCarloPluginAdministration
 		_checksum = new Checksum();
 
 		_illegalStack = ArrayFactory.createIntStack();
+		_illegalUrgencyStack = ArrayFactory.createDoubleStack();
 		_moveStack = ArrayFactory.createLargeIntStack();
 		_captiveStack = ArrayFactory.createIntStack();
 		_checksumStack = ArrayFactory.createLargeLongStack();
@@ -1099,16 +1102,16 @@ public class MonteCarloPluginAdministration
 				while (!_illegalStack.isEmpty())
 				{
 					int illegalXY = _illegalStack.pop();
+					double illegalWeight = _illegalUrgencyStack.pop();
 					emptyPoints.add(illegalXY);
-					_probabilityMap.reset(illegalXY,getColorToMove());
+					_probabilityMap.add(illegalXY,illegalWeight,getColorToMove());
 				}
 				assert(_probabilityMap.isConsistent());
 				return xy;
 			}
 			emptyPoints.remove(xy);
 			_illegalStack.push(xy);
-			assert(_probabilityMap.getWeight(xy,getColorToMove())==ProbabilityMap.DEFAULT);
-			_probabilityMap.clear(xy,getColorToMove());
+			_illegalUrgencyStack.push(_probabilityMap.clear(xy,getColorToMove()));
 //			Statistics.increment("IllegalTries");
 		}
 //		assert(!_probabilityMap.hasPoints());
@@ -1119,8 +1122,9 @@ public class MonteCarloPluginAdministration
 		while (!_illegalStack.isEmpty())
 		{
 			int illegalXY = _illegalStack.pop();
+			double illegalWeight = _illegalUrgencyStack.pop();
 			emptyPoints.add(illegalXY);
-			_probabilityMap.reset(illegalXY,getColorToMove());
+			_probabilityMap.add(illegalXY,illegalWeight,getColorToMove());
 		}
 
 		assert(_probabilityMap.isConsistent());
@@ -1928,7 +1932,7 @@ public class MonteCarloPluginAdministration
 	public String toString()
     {
 //    	return SGFUtil.createSGF(getMoveStack()) +"\n\n"+GoArray.printBoardToString(_board);
-    	return SGFUtil.createSGF(getMoveStack()) +"\n\n"+_boardModel.toString();
+    	return SGFUtil.createSGF(getMoveStack()) +"\n\n"+_boardModel.toString()+"\n\n"+_probabilityMap.toString();
     }
 
 	/**

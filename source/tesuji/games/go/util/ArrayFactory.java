@@ -64,6 +64,7 @@ public class ArrayFactory
 	private static int nrChainLists =		INITIAL_POOL_SIZE;
 	
 	private SynchronizedArrayStack<IntStack> intStackPool =			new SynchronizedArrayStack<IntStack>();
+	private SynchronizedArrayStack<DoubleStack> doubleStackPool =	new SynchronizedArrayStack<DoubleStack>();
 	private SynchronizedArrayStack<IntStack> smallIntStackPool =	new SynchronizedArrayStack<IntStack>();
 	private SynchronizedArrayStack<IntStack> largeIntStackPool =	new SynchronizedArrayStack<IntStack>();
 	private SynchronizedArrayStack<LongStack> largeLongStackPool =	new SynchronizedArrayStack<LongStack>();
@@ -175,6 +176,33 @@ public class ArrayFactory
 	
 			IntStack intStack = intStackPool.pop();
 			return intStack;
+		}
+	}
+
+	/**
+	 * Allocate an DoubleStack of default size. Instead of allocating new objects
+	 * each time, the objects created through this method can be 'recycled' and
+	 * then reused. This is much more efficient than relying on the VM to
+	 * allocate an object and then later garbage-collect it again.
+	 * 
+	 * @return second-hand DoubleStack
+	 */
+	public static DoubleStack createDoubleStack()
+	{
+		return getSingleton()._createDoubleStack();
+	}
+	private DoubleStack _createDoubleStack()
+	{
+		synchronized(doubleStackPool)
+		{
+			if (doubleStackPool.isEmpty())
+			{
+				nrIntStacks++;
+				return new DoubleStack(doubleStackPool);
+			}
+	
+			DoubleStack doubleStack = doubleStackPool.pop();
+			return doubleStack;
 		}
 	}
 

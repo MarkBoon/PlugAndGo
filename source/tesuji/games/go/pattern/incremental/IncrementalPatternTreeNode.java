@@ -27,6 +27,8 @@ package tesuji.games.go.pattern.incremental;
 
 import java.io.Serializable;
 
+import org.omg.CORBA._PolicyStub;
+
 import tesuji.core.util.ArrayList;
 import tesuji.core.util.List;
 
@@ -360,13 +362,23 @@ class IncrementalPatternTreeNode
 		if (noCareChild!=null)
 			noCareChild.removeDeadPatterns();
 	}
-
+	
 	/**
      * @return the nextCoordinate
      */
     public int getNextCoordinate()
     {
     	return nextCoordinate;
+    }
+    
+    public IncrementalPatternTreeNode getParent()
+    {
+    	return parent;
+    }
+    
+    public PatternNodeType getType()
+    {
+    	return type;
     }
 
     private boolean isRestEmpty(Pattern pattern, PointSpiral spiral, byte[] done, int orientation)

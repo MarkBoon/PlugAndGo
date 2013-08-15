@@ -108,6 +108,8 @@ class FullPatternTree
 				nrNewPatterns++;
 				addedPatterns.add(patternList.get(i));
 			}
+			else
+				_logger.info("Didn't add:\n"+patternList.get(i));
 		}
 
 		// The tree is constructed for all 16 possible permutations of the pattern.
@@ -118,6 +120,7 @@ class FullPatternTree
 			//	System.out.println("Added patterns for orientation "+orientation);
 		}
 		_logger.info("Added "+nrNewPatterns+" patterns");
+		//optimize(root);
 	}
 	
 	/**
@@ -139,4 +142,38 @@ class FullPatternTree
 	{
 		return nrNewPatterns>dirtyLimit;
 	}		
+
+	public void optimize(IncrementalPatternTreeNode node)
+	{
+		boolean optimize = true;
+		if (node.getBlackChild()!=null)
+		{
+			optimize(node.getBlackChild());
+			optimize = false;
+		}
+		if (node.getWhiteChild()!=null)
+		{
+			optimize(node.getWhiteChild());
+			optimize = false;
+		}
+		if (node.getEmptyChild()!=null)
+		{
+			optimize(node.getEmptyChild());
+			optimize = false;
+		}
+		if (node.getEdgeChild()!=null)
+		{
+			optimize(node.getEdgeChild());
+			optimize = false;
+		}
+		if (node.getNoCareChild()!=null)
+		{
+			optimize(node.getNoCareChild());
+		}
+		if (optimize && node.getLeafList()!=null && node.getLeafList().size()==0)
+		{
+			System.out.println("Superfluous node");
+		}
+	}
+
 }
