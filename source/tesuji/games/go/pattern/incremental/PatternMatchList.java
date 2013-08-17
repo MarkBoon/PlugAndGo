@@ -70,7 +70,8 @@ public class PatternMatchList
 		int index = match.matchListIndex;
 		assert(get(index).leaf==match.leaf);
 		remove(index);
-		get(index).matchListIndex = index;
+		if (index!=size())
+			get(index).matchListIndex = index;
 	}
 	
 	public void reset()

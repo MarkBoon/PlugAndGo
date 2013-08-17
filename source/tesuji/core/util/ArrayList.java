@@ -203,6 +203,7 @@ public class ArrayList<Type>
 
 		_array[i] = _array[_index-1];
 		_index--;
+		_array[_index] = null;
 	}
 	
 	/**
@@ -216,9 +217,10 @@ public class ArrayList<Type>
 		if (i>_index)
 			throw new IndexOutOfBoundsException("Index "+i+" is beyond last item");
 
-		if (i>=_index-1)
+		if (i<=_index-1)
 			System.arraycopy(_array, i+1, _array, i, _index-i-1);
 		_index--;
+		_array[_index] = null;
 	}
 	
 	/**

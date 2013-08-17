@@ -92,7 +92,7 @@ public class MatchingState
     {
     	for (int i=_nodeList.size(); --i>=0;)
     	{
-    		if (_nodeList.get(i).id==node.id)
+    		if (_nodeList.get(i)==node)
     			return node;
     	}
     	return null;
@@ -100,17 +100,21 @@ public class MatchingState
     
     public void add(IncrementalPatternTreeNode node)
     {
+    	if (node.id==5414)
+    		node.id=5414;
     	assert(findNode(node)==null);
     	_nodeList.add(node);
     }
     
     public void remove(IncrementalPatternTreeNode node)
     {
+    	if (node.id==5414)
+    		node.id=5414;
     	for (int i=_nodeList.size(); --i>=0;)
     	{
-    		if (_nodeList.get(i).id==node.id)
+    		if (_nodeList.get(i)==node)
     		{
-    			_nodeList.remove(i);
+    			_nodeList.delete(i);
     			return;
     		}
     	}
