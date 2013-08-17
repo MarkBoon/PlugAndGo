@@ -209,6 +209,7 @@ public class IncrementalPatternMatcher
     		{
     			IncrementalPatternTreeNode node = nodeList.get(n);
     			recursiveMatchAndRemoveState(node,xy-node.getOffset());
+    	    	assert(checkConsistency2());
     		}
 
     		_boardModel.set(boardChange.getXY(), boardChange.getNewValue());
@@ -216,7 +217,9 @@ public class IncrementalPatternMatcher
     		for (int n=0; n<nodeList.size(); n++)
     		{
     			IncrementalPatternTreeNode node = nodeList.get(n);
+    	    	assert(checkConsistency2());
     			recursiveMatchAndStoreState(node,xy-node.getOffset());
+    	    	assert(checkConsistency2());
     		}
     		boardChange.recycle();
         	assert(checkConsistency());
@@ -235,7 +238,8 @@ public class IncrementalPatternMatcher
 			if (_boardModel.get(i)!=EDGE)
 			{
     			recursiveCheckState(tree.getRoot(),i);
-
+    			matchingState[i].checkConsistency();
+ 
 //    			MatchingState state = matchingState[i];
 //	    		ArrayList<IncrementalPatternTreeNode> nodeList = state.getNodeList();
 //	    		
@@ -245,6 +249,18 @@ public class IncrementalPatternMatcher
 ////	    			assert(node.getType()!=PatternNodeType.NOCARE);
 //	    			recursiveCheckState(node,i-node.getOffset());
 //	    		}
+			}
+		}
+		return true;
+	}
+	
+	private boolean checkConsistency2()
+	{
+		for (int i=0; i<GoArray.MAX; i++)
+		{
+			if (matchingState[i]!=null)
+			{
+    			matchingState[i].checkConsistency();
 			}
 		}
 		return true;
@@ -293,7 +309,11 @@ public class IncrementalPatternMatcher
 			{
 				int nextXY = noCareChild.getOffset()+startXY;
 				if (nextXY>0 && nextXY<GoArray.MAX && matchingState[nextXY]!=null)
+				{
+	    	    	assert(checkConsistency2());
 					matchingState[nextXY].add(noCareChild);
+	    	    	assert(checkConsistency2());
+				}
 				recursiveMatchAndStoreState(noCareChild,startXY);
 			}
 
@@ -384,6 +404,7 @@ public class IncrementalPatternMatcher
 				MatchingState state = matchingState[nextCoordinate];
 				if (state!=null)
 					state.add(nextNode);
+    	    	assert(checkConsistency2());
 			}
 		}
 		return nextNode;

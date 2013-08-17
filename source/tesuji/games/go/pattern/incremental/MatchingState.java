@@ -26,6 +26,8 @@
 
 package tesuji.games.go.pattern.incremental;
 
+import java.util.HashMap;
+
 import tesuji.core.util.ArrayList;
 
 /**
@@ -100,6 +102,8 @@ public class MatchingState
     
     public void add(IncrementalPatternTreeNode node)
     {
+    	if (findNode(node)!=null)
+    		checkConsistency();
     	assert(findNode(node)==null);
     	_nodeList.add(node);
     }
@@ -142,6 +146,18 @@ public class MatchingState
     	clone._nodeList = _nodeList.createClone();
     	
     	return clone;
+    }
+    
+    public boolean checkConsistency()
+    {
+    	HashMap<Integer, IncrementalPatternTreeNode> map = new HashMap<Integer, IncrementalPatternTreeNode>();
+    	
+       	for (int i=_nodeList.size(); --i>=0;)
+    	{
+       		assert (map.get(_nodeList.get(i).id)==null);
+       		map.put(_nodeList.get(i).id, _nodeList.get(i));
+    	}
+    	return true;
     }
     
     public boolean equals(Object o)

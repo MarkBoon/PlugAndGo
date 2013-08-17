@@ -202,6 +202,7 @@ public class ArrayList<Type>
 			throw new IndexOutOfBoundsException("Index "+i+" is beyond last item");
 
 		_array[i] = _array[_index-1];
+		_array[_index-1] = null;
 		_index--;
 	}
 	
