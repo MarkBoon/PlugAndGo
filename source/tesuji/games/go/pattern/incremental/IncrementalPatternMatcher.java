@@ -208,7 +208,7 @@ public class IncrementalPatternMatcher
     		for (int n=0; n<nodeList.size(); n++)
     		{
     			IncrementalPatternTreeNode node = nodeList.get(n);
-    			recursiveMatchAndRemoveState(node,xy-node.getNextCoordinate());
+    			recursiveMatchAndRemoveState(node,xy-node.getOffset());
     		}
 
     		_boardModel.set(boardChange.getXY(), boardChange.getNewValue());
@@ -216,12 +216,11 @@ public class IncrementalPatternMatcher
     		for (int n=0; n<nodeList.size(); n++)
     		{
     			IncrementalPatternTreeNode node = nodeList.get(n);
-    			recursiveMatchAndStoreState(node,xy-node.getNextCoordinate());
+    			recursiveMatchAndStoreState(node,xy-node.getOffset());
     		}
     		boardChange.recycle();
+        	assert(checkConsistency());
     	}
-
-    	assert(checkConsistency());
 
     	_boardChangeList.clear();
 //    	System.out.println("Match Board:");
@@ -235,14 +234,17 @@ public class IncrementalPatternMatcher
 		{
 			if (_boardModel.get(i)!=EDGE)
 			{
-	    		MatchingState state = matchingState[i];
-	    		ArrayList<IncrementalPatternTreeNode> nodeList = state.getNodeList();
-	    		
-	    		for (int n=0; n<nodeList.size(); n++)
-	    		{
-	    			IncrementalPatternTreeNode node = nodeList.get(n);
-	    			recursiveCheckState(node,i-node.getNextCoordinate());
-	    		}
+    			recursiveCheckState(tree.getRoot(),i);
+
+//    			MatchingState state = matchingState[i];
+//	    		ArrayList<IncrementalPatternTreeNode> nodeList = state.getNodeList();
+//	    		
+//	    		for (int n=0; n<nodeList.size(); n++)
+//	    		{
+//	    			IncrementalPatternTreeNode node = nodeList.get(n);
+////	    			assert(node.getType()!=PatternNodeType.NOCARE);
+//	    			recursiveCheckState(node,i-node.getOffset());
+//	    		}
 			}
 		}
 		return true;
@@ -263,7 +265,7 @@ public class IncrementalPatternMatcher
 			IncrementalPatternTreeNode noCareChild = node.getNoCareChild();
 			if (noCareChild!=null)
 			{
-				int nextXY = noCareChild.getNextCoordinate()+startXY;
+				int nextXY = noCareChild.getOffset()+startXY;
 				if (nextXY>0 && nextXY<GoArray.MAX && matchingState[nextXY]!=null)
 					assert(matchingState[nextXY].findNode(noCareChild)!=null);
 				recursiveCheckState(noCareChild,startXY);
@@ -289,7 +291,7 @@ public class IncrementalPatternMatcher
 			IncrementalPatternTreeNode noCareChild = node.getNoCareChild();
 			if (noCareChild!=null)
 			{
-				int nextXY = noCareChild.getNextCoordinate()+startXY;
+				int nextXY = noCareChild.getOffset()+startXY;
 				if (nextXY>0 && nextXY<GoArray.MAX && matchingState[nextXY]!=null)
 					matchingState[nextXY].add(noCareChild);
 				recursiveMatchAndStoreState(noCareChild,startXY);
@@ -308,23 +310,24 @@ public class IncrementalPatternMatcher
 		// main line.  NoCare branches handled by a recursive call on this routine.
 		while (node!=null)
 		{
-			List<IncrementalPatternTreeLeaf> leafList = node.getLeafList();
-			if (leafList!=null)
-				for (int i=leafList.size(); --i>=0;)
-					removeMatch(leafList.get(i),startXY);
+			IncrementalPatternTreeNode oldNode = node;
+			// Figure out what's on the board point to be examined next. 
+			// Appropriately update node
+			node = getNextNodeAndRemoveState(node,startXY);
 
-			IncrementalPatternTreeNode noCareChild = node.getNoCareChild();
+			IncrementalPatternTreeNode noCareChild = oldNode.getNoCareChild();
 			if (noCareChild!=null)
 			{
-				int nextXY = noCareChild.getNextCoordinate()+startXY;
+				int nextXY = noCareChild.getOffset()+startXY;
 				if (nextXY>0 && nextXY<GoArray.MAX && matchingState[nextXY]!=null)
 					matchingState[nextXY].remove(noCareChild);
 				recursiveMatchAndRemoveState(noCareChild,startXY);
 			}
 
-			// Figure out what's on the board point to be examined next. 
-			// Appropriately update node
-			node = getNextNodeAndRemoveState(node,startXY);
+			List<IncrementalPatternTreeLeaf> leafList = oldNode.getLeafList();
+			if (leafList!=null)
+				for (int i=leafList.size(); --i>=0;)
+					removeMatch(leafList.get(i),startXY);
 		}
 	}
 	
@@ -339,7 +342,7 @@ public class IncrementalPatternMatcher
 	 */
 	private final IncrementalPatternTreeNode getNextNode(IncrementalPatternTreeNode node, int startXY)
 	{
-		int xy=startXY+node.getNextCoordinate();
+		int xy=startXY+node.getOffset();
 		
 		if (xy<0 || xy>=GoArray.MAX)
 			return null;
@@ -375,8 +378,7 @@ public class IncrementalPatternMatcher
 		IncrementalPatternTreeNode nextNode = getNextNode(node,startXY);
 		if (nextNode!=null && !nextNode.isLeaf())
 		{
-//			assert(nextNode.getEdgeChild()!=null || nextNode.getEmptyChild()!=null || nextNode.getBlackChild()!=null || nextNode.getWhiteChild()!=null);
-			int nextCoordinate = startXY + nextNode.getNextCoordinate();
+			int nextCoordinate = startXY + nextNode.getOffset();
 			if (nextCoordinate>=0 && nextCoordinate<MAX)
 			{
 				MatchingState state = matchingState[nextCoordinate];
@@ -401,8 +403,7 @@ public class IncrementalPatternMatcher
 		IncrementalPatternTreeNode nextNode = getNextNode(node,startXY);
 		if (nextNode!=null && !nextNode.isLeaf())
 		{
-//			assert(nextNode.getEdgeChild()!=null || nextNode.getEmptyChild()!=null || nextNode.getBlackChild()!=null || nextNode.getWhiteChild()!=null);
-			int nextCoordinate = startXY + nextNode.getNextCoordinate();
+			int nextCoordinate = startXY + nextNode.getOffset();
 			if (nextCoordinate>=0 && nextCoordinate<MAX)
 			{
 				MatchingState state = matchingState[nextCoordinate];
@@ -430,7 +431,7 @@ public class IncrementalPatternMatcher
 		IncrementalPatternTreeNode nextNode = getNextNode(node,startXY);
 		if (nextNode!=null && !nextNode.isLeaf())
 		{
-			int nextCoordinate = startXY + nextNode.getNextCoordinate();
+			int nextCoordinate = startXY + nextNode.getOffset();
 			if (nextCoordinate>=0 && nextCoordinate<MAX)
 			{
 				MatchingState state = matchingState[nextCoordinate];

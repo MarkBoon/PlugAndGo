@@ -27,8 +27,6 @@ package tesuji.games.go.pattern.incremental;
 
 import java.io.Serializable;
 
-import org.omg.CORBA._PolicyStub;
-
 import tesuji.core.util.ArrayList;
 import tesuji.core.util.List;
 
@@ -48,15 +46,18 @@ import static tesuji.games.go.common.GoConstant.*;
 class IncrementalPatternTreeNode
 	implements Serializable
 {
+	private static int counter = 1;
+	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -4750713892478332987L;
 	
+	public int id;
 	private PatternNodeType type; // The parent is actually only used as debugging info.
 	
 	private int pointNr = 0;
-	private int nextCoordinate = UNDEFINED_COORDINATE;
+	private int offset = UNDEFINED_COORDINATE;
 	private IncrementalPatternTreeNode parent; // The parent is actually only used for debugging.
 	private IncrementalPatternTreeNode blackChild;
 	private IncrementalPatternTreeNode whiteChild;
@@ -74,6 +75,7 @@ class IncrementalPatternTreeNode
 	public IncrementalPatternTreeNode(PatternNodeType type)
 	{
 		this.type = type;
+		id = counter++;
 	}
 	
 	/**
@@ -114,7 +116,7 @@ class IncrementalPatternTreeNode
 		ArrayList<Pattern> noCareList = new ArrayList<Pattern>();
 		ArrayList<Pattern> terminalList = new ArrayList<Pattern>();
 
-		determineNextCoordinate(patternList, spiral, done, orientation, depth);
+		determineOffset(patternList, spiral, done, orientation, depth);
 
 		int size = patternList.size();
 		for (int i=0; i<size; i++)
@@ -141,7 +143,10 @@ class IncrementalPatternTreeNode
 			else if (value==EDGE)
 				edgeList.add(pattern);
 			else // if (value==NOCARE)
+			{
+				assert(pointNr>=5);
 				noCareList.add(pattern);
+			}
 		}
 
 		done[pointNr] = 1;
@@ -169,6 +174,7 @@ class IncrementalPatternTreeNode
 		
 		if (noCareList.size()!=0)
 		{
+			assert(pointNr>=5);
 			if (noCareChild==null)
 				noCareChild = new IncrementalPatternTreeNode(PatternNodeType.NOCARE);
 			noCareChild.parent = this;
@@ -177,6 +183,7 @@ class IncrementalPatternTreeNode
 
 		if (blackList.size()!=0)
 		{
+			assert(pointNr!=0);
 			if (blackChild==null)
 				blackChild = new IncrementalPatternTreeNode(PatternNodeType.BLACK);
 			blackChild.parent = this;
@@ -184,6 +191,7 @@ class IncrementalPatternTreeNode
 		}
 		if (whiteList.size()!=0)
 		{
+			assert(pointNr!=0);
 			if (whiteChild==null)
 				whiteChild = new IncrementalPatternTreeNode(PatternNodeType.WHITE);
 			whiteChild.parent = this;
@@ -364,11 +372,11 @@ class IncrementalPatternTreeNode
 	}
 	
 	/**
-     * @return the nextCoordinate
+     * @return the offset
      */
-    public int getNextCoordinate()
+    public int getOffset()
     {
-    	return nextCoordinate;
+    	return offset;
     }
     
     public IncrementalPatternTreeNode getParent()
@@ -394,9 +402,9 @@ class IncrementalPatternTreeNode
 		return true;
     }
 
-    private void determineNextCoordinate(List<Pattern> patternList, PointSpiral spiral, byte[] done, int orientation, int depth)
+    private void determineOffset(List<Pattern> patternList, PointSpiral spiral, byte[] done, int orientation, int depth)
     {
-		if (nextCoordinate==UNDEFINED_COORDINATE)
+		if (offset==UNDEFINED_COORDINATE)
 		{
 			int bestPoint = 0;
 			int minNoCare = Integer.MAX_VALUE;
@@ -468,7 +476,12 @@ class IncrementalPatternTreeNode
 	
 			}
 			pointNr = bestPoint;
-			nextCoordinate = spiral.getPointOrder()[pointNr];
+			offset = spiral.getPointOrder()[pointNr];
 		}    	
+    }
+    
+    public String toString()
+    {
+    	return Integer.toString(id);
     }
 }

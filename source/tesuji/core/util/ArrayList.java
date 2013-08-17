@@ -196,7 +196,7 @@ public class ArrayList<Type>
 	 * order of the remaining items in the list.
 	 * @param i is the index at whicch to remove the object.
 	 */
-	public /*final*/ void remove(int i)
+	public final void remove(int i)
 	{
 		if (i>_index)
 			throw new IndexOutOfBoundsException("Index "+i+" is beyond last item");

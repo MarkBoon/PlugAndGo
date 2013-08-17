@@ -100,7 +100,7 @@ public class PointSpiral
 			for (int j=d-1; j>-d; j--)	{ spiralMapX[counter] = -d;	spiralMapY[counter++] = j; }
 		}
 
-		//sortSpiral();
+		sortSpiral();
 		
 		pointOrder = new int[LONGEST_SPIRAL];
 		computePointOrder();

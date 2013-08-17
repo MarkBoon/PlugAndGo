@@ -25,6 +25,10 @@
 */
 package tesuji.games.go.pattern.incremental;
 
+import java.util.HashMap;
+
+import javax.print.attribute.HashAttributeSet;
+
 import org.apache.log4j.Logger;
 
 import tesuji.core.util.ArrayList;
@@ -119,6 +123,7 @@ class FullPatternTree
 			//if (patternList.size()>1000)
 			//	System.out.println("Added patterns for orientation "+orientation);
 		}
+		assert(checkConsistency());
 		_logger.info("Added "+nrNewPatterns+" patterns");
 		//optimize(root);
 	}
@@ -175,5 +180,26 @@ class FullPatternTree
 			System.out.println("Superfluous node");
 		}
 	}
+	
+	public boolean checkConsistency()
+	{
+		HashMap<Integer,IncrementalPatternTreeNode> hashMap = new HashMap<Integer, IncrementalPatternTreeNode>();
+		checkConsistency(hashMap, getRoot());
+		return true;
+	}
+	
+	public void checkConsistency(HashMap<Integer,IncrementalPatternTreeNode> hashMap, IncrementalPatternTreeNode node)
+	{
+		if (node==null)
+			return;
 
+		assert (hashMap.get(node.id)==null);
+		hashMap.put(node.id, node);
+
+		checkConsistency(hashMap,node.getBlackChild());
+		checkConsistency(hashMap,node.getWhiteChild());
+		checkConsistency(hashMap,node.getEmptyChild());
+		checkConsistency(hashMap,node.getEdgeChild());
+		checkConsistency(hashMap,node.getNoCareChild());
+	}
 }

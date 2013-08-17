@@ -35,7 +35,7 @@
 	
 	<bean id="patternManager" class="tesuji.games.go.pattern.common.HibernatePatternManager" singleton="true">
 		<constructor-arg>
-			<value>Simulation9x9</value>
+			<value>Test</value>
 		</constructor-arg>
 	</bean>
 	

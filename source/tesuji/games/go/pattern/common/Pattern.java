@@ -171,17 +171,17 @@ public class Pattern
 //			throw new ArrayIndexOutOfBoundsException("Illegal value for y = "+y);
 		
 		// The following code returns a value EDGE but only for one point for each edge
-		// which is the one aligning the center of the pattern. This basically adds a
+		// which is the one aligning the start-point of the pattern. This basically adds a
 		// point to the pattern for each edge it has defined.
 		if (x==-1)
 		{
-			if (y==height/2 && leftEdge)
+			if (y==startY && leftEdge)
 				return EDGE;
 			return NOCARE;
 		}
 		if (y==-1)
 		{
-			if (x==width/2 && topEdge)
+			if (x==startX && topEdge)
 				return EDGE;
 			return NOCARE;
 		}
