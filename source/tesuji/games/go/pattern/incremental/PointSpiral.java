@@ -52,7 +52,7 @@ public class PointSpiral
 	// Maximum number of iterations it tries to optimize the spiral.
 //	private static final int MAX_ITERATION = 2;
 	
-	private static final int SPIRAL_SIZE = 4;		// Maximum distance from the pattern-center.
+	private static final int SPIRAL_SIZE = 9;		// Maximum distance from the pattern-center.
 	
 	/** Total number of points on a standard size board. */
 	public static final int LONGEST_SPIRAL	= (2*SPIRAL_SIZE+1)*(2*SPIRAL_SIZE+1);

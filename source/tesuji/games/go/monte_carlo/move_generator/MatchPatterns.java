@@ -99,6 +99,14 @@ public class MatchPatterns extends AbstractMoveGenerator
 		_patternMatcher.updatePatternMatches();
 		ArrayList<PatternMatch> deletedMatchList = _patternMatcher.getDeletedMatchList();
 		ArrayList<PatternMatch> newMatchList = _patternMatcher.getNewMatchList();
+		for (int i=newMatchList.size(); --i>=0;)
+		{
+			if (deletedMatchList.contains(newMatchList.get(i)))
+			{
+				newMatchList.remove(i);
+				deletedMatchList.remove(newMatchList.get(i));
+			}
+		}
 		for (PatternMatch pm : newMatchList)
 		{
 			if (board[pm.getMoveXY(ColorConstant.BLACK)]==ColorConstant.EMPTY)

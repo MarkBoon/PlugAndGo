@@ -100,21 +100,17 @@ public class MatchingState
     
     public void add(IncrementalPatternTreeNode node)
     {
-    	if (node.id==5414)
-    		node.id=5414;
     	assert(findNode(node)==null);
     	_nodeList.add(node);
     }
     
     public void remove(IncrementalPatternTreeNode node)
     {
-    	if (node.id==5414)
-    		node.id=5414;
     	for (int i=_nodeList.size(); --i>=0;)
     	{
     		if (_nodeList.get(i)==node)
     		{
-    			_nodeList.delete(i);
+    			_nodeList.delete(i); // XXX - remove
     			return;
     		}
     	}

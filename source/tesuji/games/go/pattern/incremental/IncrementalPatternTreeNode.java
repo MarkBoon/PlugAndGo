@@ -117,7 +117,9 @@ class IncrementalPatternTreeNode
 		ArrayList<Pattern> terminalList = new ArrayList<Pattern>();
 
 		determineOffset(patternList, spiral, done, orientation, depth);
-
+		assert(offset == spiral.getPointOrder()[depth]);
+		assert(checkOffsetConsistency());
+		
 		int size = patternList.size();
 		for (int i=0; i<size; i++)
 		{
@@ -478,6 +480,17 @@ class IncrementalPatternTreeNode
 			pointNr = bestPoint;
 			offset = spiral.getPointOrder()[pointNr];
 		}    	
+    }
+    
+    private boolean checkOffsetConsistency()
+    {
+    	IncrementalPatternTreeNode parent = this.parent;
+    	while (parent!=null)
+    	{
+    		assert(parent.offset!=offset);
+    		parent = parent.parent;
+    	}
+    	return true;
     }
     
     public String toString()
