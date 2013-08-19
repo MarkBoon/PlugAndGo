@@ -267,7 +267,7 @@ public class PatternMatch
 		builder.append('\n');
 		return builder.toString();
 	}
-
+	
 	/**
      * @return the conditions
      */

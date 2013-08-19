@@ -49,7 +49,7 @@
 						<property name="explorationMoveFilterList">
 							<list>
 								<ref bean="eyeMoveFilter"/>
-								<ref bean="fogOfWarFilter"/>
+								<!--<ref bean="fogOfWarFilter"/>-->
 							</list>
 						</property>
 						<property name="simulationMoveGeneratorList">

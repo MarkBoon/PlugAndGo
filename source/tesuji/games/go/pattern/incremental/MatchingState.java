@@ -94,7 +94,7 @@ public class MatchingState
     {
     	for (int i=_nodeList.size(); --i>=0;)
     	{
-    		if (_nodeList.get(i).id==node.id)
+    		if (_nodeList.get(i)==node)
     			return node;
     	}
     	return null;
@@ -112,9 +112,9 @@ public class MatchingState
     {
     	for (int i=_nodeList.size(); --i>=0;)
     	{
-    		if (_nodeList.get(i).id==node.id)
+    		if (_nodeList.get(i)==node)
     		{
-    			_nodeList.remove(i);
+    			_nodeList.delete(i); // XXX - remove
     			return;
     		}
     	}
