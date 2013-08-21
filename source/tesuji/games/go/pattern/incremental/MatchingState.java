@@ -102,8 +102,6 @@ public class MatchingState
     
     public void add(IncrementalPatternTreeNode node)
     {
-    	if (findNode(node)!=null)
-    		checkConsistency();
     	assert(findNode(node)==null);
     	_nodeList.add(node);
     }
@@ -148,11 +146,14 @@ public class MatchingState
     	return clone;
     }
     
-    public boolean checkConsistency()
+    public boolean checkConsistency(IncrementalPatternMatcher matcher)
     {
     	HashMap<Integer, IncrementalPatternTreeNode> map = new HashMap<Integer, IncrementalPatternTreeNode>();
     	
-       	for (int i=_nodeList.size(); --i>=0;)
+       	for (int i=_matchList.size(); --i>=0;)
+       		assert(matcher.getMatchList().contains(_matchList.get(i)));
+
+        for (int i=_nodeList.size(); --i>=0;)
     	{
        		assert (map.get(_nodeList.get(i).id)==null);
        		map.put(_nodeList.get(i).id, _nodeList.get(i));

@@ -66,7 +66,8 @@ public class IncrementalPatternMatcher
 	
 	private MatchingState[] matchingState;
 	private ArrayList<PatternMatch> _newMatchList = new ArrayList<PatternMatch>();
-	private PatternMatchList _deletedMatchList = new PatternMatchList();
+	private ArrayList<PatternMatch> _deletedMatchList = new ArrayList<PatternMatch>();
+	//private PatternMatchList _deletedMatchList = new PatternMatchList();
 	private ArrayList<Pattern> _newPatternList = new ArrayList<Pattern>();
 	
 	public static int nrMatches = 0;
@@ -209,7 +210,7 @@ public class IncrementalPatternMatcher
     		{
     			IncrementalPatternTreeNode node = nodeList.get(n);
     			recursiveMatchAndRemoveState(node,xy-node.getOffset());
-    	    	assert(checkConsistency2());
+//    	    	assert(checkConsistency2());
     		}
 
     		_boardModel.set(boardChange.getXY(), boardChange.getNewValue());
@@ -217,9 +218,9 @@ public class IncrementalPatternMatcher
     		for (int n=0; n<nodeList.size(); n++)
     		{
     			IncrementalPatternTreeNode node = nodeList.get(n);
-    	    	assert(checkConsistency2());
+ //   	    	assert(checkConsistency2());
     			recursiveMatchAndStoreState(node,xy-node.getOffset());
-    	    	assert(checkConsistency2());
+//    	    	assert(checkConsistency2());
     		}
     		boardChange.recycle();
         	assert(checkConsistency());
@@ -238,7 +239,7 @@ public class IncrementalPatternMatcher
 			if (_boardModel.get(i)!=EDGE)
 			{
     			recursiveCheckState(tree.getRoot(),i);
-    			matchingState[i].checkConsistency();
+    			matchingState[i].checkConsistency(this);
  
 //    			MatchingState state = matchingState[i];
 //	    		ArrayList<IncrementalPatternTreeNode> nodeList = state.getNodeList();
@@ -260,7 +261,7 @@ public class IncrementalPatternMatcher
 		{
 			if (matchingState[i]!=null)
 			{
-    			matchingState[i].checkConsistency();
+    			matchingState[i].checkConsistency(this);
 			}
 		}
 		return true;
@@ -310,9 +311,9 @@ public class IncrementalPatternMatcher
 				int nextXY = noCareChild.getOffset()+startXY;
 				if (nextXY>0 && nextXY<GoArray.MAX && matchingState[nextXY]!=null)
 				{
-	    	    	assert(checkConsistency2());
+//	    	    	assert(checkConsistency2());
 					matchingState[nextXY].add(noCareChild);
-	    	    	assert(checkConsistency2());
+//	    	    	assert(checkConsistency2());
 				}
 				recursiveMatchAndStoreState(noCareChild,startXY);
 			}
@@ -404,7 +405,7 @@ public class IncrementalPatternMatcher
 				MatchingState state = matchingState[nextCoordinate];
 				if (state!=null)
 					state.add(nextNode);
-    	    	assert(checkConsistency2());
+//    	    	assert(checkConsistency2());
 			}
 		}
 		return nextNode;
@@ -568,7 +569,7 @@ public class IncrementalPatternMatcher
 	/**
      * @return the deletedMatchList
      */
-    public PatternMatchList getDeletedMatchList()
+    public ArrayList<PatternMatch> getDeletedMatchList()
     {
     	return _deletedMatchList;
     }
@@ -587,6 +588,7 @@ public class IncrementalPatternMatcher
     	_matchList.copyDataFrom(source._matchList);
 //    	assert(_matchList.equals(source._matchList));
     	_deletedMatchList.clear(); // TODO - check for correctness.
+    	_newMatchList.clear(); // TODO - check for correctness.
     	clearBoardChangeList();
     	_moveNr = source._moveNr;
 		for (int i=0; i<GoArray.MAX; i++)

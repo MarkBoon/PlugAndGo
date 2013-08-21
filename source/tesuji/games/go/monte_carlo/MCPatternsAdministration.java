@@ -352,7 +352,7 @@ public class MCPatternsAdministration
 	
     public void punishUnplayedPatterns(byte color)
     {
-		PatternMatchList matchList = _patternSet.getDeletedMatchList();
+		ArrayList<PatternMatch> matchList = _patternSet.getDeletedMatchList();
 		for (int j=0; j<matchList.size(); j++)
 		{
 			PatternMatch match = matchList.get(j);

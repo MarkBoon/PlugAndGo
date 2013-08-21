@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 
 import tesuji.core.util.MersenneTwisterFast;
+import tesuji.games.go.common.GoConstant;
 
 import static tesuji.games.general.ColorConstant.BLACK;
 
@@ -42,6 +43,7 @@ public class ProbabilityMap
 
 	public void add(int xy, double weight)
 	{
+		assert(weight>0.0);
 		int y = GoArray.getY(xy);
 		_weights[0][xy] += weight;
 		_weights[1][xy] += weight;
@@ -62,6 +64,7 @@ public class ProbabilityMap
 
 	public void add(int xy, double weight, byte color)
 	{
+		assert(weight>0.0);
 		int i = (color==BLACK)? 0 : 1;
 		int y = GoArray.getY(xy);
 		_weights[i][xy] += weight;
@@ -71,7 +74,6 @@ public class ProbabilityMap
 //			throw new IllegalStateException();
 		if (_weights[i][xy]<-ERROR_MARGIN)
 			throw new IllegalStateException();
-		assert(isConsistent());
 	}
 
 	public void add(int xy)
@@ -79,11 +81,11 @@ public class ProbabilityMap
 		add(xy,DEFAULT);
 	}
 	
-	public void add(int xy, int urgency)
-	{
-		add(xy,urgency*DEFAULT);
-	}
-	
+//	public void add(int xy, int urgency)
+//	{
+//		add(xy,urgency*DEFAULT);
+//	}
+//	
 	public void subtract(int xy, double weight)
 	{
 		int y = GoArray.getY(xy);
@@ -110,10 +112,16 @@ public class ProbabilityMap
 		_rowSum[i][y] -= weight;
 //		assert(_rowSum[y]>=0.0);
 		_total[i] -= weight;
+//		if (_weights[i][xy]==0.0 && _weights[(i^1)][xy]!=0.0)
+//			throw new IllegalStateException();
+
 //		assert(_total>=0.0);
 //		assert(_weights[i][xy]>=0.0);
 		if (_weights[i][xy]<-ERROR_MARGIN)
-			throw new IllegalStateException();
+		{
+			add(xy,weight,color);
+		//	throw new IllegalStateException();
+		}
 		assert(isConsistent());
 	}
 
@@ -175,6 +183,9 @@ public class ProbabilityMap
 	public int getCoordinate(byte color)
 	{
 		int i = (color==BLACK)? 0 : 1;
+		if (_total[i]<=0.0)
+			return GoConstant.PASS;
+		
 		double randomValue = _random.nextDouble() * _total[i];
 		assert( randomValue<_total[i]);
 		int y = 0;
@@ -210,6 +221,11 @@ public class ProbabilityMap
 	
 	public boolean isConsistent()
 	{
+		for (int i=GoArray.FIRST; i<=GoArray.LAST; i++)
+		{
+			assert (_weights[0][i]!=0.0 || _weights[1][i]==0.0);
+			assert (_weights[0][i]==0.0 || _weights[1][i]!=0.0);
+		}
 //		double total = 0.0;
 //		double rowTotal = 0.0;
 //		

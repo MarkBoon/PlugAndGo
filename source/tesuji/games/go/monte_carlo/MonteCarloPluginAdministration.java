@@ -1095,6 +1095,8 @@ public class MonteCarloPluginAdministration
 		{
 //			assert(_probabilityMap.hasPoints());
 			int xy = _probabilityMap.getCoordinate(getColorToMove());
+			if (xy==PASS)
+				break;
 			assert(xy!=PASS);
 			assert(_boardModel.get(xy)==EMPTY);
 			if (isLegal(xy) && !isVerboten(xy,filterList))
@@ -1117,7 +1119,6 @@ public class MonteCarloPluginAdministration
 //		assert(!_probabilityMap.hasPoints());
 //		if ((emptyPoints.getSize()==0 && _probabilityMap.hasPoints()) || (emptyPoints.getSize()!=0 && !_probabilityMap.hasPoints()))
 //			System.err.println("Inconsistent!");
-		assert(_probabilityMap.isConsistent());
 //		assert((emptyPoints.getSize()!=0)==_probabilityMap.hasPoints());
 		while (!_illegalStack.isEmpty())
 		{
