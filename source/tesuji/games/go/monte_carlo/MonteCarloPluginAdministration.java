@@ -846,12 +846,20 @@ public class MonteCarloPluginAdministration
 			}
 			else if (USE_MERCY_RULE)
 			{
-				int score = getScoreEstimate();
-		    	if (score>_mercyThreshold || score<-_mercyThreshold)
-		    	{
-		    		_inPlayout = false;
-		    		return (score>0);
-		    	}
+				int nrCaptives = _captiveStack.getSize();
+				if (nrCaptives!=0)
+				{
+					int score = getScoreEstimate();
+			    	if (_colorToPlay==BLACK)
+			    		score -= nrCaptives;
+			    	else
+			    		score += nrCaptives;
+			    	if (score>_mercyThreshold || score<-_mercyThreshold)
+			    	{
+			    		_inPlayout = false;
+			    		return (score>0);
+			    	}
+				}
 			}
 		}
 	}

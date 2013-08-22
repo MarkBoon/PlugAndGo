@@ -16,7 +16,6 @@ import tesuji.games.go.util.PointSet;
 import tesuji.games.go.util.PointSetFactory;
 
 public class MonteCarloHashMapResult
-//	implements SearchResult<GoMove>
 {
 	public static final int FORBIDDEN = 1000000;
 	public static final double MAX_SCORE = 1.0;
@@ -31,10 +30,8 @@ public class MonteCarloHashMapResult
 	 */
 	private static final double _explorationFactor = Math.sqrt(0.2);
 
-//	private GoMove		_move;
 	private int			_xy;
 	private byte		_color;
-//	private int			_koPoint;
 	private int			_totalPlayouts;
 	private int[]		_wins;
 	private int[]		_playouts;
@@ -51,9 +48,6 @@ public class MonteCarloHashMapResult
 	
 	private int _boardSize;
 	
-//	private byte[] _board;
-//	private IntStack _moves;
-	
 	private SynchronizedArrayStack<MonteCarloHashMapResult> _owner;
 
 	MonteCarloHashMapResult(SynchronizedArrayStack<MonteCarloHashMapResult> owner)
@@ -69,22 +63,12 @@ public class MonteCarloHashMapResult
 		_playouts = GoArray.createIntegers();
 		_virtualWins = GoArray.createFloats();
 		_virtualPlayouts = GoArray.createFloats();
-//		_board = GoArray.createBytes();
-//		_moves = new ArrayFactory().createIntStack();
 	}
 	
 	public void setPointSet(MonteCarloPluginAdministration administration)
 	{
 		MersenneTwisterFast random = administration.RANDOM;
 		_boardSize = administration.getBoardSize();
-
-//		_koPoint = administration.getKoPoint();
-//
-//		if (administration.getBoardArray()!=null)
-//		{
-//			GoArray.copy(administration.getBoardArray(), _board);
-//			_moves.copyFrom(administration.getMoveStack());
-//		}
 
 		assert(_emptyPoints.getSize()==0);
 		PointSet copy = PointSetFactory.createPointSet();
@@ -138,27 +122,10 @@ public class MonteCarloHashMapResult
 //	@Override
     public void recycle()
     {
-//		init();
-//		if (_move!=null)
-//			_move.recycle();
-//		_move = null;
-
     	assert(_emptyPoints.unfreeze());
 		_owner.push(this);
     }
 
-//	@Override
-//    public GoMove getMove()
-//    {
-//	    return _move;
-//    }
-	
-//	@Override
-//    public void setMove(GoMove move)
-//    {
-//	    _move = move;
-//    }
-	
 	public PointSet getEmptyPoints()
 	{
 		return _emptyPoints;

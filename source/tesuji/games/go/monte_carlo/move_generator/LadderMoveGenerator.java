@@ -37,6 +37,9 @@ public abstract class LadderMoveGenerator extends AbstractMoveGenerator
 
 	   protected boolean isSafeToMove(int moveXY)
 	   {
+		   if (administration.getNeighbourArray()[moveXY]<2)
+			   return true;
+		   
 			_ladderReader.setBoardArray(administration.getBoardArray());
 			_ladderReader.setKoPoint(administration.getKoPoint());
 			return (_ladderReader.wouldBeLadder(moveXY,BLACK)==TacticsConstant.CANNOT_CATCH
@@ -45,6 +48,9 @@ public abstract class LadderMoveGenerator extends AbstractMoveGenerator
 
 	   protected boolean isSafeToMove(int moveXY, byte color)
 	   {
+		   if (administration.getNeighbourArray()[moveXY]<2)
+			   return true;
+		   
 			_ladderReader.setBoardArray(administration.getBoardArray());
 			_ladderReader.setKoPoint(administration.getKoPoint());
 			return (_ladderReader.wouldBeLadder(moveXY,color)==TacticsConstant.CANNOT_CATCH);

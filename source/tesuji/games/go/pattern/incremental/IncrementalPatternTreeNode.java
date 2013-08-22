@@ -89,6 +89,7 @@ class IncrementalPatternTreeNode
 		byte[] done = GoArray.createBytes();
 		GoArray.clear(done);
 		addPatterns(patternList,spiral,depth,rotation,done);
+		assert(isConsistent());
 	}
 	
 	/**
@@ -480,6 +481,48 @@ class IncrementalPatternTreeNode
 			pointNr = bestPoint;
 			offset = spiral.getPointOrder()[pointNr];
 		}    	
+    }
+    
+    boolean isConsistent()
+    {
+    	if (parent!=null)
+    	{
+    		switch(type)
+    		{
+    			case BLACK:
+    			{
+    				assert(parent.blackChild==this); break;
+    			}
+    			case WHITE:
+    			{
+    				assert(parent.whiteChild==this); break;
+    			}
+    			case EMPTY:
+    			{
+    				assert(parent.emptyChild==this); break;
+    			}
+    			case EDGE:
+    			{
+    				assert(parent.edgeChild==this); break;
+    			}
+    			default:
+    			{
+    				assert(parent.noCareChild==this);
+    			}
+    		}
+    		
+    		if (blackChild!=null)
+    			assert(blackChild.isConsistent());
+    		if (whiteChild!=null)
+    			assert(whiteChild.isConsistent());
+    		if (emptyChild!=null)
+    			assert(emptyChild.isConsistent());
+    		if (edgeChild!=null)
+    			assert(edgeChild.isConsistent());
+    		if (noCareChild!=null)
+    			assert(noCareChild.isConsistent());
+    	}
+    	return true;
     }
     
     private boolean checkOffsetConsistency()

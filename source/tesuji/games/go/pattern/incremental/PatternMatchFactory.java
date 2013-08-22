@@ -59,7 +59,7 @@ public class PatternMatchFactory
 	}
 	private PatternMatch _createMatch()
 	{
-		synchronized(pool)
+//		synchronized(pool)
 		{
 			if (pool.isEmpty())
 			{
