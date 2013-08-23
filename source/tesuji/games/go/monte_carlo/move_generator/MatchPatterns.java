@@ -116,10 +116,20 @@ public class MatchPatterns extends LadderMoveGenerator
 		for (int i=newMatchList.size(); --i>=0;)
 		{
 			PatternMatch pm = newMatchList.get(i);
-			if (board[pm.getMoveXY(ColorConstant.BLACK)]==ColorConstant.EMPTY && isSafeToMove(pm.getMoveXY(ColorConstant.BLACK), ColorConstant.BLACK))
-				map.add(pm.getMoveXY(ColorConstant.BLACK), pm.getUrgencyValue(ColorConstant.BLACK)*factor, ColorConstant.BLACK);
-			if (board[pm.getMoveXY(ColorConstant.WHITE)]==ColorConstant.EMPTY && isSafeToMove(pm.getMoveXY(ColorConstant.WHITE), ColorConstant.WHITE))
-				map.add(pm.getMoveXY(ColorConstant.WHITE), pm.getUrgencyValue(ColorConstant.WHITE)*factor, ColorConstant.WHITE);
+			if (board[pm.getMoveXY(ColorConstant.BLACK)]==ColorConstant.EMPTY)
+			{
+				if (isSafeToMove(pm.getMoveXY(ColorConstant.BLACK), ColorConstant.BLACK))
+					map.add(pm.getMoveXY(ColorConstant.BLACK), pm.getUrgencyValue(ColorConstant.BLACK)*factor, ColorConstant.BLACK);
+				else
+					i=i;
+			}
+			if (board[pm.getMoveXY(ColorConstant.WHITE)]==ColorConstant.EMPTY)
+			{
+				if (isSafeToMove(pm.getMoveXY(ColorConstant.WHITE), ColorConstant.WHITE))
+					map.add(pm.getMoveXY(ColorConstant.WHITE), pm.getUrgencyValue(ColorConstant.WHITE)*factor, ColorConstant.WHITE);
+				else
+					i=i;
+			}
 		}
 		for (int i=deletedMatchList.size(); --i>=0;)
 		{

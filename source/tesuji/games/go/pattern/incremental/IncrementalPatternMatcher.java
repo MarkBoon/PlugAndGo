@@ -289,9 +289,9 @@ public class IncrementalPatternMatcher
 			IncrementalPatternTreeNode noCareChild = node.getNoCareChild();
 			if (noCareChild!=null)
 			{
-//				int nextXY = noCareChild.getOffset()+startXY;
-//				if (nextXY>0 && nextXY<GoArray.MAX && matchingState[nextXY]!=null)
-//					assert(matchingState[nextXY].findNode(noCareChild)!=null);
+				int nextXY = noCareChild.getOffset()+startXY;
+				if (nextXY>0 && nextXY<GoArray.MAX && matchingState[nextXY]!=null)
+					assert(matchingState[nextXY].findNode(noCareChild)!=null);
 				recursiveCheckState(noCareChild,startXY);
 			}
 
@@ -315,13 +315,13 @@ public class IncrementalPatternMatcher
 			IncrementalPatternTreeNode noCareChild = node.getNoCareChild();
 			if (noCareChild!=null)
 			{
-//				int nextXY = noCareChild.getOffset()+startXY;
-//				if (nextXY>0 && nextXY<GoArray.MAX && matchingState[nextXY]!=null)
-//				{
-////	    	    	assert(checkConsistency2());
-//					matchingState[nextXY].add(noCareChild);
-////	    	    	assert(checkConsistency2());
-//				}
+				int nextXY = noCareChild.getOffset()+startXY;
+				if (nextXY>0 && nextXY<GoArray.MAX && matchingState[nextXY]!=null)
+				{
+//	    	    	assert(checkConsistency2());
+					matchingState[nextXY].add(noCareChild);
+//	    	    	assert(checkConsistency2());
+				}
 				recursiveMatchAndStoreState(noCareChild,startXY);
 			}
 
@@ -346,9 +346,9 @@ public class IncrementalPatternMatcher
 			IncrementalPatternTreeNode noCareChild = oldNode.getNoCareChild();
 			if (noCareChild!=null)
 			{
-//				int nextXY = noCareChild.getOffset()+startXY;
-//				if (nextXY>0 && nextXY<GoArray.MAX && matchingState[nextXY]!=null)
-//					matchingState[nextXY].remove(noCareChild);
+				int nextXY = noCareChild.getOffset()+startXY;
+				if (nextXY>0 && nextXY<GoArray.MAX && matchingState[nextXY]!=null)
+					matchingState[nextXY].remove(noCareChild);
 				recursiveMatchAndRemoveState(noCareChild,startXY);
 			}
 
