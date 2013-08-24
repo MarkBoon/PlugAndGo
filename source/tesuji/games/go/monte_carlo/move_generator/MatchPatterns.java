@@ -31,7 +31,6 @@ public class MatchPatterns extends LadderMoveGenerator
 		administration = admin;
 		administration._explorationMoveSupport.addBoardModelListener(_patternMatcher);
 		administration.getBoardModel().addBoardModelListener(_patternMatcher);
-//		clear();		
     }
 	
 	public void clear()
@@ -50,27 +49,7 @@ public class MatchPatterns extends LadderMoveGenerator
 //	@Override
     public int generate()
     {
-//    	byte[] board = administration.getBoardArray();
-    	ProbabilityMap map = administration.getProbabilityMap();
 		update();
-//		ArrayList<PatternMatch> matchList = _patternMatcher.getDeletedMatchList();
-//		for (PatternMatch pm : matchList)
-//		{
-//			if (board[pm.getMoveXY(ColorConstant.BLACK)]==ColorConstant.EMPTY)
-//				map.subtract(pm.getMoveXY(ColorConstant.BLACK), pm.getUrgencyValue(ColorConstant.BLACK), ColorConstant.BLACK);
-//			if (board[pm.getMoveXY(ColorConstant.WHITE)]==ColorConstant.EMPTY)
-//				map.subtract(pm.getMoveXY(ColorConstant.WHITE), pm.getUrgencyValue(ColorConstant.WHITE), ColorConstant.WHITE);
-//		}
-//		matchList = _patternMatcher.getNewMatchList();
-//		for (PatternMatch pm : matchList)
-//		{
-//			if (board[pm.getMoveXY(ColorConstant.BLACK)]==ColorConstant.EMPTY)
-//				map.add(pm.getMoveXY(ColorConstant.BLACK), pm.getUrgencyValue(ColorConstant.BLACK), ColorConstant.BLACK);
-////				administration.addPriorityMove(pm.getXY(), pm.getUrgencyValue(ColorConstant.BLACK));
-//			if (board[pm.getMoveXY(ColorConstant.WHITE)]==ColorConstant.EMPTY)
-//				map.add(pm.getMoveXY(ColorConstant.WHITE), pm.getUrgencyValue(ColorConstant.WHITE), ColorConstant.WHITE);
-////				administration.addPriorityMove(pm.getXY(), pm.getUrgencyValue(ColorConstant.WHITE));
-//		}
 		return UNDEFINED_COORDINATE;
     }
     
@@ -116,22 +95,18 @@ public class MatchPatterns extends LadderMoveGenerator
 		for (int i=newMatchList.size(); --i>=0;)
 		{
 			PatternMatch pm = newMatchList.get(i);
-			boolean valid = ((board[pm.getMoveXY(ColorConstant.BLACK)]!=ColorConstant.EMPTY || isSafeToMove(pm.getMoveXY(ColorConstant.BLACK), ColorConstant.BLACK)) 
-							&& (board[pm.getMoveXY(ColorConstant.WHITE)]!=ColorConstant.EMPTY || isSafeToMove(pm.getMoveXY(ColorConstant.WHITE), ColorConstant.WHITE)));
+			boolean valid = true; /*((board[pm.getMoveXY(ColorConstant.BLACK)]!=ColorConstant.EMPTY || isSafeToMove(pm.getMoveXY(ColorConstant.BLACK), ColorConstant.BLACK)) 
+							&& (board[pm.getMoveXY(ColorConstant.WHITE)]!=ColorConstant.EMPTY || isSafeToMove(pm.getMoveXY(ColorConstant.WHITE), ColorConstant.WHITE)));*/
 			
 			if (board[pm.getMoveXY(ColorConstant.BLACK)]==ColorConstant.EMPTY)
 			{
 				if (valid)
 					map.add(pm.getMoveXY(ColorConstant.BLACK), pm.getUrgencyValue(ColorConstant.BLACK)*factor, ColorConstant.BLACK);
-				else
-					i=i;
 			}
 			if (board[pm.getMoveXY(ColorConstant.WHITE)]==ColorConstant.EMPTY)
 			{
 				if (valid)
 					map.add(pm.getMoveXY(ColorConstant.WHITE), pm.getUrgencyValue(ColorConstant.WHITE)*factor, ColorConstant.WHITE);
-				else
-					i=i;
 			}
 		}
 		for (int i=deletedMatchList.size(); --i>=0;)

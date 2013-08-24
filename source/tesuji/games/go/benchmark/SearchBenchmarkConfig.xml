@@ -31,6 +31,7 @@
 	<bean id="mctsGoAdministration" class="tesuji.games.go.monte_carlo.MonteCarloGoAdministration" singleton="false"/>
 	
 	<bean id="eyeMoveFilter" class="tesuji.games.go.monte_carlo.EyeMoveFilter" singleton="false"/>
+	<bean id="safetyFilter" class="tesuji.games.go.monte_carlo.SafetyFilter" singleton="false"/>
 	<bean id="fogOfWarFilter" class="tesuji.games.go.monte_carlo.FogOfWarFilter" singleton="false"/>
 	
 	<bean id="patternManager" class="tesuji.games.go.pattern.common.HibernatePatternManager" singleton="true">
@@ -70,6 +71,7 @@
 				<property name="simulationMoveFilterList">
 					<list>
 						<ref bean="eyeMoveFilter"/>
+						<ref bean="safetyFilter"/>
 					</list>
 				</property>
 				<property name="explorationMoveFilterList">
