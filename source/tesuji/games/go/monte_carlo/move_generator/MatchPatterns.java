@@ -90,13 +90,11 @@ public class MatchPatterns extends LadderMoveGenerator
 			}
 		}
 		double factor = 1.0;
-		if (GlobalParameters.isTestVersion())
-			factor = 0.1;
 		for (int i=newMatchList.size(); --i>=0;)
 		{
 			PatternMatch pm = newMatchList.get(i);
-			boolean valid = true; /*((board[pm.getMoveXY(ColorConstant.BLACK)]!=ColorConstant.EMPTY || isSafeToMove(pm.getMoveXY(ColorConstant.BLACK), ColorConstant.BLACK)) 
-							&& (board[pm.getMoveXY(ColorConstant.WHITE)]!=ColorConstant.EMPTY || isSafeToMove(pm.getMoveXY(ColorConstant.WHITE), ColorConstant.WHITE)));*/
+			boolean valid = ((board[pm.getMoveXY(ColorConstant.BLACK)]!=ColorConstant.EMPTY || isSafeToMove(pm.getMoveXY(ColorConstant.BLACK), ColorConstant.BLACK)) 
+							&& (board[pm.getMoveXY(ColorConstant.WHITE)]!=ColorConstant.EMPTY || isSafeToMove(pm.getMoveXY(ColorConstant.WHITE), ColorConstant.WHITE)));
 			
 			if (board[pm.getMoveXY(ColorConstant.BLACK)]==ColorConstant.EMPTY)
 			{

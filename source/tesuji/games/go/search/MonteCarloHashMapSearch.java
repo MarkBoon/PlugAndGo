@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 import org.cliffc.high_scale_lib.NonBlockingHashMapLong;
 
 import tesuji.core.util.ArrayStack;
+import tesuji.games.general.GlobalParameters;
 import tesuji.games.general.TreeNode;
 import tesuji.games.general.search.Search;
 import tesuji.games.general.search.SearchProperties;
@@ -139,6 +140,8 @@ public class MonteCarloHashMapSearch
 			_rootResult = _hashMap.get(checksum);
 			if (_rootResult==null)
 			{
+   				if (GlobalParameters.isTestVersion())
+   					((MonteCarloPluginAdministration)_monteCarloAdministration).selectSimulationMove(_monteCarloAdministration.getEmptyPoints());
 				_rootResult = SearchResultFactory.createMonteCarloHashMapResult();
 				_rootResult.setPointSet((MonteCarloPluginAdministration)_monteCarloAdministration);
 				_rootResult.setXY(GoConstant.PASS);
@@ -664,13 +667,15 @@ public class MonteCarloHashMapSearch
 	    		MonteCarloHashMapResult bestNode = _hashMap.get(checksum);
 	   			if (bestNode==null)
 	   			{
+	   				if (GlobalParameters.isTestVersion())
+	   					_searchAdministration.selectSimulationMove(_searchAdministration.getEmptyPoints());
 	   				bestNode = SearchResultFactory.createMonteCarloHashMapResult();
 	   				bestNode.setXY(xy);
 	   				bestNode.setColor(color);
 	   				bestNode.setAge(_searchAdministration.getMoveStack().getSize());
 	   				bestNode.setPointSet((MonteCarloPluginAdministration)_searchAdministration);
 	   				bestNode.setChecksum(checksum);
-
+	   				
 	   				if (_book!=null)
 	   				{
 	   					int mid = (_searchAdministration.getBoardSize()+1) / 2;

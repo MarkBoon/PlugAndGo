@@ -5,6 +5,7 @@ import static tesuji.games.general.ColorConstant.WHITE;
 import tesuji.core.util.MersenneTwisterFast;
 import tesuji.core.util.SynchronizedArrayStack;
 import tesuji.games.general.ColorConstant;
+import tesuji.games.general.GlobalParameters;
 import tesuji.games.general.search.SearchResult;
 import tesuji.games.go.common.GoConstant;
 import tesuji.games.go.common.GoMove;
@@ -14,6 +15,7 @@ import tesuji.games.go.monte_carlo.move_generator.MoveGenerator;
 import tesuji.games.go.util.GoArray;
 import tesuji.games.go.util.PointSet;
 import tesuji.games.go.util.PointSetFactory;
+import tesuji.games.go.util.ProbabilityMap;
 
 public class MonteCarloHashMapResult
 {
@@ -73,6 +75,9 @@ public class MonteCarloHashMapResult
 		assert(_emptyPoints.getSize()==0);
 		PointSet copy = PointSetFactory.createPointSet();
 		copy.copyFrom(administration.getEmptyPoints());
+		boolean isTestVersion = GlobalParameters.isTestVersion();
+		ProbabilityMap map = administration.getProbabilityMap();
+		byte colorToMove = administration.getColorToMove();
 		for (int size = copy.getSize(); size>0; size--)
 		{
 			int xy = copy.get(random.nextInt(size));
@@ -80,8 +85,24 @@ public class MonteCarloHashMapResult
 			if (administration.isLegal(xy) && !administration.isVerboten(xy))
 			{
 				_emptyPoints.add(xy);
-				_virtualPlayouts[xy] = 0.0f;
-				_virtualWins[xy] = 0.0f;
+				if (true || isTestVersion)
+				{
+					float weight = (float)map.getWeight(xy, colorToMove);
+					float factor = (float)Math.log(weight);
+					if (weight<1.0)
+						weight = 0.0f;
+					else
+						weight -= 1.0f;
+					if (factor<1)
+						factor = 1.0f;
+					_virtualPlayouts[xy] = weight/factor;
+					_virtualWins[xy] = weight;
+				}
+				else
+				{
+					_virtualPlayouts[xy] = 0.0f;
+					_virtualWins[xy] = 0.0f;
+				}
 			}
 		}
 		copy.recycle();

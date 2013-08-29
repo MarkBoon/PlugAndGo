@@ -46,7 +46,7 @@ import tesuji.games.go.common.GoEngine;
 
 public class GoEngineBeanHelper
 {
-	public static Hashtable<String, GoEngine> getGoEngineBeans(String initialXmlFile, String engineName)
+	public static Hashtable<String, GoEngine> getGoEngineBeans(String initialXmlFile, String ... engineName)
 		throws Exception
 	{
 		Logger logger = Logger.getRootLogger();
@@ -77,7 +77,7 @@ public class GoEngineBeanHelper
 				String[] beanNames = factory.getBeanDefinitionNames();
 				for (String bean : beanNames)
 				{
-					if (engineName==null || engineName.equals(bean))
+					if (engineName==null || containsName(engineName, bean))
 					{
 						try
 						{
@@ -122,6 +122,15 @@ public class GoEngineBeanHelper
 		
 		return engineList;
 	}
+	
+	private static boolean containsName(String[] names, String name)
+	{
+		for (String n : names)
+			if (n.equals(name))
+				return true;
+		return false;
+	}
+	
 	public static GoGameProperties getGoGameProperties(String xmlFile)
 		throws Exception
 	{

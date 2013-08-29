@@ -39,8 +39,8 @@ public class EngineTesterMain
 		Logger logger = Logger.getRootLogger();
 		logger.info("Start EngineTesterMain");
 		
-		String firstEngineName = "Bot1";
-		String secondEngineName = "Bot4";
+		String firstEngineName = "Bot3";
+		String secondEngineName = "Bot5";
 		
 		if (args.length==2)
 		{
@@ -53,14 +53,14 @@ public class EngineTesterMain
 
 		try
 		{
-			gameProperties = GoEngineBeanHelper.getGoGameProperties("source/tesuji/games/go/main/GoEngine.xml");
+			gameProperties = GoEngineBeanHelper.getGoGameProperties("source/tesuji/games/go/main/TreeSearchEngine.xml");
 			if (gameProperties==null)
 			{
 				System.err.println("Couldn't instantiate GoGameProperties");
 				System.exit(-1);
 			}
 			
-			engineList = GoEngineBeanHelper.getGoEngineBeans("source/tesuji/games/go/main/GoEngine.xml",null);
+			engineList = GoEngineBeanHelper.getGoEngineBeans("source/tesuji/games/go/main/TreeSearchEngine.xml",firstEngineName,secondEngineName);
 			
 			engine1 = engineList.get(firstEngineName);
 			engine2 = engineList.get(secondEngineName);

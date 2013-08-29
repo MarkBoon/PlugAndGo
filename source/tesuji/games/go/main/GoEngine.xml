@@ -54,24 +54,17 @@
 						</property>
 						<property name="simulationMoveGeneratorList">
 							<list>
-								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"><property name="weight"><value>5000</value></property><property name="checkHistory"><value>false</value></property></bean>
-								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"><property name="weight"><value>4000</value></property><property name="checkHistory"><value>false</value></property></bean>
-								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"><property name="weight"><value>3000</value></property><property name="checkHistory"><value>false</value></property></bean>
+								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"><property name="weight"><value>1000</value></property><property name="checkHistory"><value>false</value></property></bean>
+								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"><property name="weight"><value>800</value></property><property name="checkHistory"><value>false</value></property></bean>
+								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"><property name="weight"><value>600</value></property><property name="checkHistory"><value>false</value></property></bean>
 								<ref bean="patternMatcher"/>
 							</list>
 						</property>
 						<property name="explorationMoveGeneratorList">
 							<list>
-								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"><property name="urgency"><value>10</value></property></bean>
-								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"><property name="urgency"><value>8</value></property></bean>
-								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"><property name="urgency"><value>6</value></property></bean>
-								<!--<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"><property name="urgency"><value>5</value></property></bean>
-								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"><property name="urgency"><value>5</value></property></bean>
-								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"><property name="urgency"><value>5</value></property></bean>
-								<bean class="tesuji.games.go.monte_carlo.move_generator.Cut" singleton="false"><property name="urgency"><value>5</value></property></bean>
-								<bean class="tesuji.games.go.monte_carlo.move_generator.Connect" singleton="false"><property name="urgency"><value>5</value></property></bean>
-								<bean class="tesuji.games.go.monte_carlo.move_generator.KeimaBlock" singleton="false"><property name="urgency"><value>5</value></property></bean> -->
-								<!--<bean class="tesuji.games.go.monte_carlo.move_generator.GlobalTactics" singleton="false"><property name="urgency"><value>5</value></property></bean>-->
+								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateAtariEscape" singleton="false"><property name="urgency"><value>1000</value></property></bean>
+								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateCapture" singleton="false"><property name="urgency"><value>800</value></property></bean>
+								<bean class="tesuji.games.go.monte_carlo.move_generator.ImmediateLadder" singleton="false"><property name="urgency"><value>600</value></property></bean>
 							</list>
 						</property>
 				  	</bean>
@@ -83,7 +76,7 @@
 		  			<value>1</value>
 		  		</property>
 		  		<property name="minimumNrNodes">
-		  			<value>20000</value>
+		  			<value>10000</value>
 		  		</property>
 		  		<property name="useAMAF">
 		  			<value>true</value>
@@ -97,7 +90,7 @@
 			</bean>
   		</constructor-arg>
   		<property name="isTestVersion">
-  			<value>false</value>
+  			<value>true</value>
   		</property>
   	</bean>
 
@@ -128,7 +121,7 @@
 		  			<value>1</value>
 		  		</property>
 		  		<property name="minimumNrNodes">
-		  			<value>20000</value>
+		  			<value>10000</value>
 		  		</property>
 		  		<property name="useAMAF">
 		  			<value>true</value>
@@ -223,7 +216,7 @@
 		  			<value>1</value>
 		  		</property>
 		  		<property name="minimumNrNodes">
-		  			<value>20000</value>
+		  			<value>10000</value>
 		  		</property>
 		  		<property name="useAMAF">
 		  			<value>true</value>

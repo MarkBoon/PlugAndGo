@@ -1043,7 +1043,7 @@ public class MonteCarloPluginAdministration
 	 * 
 	 * @return the selected move
 	 */
-	protected int selectSimulationMove(PointSet emptyPoints)
+	public int selectSimulationMove(PointSet emptyPoints)
 	{
 		int priorityMove = selectPriorityMove(_simulationMoveGeneratorList);
 		//if (priorityMove!=UNDEFINED_COORDINATE && priorityMove!=PASS && isLegal(priorityMove))

@@ -105,9 +105,6 @@
 		<property name="nrSimulationsBeforeExpansion">
 			<value>64</value>
 		</property>
-		<property name="isTestVersion">
-			<value>false</value>
-		</property>
 	</bean>
  	
 	<bean id="MonteCarloHashmapSearch" class="tesuji.games.go.search.MonteCarloHashMapSearch" singleton="false">
