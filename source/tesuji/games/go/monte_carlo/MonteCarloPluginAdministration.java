@@ -284,6 +284,8 @@ public class MonteCarloPluginAdministration
 		_boardMarker = new BoardMarker();
 		
 		_probabilityMap = new ProbabilityMap(RANDOM);
+		
+		setBoardSize(_boardSize);
 	}
 
 	public MonteCarloPluginAdministration(int boardSize)

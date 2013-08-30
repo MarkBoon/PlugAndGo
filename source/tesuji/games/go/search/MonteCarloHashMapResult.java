@@ -2,6 +2,9 @@ package tesuji.games.go.search;
 
 import static tesuji.games.general.ColorConstant.BLACK;
 import static tesuji.games.general.ColorConstant.WHITE;
+
+import java.util.Arrays;
+
 import tesuji.core.util.MersenneTwisterFast;
 import tesuji.core.util.SynchronizedArrayStack;
 import tesuji.games.general.ColorConstant;
@@ -120,6 +123,26 @@ public class MonteCarloHashMapResult
 				increaseVirtualPlayouts(xy, generator.getUrgency(), generator.getUrgency());
 		}
 		assert(_emptyPoints.freeze());
+	}
+	
+	public void copyDataFrom(MonteCarloHashMapResult source)
+	{
+		_xy = source._xy;
+		_color = source._color;
+		_totalPlayouts = source._totalPlayouts;
+		_wins = Arrays.copyOf(source._wins, source._wins.length);
+		_playouts = Arrays.copyOf(source._playouts, source._playouts.length);
+		_virtualWins = Arrays.copyOf(source._virtualWins, source._virtualWins.length);
+		_virtualPlayouts = Arrays.copyOf(source._virtualPlayouts, source._virtualPlayouts.length);
+		_emptyPoints.copyFrom(source._emptyPoints);
+		_logNrPlayouts = source._logNrPlayouts;
+		_beta = source._beta;
+		_age = source._age;
+		_checksum = source._checksum;
+		_bestMove = source._bestMove;
+		_bestResult = source._bestResult;
+		usedLastBest = source.usedLastBest;
+		_boardSize = source._boardSize;
 	}
 	
 	protected void init()

@@ -73,6 +73,9 @@ public class MonteCarloHashMapSearch
 	Point p = new Point();
 	
 	private MCBook _book;
+
+	MCBoardController controller;
+	MCBoardDisplay display;
 	
 	public MonteCarloHashMapSearch()
 	{	
@@ -88,6 +91,10 @@ public class MonteCarloHashMapSearch
 	
 	public void setMonteCarloAdministration(MonteCarloAdministration<GoMove> administration)
 	{
+		controller = new MCBoardController((MonteCarloPluginAdministration)administration, getHashMap());
+		display = new MCBoardDisplay(controller);
+		Console.getSingleton().addExtraDataPanel(display);
+
 		_monteCarloAdministration = administration;
 		initRoot();
 	}
@@ -307,6 +314,7 @@ public class MonteCarloHashMapSearch
 		_logger.info("Nr root visits "+_rootResult.getPlayouts());
 		_logger.info(""+((double)_nrPlayouts/(double)(time3-time0))+" kpos/sec");
 		
+		display.update();
 /*		JFrame window = new JFrame();					
 		MCBoardController controller = new MCBoardController(getAdministration(), getHashMap());
 		MCBoardDisplay display = new MCBoardDisplay(controller);

@@ -28,6 +28,7 @@ package tesuji.games.util;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -63,6 +64,7 @@ public class Console
 	private Appender _logAppender;
 	private JScrollPane _scrollPane;
 	private JPanel _dataPanel;
+	private JComponent _extraDataPanel;
 	private boolean isDataPanelInitialized = false;
 	
 	private static Console _singleton;
@@ -172,10 +174,22 @@ public class Console
 		if (!isDataPanelInitialized)
 		{
 			isDataPanelInitialized = true;
-			_dataPanel.add(dataPanel, BorderLayout.CENTER);
-			_dataPanel.add(selectorPanel, BorderLayout.SOUTH);
+			if (_extraDataPanel!=null)
+			{
+				_dataPanel.setLayout(new GridLayout(1, 2));
+				_dataPanel.add(dataPanel);
+				_dataPanel.add(_extraDataPanel);
+			}
+			else
+				_dataPanel.add(dataPanel, BorderLayout.CENTER);
+			//_dataPanel.add(selectorPanel, BorderLayout.SOUTH);
 			getWindow().validate();
 		}
+	}
+	
+	public void addExtraDataPanel(JComponent dataPanel)
+	{
+		_extraDataPanel = dataPanel;
 	}
 	
 	public void setTitle(String title)

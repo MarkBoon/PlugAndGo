@@ -38,6 +38,7 @@ import java.awt.event.MouseEvent;
 import org.apache.log4j.Logger;
 
 import tesuji.games.go.search.MonteCarloHashMapResult;
+import tesuji.games.go.search.SearchResultFactory;
 import tesuji.games.go.util.GoArray;
 import tesuji.games.model.BoardModel;
 
@@ -74,6 +75,7 @@ public class MCBoardDisplay
 	public MCBoardDisplay(MCBoardController controller)
 	{
 		_controller = controller;
+		_result = SearchResultFactory.createMonteCarloHashMapResult();
 		requestFocus();
 		
 		addMouseListener(new MouseAdapter()
@@ -138,6 +140,11 @@ public class MCBoardDisplay
 		}
 		requestFocus();
 	}
+	
+	public void update()
+	{
+		updateAll(getGraphics());
+	}
    
     /**
      * @see javax.swing.JComponent#paint(java.awt.Graphics)
@@ -152,7 +159,11 @@ public class MCBoardDisplay
     
 	private void updateAll(Graphics g)
 	{
-		_result = _controller.getResult();
+		if (g==null)
+			return;
+
+		if (_controller.getResult()!=null)
+			_result.copyDataFrom(_controller.getResult());
 		g.setColor(BOARD_COLOR)	;
 		g.fill3DRect(offsetX,offsetY,pointSize*boardSize,pointSize*boardSize,true);
 		

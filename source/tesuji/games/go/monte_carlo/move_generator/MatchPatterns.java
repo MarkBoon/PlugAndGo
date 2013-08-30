@@ -3,7 +3,6 @@ package tesuji.games.go.monte_carlo.move_generator;
 import static tesuji.games.go.common.GoConstant.UNDEFINED_COORDINATE;
 import tesuji.core.util.ArrayList;
 import tesuji.games.general.ColorConstant;
-import tesuji.games.general.GlobalParameters;
 import tesuji.games.go.monte_carlo.MonteCarloPluginAdministration;
 import tesuji.games.go.pattern.common.PatternManager;
 import tesuji.games.go.pattern.incremental.IncrementalPatternMatcher;
@@ -31,6 +30,7 @@ public class MatchPatterns extends LadderMoveGenerator
 		administration = admin;
 		administration._explorationMoveSupport.addBoardModelListener(_patternMatcher);
 		administration.getBoardModel().addBoardModelListener(_patternMatcher);
+		_patternMatcher.setBoardSize(administration.getBoardSize());
     }
 	
 	public void clear()
