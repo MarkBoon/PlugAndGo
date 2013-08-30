@@ -343,9 +343,12 @@ public class MonteCarloHashMapSearch
 //		_logger.info("Second-best: "+secondBestNode.getContent());
 		if (xy==GoConstant.PASS)
 			_logger.info("PASS!");
-		_lastScore = _rootResult.getWinRatio(xy);
-		if (_lastScore<0.05)
-			return GoMoveFactory.getSingleton().createResignMove(_monteCarloAdministration.getColorToMove());
+		else
+		{
+			_lastScore = _rootResult.getWinRatio(xy);
+			if (_lastScore<0.05)
+				return GoMoveFactory.getSingleton().createResignMove(_monteCarloAdministration.getColorToMove());
+		}
 		
 		assert _monteCarloAdministration.isConsistent() : "Inconsistent Monte-Carlo administration at the end of the search.";
 
