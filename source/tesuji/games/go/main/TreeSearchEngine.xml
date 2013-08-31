@@ -199,6 +199,9 @@
 				</property>-->
 			</bean>
   		</constructor-arg>
+  		<property name="isTestVersion">
+  			<value>true</value>
+  		</property>
   	</bean>
 
 	<bean id="Bot4" class="tesuji.games.go.engine.TreeSearchEngine" singleton="false">
@@ -287,7 +290,7 @@
 			</bean>
   		</constructor-arg>
   		<property name="isTestVersion">
-  			<value>false</value>
+  			<value>true</value>
   		</property>
   	</bean>
 

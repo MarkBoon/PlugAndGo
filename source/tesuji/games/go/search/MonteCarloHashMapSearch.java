@@ -76,6 +76,7 @@ public class MonteCarloHashMapSearch
 
 	MCBoardController controller;
 	MCBoardDisplay display;
+	JFrame dataWindow;
 	
 	public MonteCarloHashMapSearch()
 	{	
@@ -93,7 +94,12 @@ public class MonteCarloHashMapSearch
 	{
 		controller = new MCBoardController((MonteCarloPluginAdministration)administration, getHashMap());
 		display = new MCBoardDisplay(controller);
-		Console.getSingleton().addExtraDataPanel(display);
+		dataWindow = new JFrame();					
+		java.awt.Point p = Console.getSingleton().getDataPanel().getLocation();
+		Dimension d = Console.getSingleton().getDataPanel().getSize();
+		dataWindow.setLocation(p.x+d.width+20, p.y);
+		dataWindow.setSize(300, 300);
+		dataWindow.getContentPane().add(display);
 
 		_monteCarloAdministration = administration;
 		initRoot();
@@ -147,8 +153,6 @@ public class MonteCarloHashMapSearch
 			_rootResult = _hashMap.get(checksum);
 			if (_rootResult==null)
 			{
-   				if (GlobalParameters.isTestVersion())
-   					((MonteCarloPluginAdministration)_monteCarloAdministration).selectSimulationMove(_monteCarloAdministration.getEmptyPoints());
 				_rootResult = SearchResultFactory.createMonteCarloHashMapResult();
 				_rootResult.setPointSet((MonteCarloPluginAdministration)_monteCarloAdministration);
 				_rootResult.setXY(GoConstant.PASS);
@@ -241,6 +245,16 @@ public class MonteCarloHashMapSearch
 		_searchProperties.setIntProperty(SearchProperties.NR_PROCESSORS,_nrThreads);
     }
 
+    public void updateStats()
+    {
+		if (GlobalParameters.isTestVersion())
+		{
+			controller.init((MonteCarloPluginAdministration)_monteCarloAdministration, _hashMap);
+			display.update();
+			dataWindow.setVisible(true);
+		}
+    }
+
 //	@Override
     public GoMove doSearch(byte startColor) throws Exception
     {
@@ -257,6 +271,8 @@ public class MonteCarloHashMapSearch
 		_nrGeneratedMoves++;
 
 		initRoot();
+
+		updateStats();
 
 		long time1 = System.currentTimeMillis();
 		long time2;
@@ -313,8 +329,9 @@ public class MonteCarloHashMapSearch
 		_logger.info("Nr sets "+_nrSets);
 		_logger.info("Nr root visits "+_rootResult.getPlayouts());
 		_logger.info(""+((double)_nrPlayouts/(double)(time3-time0))+" kpos/sec");
-		
-		display.update();
+				
+		updateStats();
+
 /*		JFrame window = new JFrame();					
 		MCBoardController controller = new MCBoardController(getAdministration(), getHashMap());
 		MCBoardDisplay display = new MCBoardDisplay(controller);
@@ -678,8 +695,6 @@ public class MonteCarloHashMapSearch
 	    		MonteCarloHashMapResult bestNode = _hashMap.get(checksum);
 	   			if (bestNode==null)
 	   			{
-	   				if (GlobalParameters.isTestVersion())
-	   					_searchAdministration.selectSimulationMove(_searchAdministration.getEmptyPoints());
 	   				bestNode = SearchResultFactory.createMonteCarloHashMapResult();
 	   				bestNode.setXY(xy);
 	   				bestNode.setColor(color);

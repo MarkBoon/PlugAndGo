@@ -18,6 +18,11 @@ public class MCBoardController
 	
 	public MCBoardController(MonteCarloPluginAdministration mcAdministration, NonBlockingHashMapLong<MonteCarloHashMapResult> hashMap)
 	{
+		init(mcAdministration,hashMap);
+	}
+	
+	public void init(MonteCarloPluginAdministration mcAdministration, NonBlockingHashMapLong<MonteCarloHashMapResult> hashMap)
+	{
 		_initialMCAdministration = (MonteCarloPluginAdministration)mcAdministration.createClone();
 		_mcAdministration = (MonteCarloPluginAdministration)_initialMCAdministration.createClone();
 		_hashMap = hashMap;
